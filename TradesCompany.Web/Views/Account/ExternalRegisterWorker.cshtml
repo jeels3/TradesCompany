@@ -1,0 +1,39 @@
+﻿@model TradesCompany.Web.ViewModel.ExternalRegisterWorkerViewModel
+
+@{
+    ViewData["Title"] = "Complete Worker Registration";
+}
+<link rel="stylesheet" href="~/css/registerpage.css" />
+
+<div class="register-container">
+    <div class="form-section">
+        <div class="form-wrapper">
+            <h2>Complete Worker Registration</h2>
+
+            <form asp-action="ExternalRegisterWorker" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <input type="hidden" asp-for="Email" />
+                <input type="hidden" asp-for="UserName" />
+                <input type="hidden" asp-for="Role" />
+
+                <div class="form-group">
+                    <label asp-for="ServiceType">Service Type</label>
+                    <input asp-for="ServiceType" class="form-control" placeholder="e.g. Plumbing, Electrician" />
+                    <span asp-validation-for="ServiceType" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn-submit">Complete Registration</button>
+            </form>
+
+            <div class="signin-link">
+                Already completed registration? <a href="/Account/Login">Sign In</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="image-section"></div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

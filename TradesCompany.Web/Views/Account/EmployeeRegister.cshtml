@@ -1,0 +1,94 @@
+﻿@model TradesCompany.Web.ViewModel.RegisterViewModel
+
+@{
+    ViewBag.Title = "Register";
+}
+
+<link rel="stylesheet" href="~/css/registerpage.css" />
+
+<div class="register-container">
+    <div class="form-section">
+        <div class="form-wrapper">
+            <h2>Get Started Now</h2>
+
+            <form method="post">
+
+                <span asp-validation-summary="RegistrationError" class="text-danger mb-3"></span>
+
+                <div class="form-group">
+                    <label asp-for="UserName">Name</label>
+                    <input asp-for="UserName" class="form-control" placeholder="Enter your name" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Email">Email address</label>
+                    <input asp-for="Email" class="form-control" placeholder="Enter your email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Password">Password</label>
+                    <input asp-for="Password" class="form-control" placeholder="Enter your password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="ConfirmPassword">Confirm Password</label>
+                    <input asp-for="ConfirmPassword" class="form-control" placeholder="Enter your Confirm Password" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                
+
+                <div class="checkbox">
+                    <input type="checkbox" required style="margin-right: 8px;" />
+                    <label>I agree to the <a href="#">terms & policy</a></label>
+                </div>
+
+                <button type="submit" class="btn-submit">Signup</button>
+            </form>
+
+            <div class="divider">or</div>
+
+            @if (Model.ExternalLogins?.Any() == true)
+            {
+                var google = Model.ExternalLogins.FirstOrDefault(e => e.Name == "Google");
+                if (google != null)
+                {
+                    <button type="button"
+                            class="google-btn"
+                            data-url="@Url.Action("ExternalLogin", "Account", new { provider = google.Name, returnUrl = "/", role = "Employee" })"
+                            data-provider="@google.Name">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
+                        Sign in with Google
+                    </button>
+                }
+            }
+
+            <div class="signin-link">
+                Have an account? <a href="/Account/Login">Sign In</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="image-section">
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.google-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const url = this.getAttribute('data-url');
+                const popup = window.open(url, '_blank', 'width=500,height=600');
+                const poll = setInterval(() => {
+                    if (popup.closed) {
+                        clearInterval(poll);
+                        window.location.reload();
+                    }
+                }, 500);
+            });
+        });
+    </script>
+}

@@ -1,0 +1,268 @@
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System.Data;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using TradesCompany.Web.ViewModel;
+
+namespace TradesCompany.Web.Controllers
+{
+    public class AccountController : Controller
+    {
+       private readonly  UserManager<IdentityUser> _userManager;
+       private readonly SignInManager<IdentityUser> _signInManager;
+       private readonly RoleManager<IdentityRole> _roleManager;
+
+        public AccountController(UserManager<IdentityUser> userManager,
+            SignInManager<IdentityUser> signInManager,
+            RoleManager<IdentityRole> roleManager
+            )
+        {
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _roleManager = roleManager;
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> CustomerRegister()
+        {
+            RegisterViewModel model = new RegisterViewModel
+            {
+                ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
+            };
+            return View(model);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> EmployeeRegister()
+        {
+            RegisterViewModel model = new RegisterViewModel
+            {
+                ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> CustomerRegister(RegisterViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = new IdentityUser
+                {
+                    UserName = model.UserName,
+                    Email = model.Email
+                };
+
+                var result = await _userManager.CreateAsync(user, model.Password);
+
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(user, "USER");
+                    return RedirectToAction("Dashboard","User");
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("RegistrationError", error.Description);
+                }
+            }
+            return View(model);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> Login(string? ReturnUrl = null)
+        {
+            LoginViewModel model = new LoginViewModel
+            {
+                ReturnUrl = ReturnUrl,
+                ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginViewModel model, string? ReturnUrl)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+
+                if (result.Succeeded)
+                {
+                    if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+                    {
+                        return Redirect(ReturnUrl);
+                    }
+
+                    return RedirectToAction(nameof(HomeController.Index), "Home");
+                }
+                if (result.RequiresTwoFactor)
+                {
+                    // Handle two-factor authentication case
+                }
+                if (result.IsLockedOut)
+                {
+                    // Handle lockout scenario
+                }
+                else
+                {
+                    model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+                    ModelState.AddModelError("LoginError", "Invalid login attempt.");
+                    return View(model);
+                }
+            }
+            model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            return View(model);
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> IsEmailAvailable(string Email)
+        {
+            //Check If the Email Id is Already in the Database
+            var user = await _userManager.FindByEmailAsync(Email);
+
+            if (user == null)
+            {
+                return Json(true);
+            }
+            else
+            {
+                return Json($"Email {Email} is already in use.");
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult ExternalLogin(string provider, string returnUrl , string role)
+        {
+            var redirectUrl = Url.Action(
+                action: "ExternalLoginCallback",
+                controller: "Account",           
+                values: new { ReturnUrl = returnUrl , role} 
+            );
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            return new ChallengeResult(provider, properties);
+        }
+
+        [AllowAnonymous]
+        public async Task<IActionResult> ExternalLoginCallback(string? returnUrl, string? remoteError, string? role)
+        {
+            returnUrl ??= Url.Content("~/");
+
+            if (remoteError != null)
+                return Content($"<script>alert('Error from external provider: {remoteError}'); window.close();</script>", "text/html");
+
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+                return Content($"<script>alert('Error loading external login info.'); window.close();</script>", "text/html");
+
+            var signInResult = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+
+            if (signInResult.Succeeded)
+            {
+                return RedirectToAction("Dashboard", "User");
+                return Content($"<script>window.opener.location.href = '{returnUrl}'; window.close();</script>", "text/html");
+            }
+
+            if (signInResult.IsLockedOut)
+                return Content($"<script>alert('Your account is locked out.'); window.close();</script>", "text/html");
+
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            var name = info.Principal.FindFirstValue(ClaimTypes.GivenName) ?? info.Principal.Identity.Name;
+
+            if (email == null)
+                return Content($"<script>alert('Email claim not received.'); window.close();</script>", "text/html");
+
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                if (role == "Employee")
+                {
+                    var model = new ExternalRegisterWorkerViewModel
+                    {
+                        Email = email,
+                        UserName = name,
+                        Role = "Employee"
+                    };
+                    return View("ExternalRegisterWorker", model);
+                }
+                else
+                {
+                    user = new IdentityUser
+                    {
+                        Email = email,
+                        UserName = name
+                    };
+
+                    var createResult = await _userManager.CreateAsync(user);
+                    if (!createResult.Succeeded)
+                        return Content($"<script>alert('Error: {string.Join(", ", createResult.Errors.Select(e => e.Description))}'); window.close();</script>", "text/html");
+
+                    await _userManager.AddLoginAsync(user, info);
+                    await _userManager.AddToRoleAsync(user,role);
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    return RedirectToAction("Dashboard", "User");
+                    return Content($"<script>window.opener.location.href = '{returnUrl}'; window.close();</script>", "text/html");
+                }
+            }
+            else
+            {
+                // user exists but not linked to Google
+                await _userManager.AddLoginAsync(user, info);
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                return Content($"<script>window.opener.location.href = '{returnUrl}'; window.close();</script>", "text/html");
+            }
+        }
+
+        public IActionResult ExternalRegisterWorker()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> ExternalRegisterWorker(ExternalRegisterWorkerViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                return Content("<script>alert('External login info not found.'); window.close();</script>", "text/html");
+            }
+
+            var user = new IdentityUser
+            {
+                UserName = model.UserName,
+                Email = model.Email,
+            };
+
+            var result = await _userManager.CreateAsync(user);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                return View(model);
+            }
+
+            await _userManager.AddLoginAsync(user, info);
+            await _userManager.AddToRoleAsync(user, model.Role);
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
+            return Content("<script>window.opener.location.href = '/'; window.close();</script>", "text/html");
+        }
+    }
+}

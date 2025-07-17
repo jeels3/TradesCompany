@@ -1,0 +1,82 @@
+﻿@model TradesCompany.Web.ViewModel.LoginViewModel;
+
+<div class="row">
+    <div class="col-md-6">
+        <h1>Local Account Login</h1>
+        <hr />
+        <form method="post" asp-action="Login" asp-controller="Account">
+            <input type="hidden" name="ReturnUrl" value="@Model.ReturnUrl" />
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Email"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label asp-for="RememberMe">
+                        <input asp-for="RememberMe" />
+                        @Html.DisplayNameFor(m => m.RememberMe)
+                    </label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+    </div>
+    <div class="col-md-6">
+        <h1>External Login</h1>
+        <hr />
+        @if (Model.ExternalLogins == null || Model.ExternalLogins.Count == 0)
+        {
+            <div>No external logins configured</div>
+        }
+        else
+        {
+            <div>
+                @foreach (var provider in Model.ExternalLogins)
+                {
+                    <button type="button" class="btn btn-primary external-login-btn"
+                            data-provider="@provider.Name"
+                            data-url="@Url.Action("ExternalLogin", "Account", new { provider = provider.Name, returnUrl = Model.ReturnUrl })"
+                            title="Log in using your @provider.DisplayName account">
+                        @provider.DisplayName
+                    </button>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        document.querySelectorAll('.external-login-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                var provider = this.getAttribute('data-provider');
+                var url = this.getAttribute('data-url');
+
+                // Define popup window size
+                var width = 500;
+                var height = 600;
+                var left = (window.innerWidth / 2) - (width / 2);
+                var top = (window.innerHeight / 2) - (height / 2);
+
+                // Open the popup window
+                var popup = window.open(url, provider, `width=${width},height=${height},top=${top},left=${left},resizable=yes`);
+
+                // Monitor the popup to check if it closes
+                var checkPopup = setInterval(function () {
+                    if (popup.closed) {
+                        clearInterval(checkPopup);
+                        // Optionally, reload or fetch updated user state
+                        location.reload(); // Refresh the parent window to reflect login state
+                    }
+                }, 500); // Check every 500ms if the popup is closed
+            });
+        });
+    </script>
+}
