@@ -6,4 +6,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TradesCompany.Domain\TradesCompany.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Settings\" />
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 </Project>

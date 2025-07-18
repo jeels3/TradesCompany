@@ -39,7 +39,7 @@ namespace TradesCompany.Web.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> EmployeeRegister()
         {
-            RegisterViewModel model = new RegisterViewModel
+            EmployeeRegisterViewModel model = new EmployeeRegisterViewModel
             {
                 ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
             };
@@ -62,8 +62,36 @@ namespace TradesCompany.Web.Controllers
 
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, "USER");
+                    await _userManager.AddToRoleAsync(user, model.Role);
                     return RedirectToAction("Dashboard","User");
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("RegistrationError", error.Description);
+                }
+            }
+            return View(model);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> EmployeeRegister(EmployeeRegisterViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = new IdentityUser
+                {
+                    UserName = model.UserName,
+                    Email = model.Email
+                };
+
+                var result = await _userManager.CreateAsync(user, model.Password);
+
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(user, model.Role);
+                    return RedirectToAction("Dashboard", "Employee");
                 }
 
                 foreach (var error in result.Errors)
@@ -87,20 +115,32 @@ namespace TradesCompany.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model, string? ReturnUrl)
+        [AllowAnonymous]
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    ModelState.AddModelError("", "Invalid login attempt.");
+                    return View(model);
+                }
+
+                var result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
 
                 if (result.Succeeded)
                 {
-                    if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+                    var roles = await _userManager.GetRolesAsync(user);
+                    if (roles.Contains("Employee"))
                     {
-                        return Redirect(ReturnUrl);
+                        return RedirectToAction("Dashboard", "Employee");
                     }
-
-                    return RedirectToAction(nameof(HomeController.Index), "Home");
+                    else if (roles.Contains("User"))
+                    {
+                        return RedirectToAction("Dashboard", "User");
+                    }
+                    //return RedirectToAction(nameof(HomeController.Index), "Home");
                 }
                 if (result.RequiresTwoFactor)
                 {
@@ -112,12 +152,13 @@ namespace TradesCompany.Web.Controllers
                 }
                 else
                 {
-                    model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-                    ModelState.AddModelError("LoginError", "Invalid login attempt.");
+                    // Handle failure
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                     return View(model);
                 }
             }
-            model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+            // If we got this far, something failed, redisplay form
             return View(model);
         }
 
@@ -261,8 +302,8 @@ namespace TradesCompany.Web.Controllers
             await _userManager.AddLoginAsync(user, info);
             await _userManager.AddToRoleAsync(user, model.Role);
             await _signInManager.SignInAsync(user, isPersistent: false);
-
-            return Content("<script>window.opener.location.href = '/'; window.close();</script>", "text/html");
+            // add into service type
+            return RedirectToAction("Dashboard", "Employee");
         }
     }
 }

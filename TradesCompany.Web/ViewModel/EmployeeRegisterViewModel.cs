@@ -4,12 +4,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TradesCompany.Web.ViewModel
 {
-    public class RegisterViewModel
+    public class EmployeeRegisterViewModel
     {
         [Required(ErrorMessage = "User Name is Required")]
         [Display(Name = "User Name")]
         public string UserName { get; set; }
-        
+
         [Required]
         [EmailAddress]
         [Remote(action: "IsEmailAvailable", controller: "Account")]
@@ -21,7 +21,9 @@ namespace TradesCompany.Web.ViewModel
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "Password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
-        public string Role { get; set; } = "User";
+        public string Role { get; set; } = "Employee"; // Default role for employees
+        [Required(ErrorMessage = "Service Type is Required")]
+        public string ServiceType { get; set; }
         public IList<AuthenticationScheme>? ExternalLogins { get; set; }
     }
 }
