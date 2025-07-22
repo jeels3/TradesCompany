@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using TradesCompany.Domain.Entities;
 
 namespace TradesCompany.Web.ViewModel
 {
@@ -23,7 +24,8 @@ namespace TradesCompany.Web.ViewModel
         public string ConfirmPassword { get; set; }
         public string Role { get; set; } = "Employee"; // Default role for employees
         [Required(ErrorMessage = "Service Type is Required")]
-        public string ServiceType { get; set; }
+        public int ServiceTypeId { get; set; }
+        public List<ServiceType>? ServiceTypes { get; set; }
         public IList<AuthenticationScheme>? ExternalLogins { get; set; }
     }
 }

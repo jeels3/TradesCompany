@@ -22,7 +22,7 @@
         </button>
 
         <div class="ms-auto d-flex align-items-center gap-3">
-            <a href="#" class="text-dark"><i class="bi bi-bell fs-5"></i></a>
+            <a asp-action="Notification" asp-controller="Employee" class="text-dark"><i class="bi bi-bell fs-5"></i></a>
             <a href="#" class="text-dark"><i class="bi bi-person-circle fs-5"></i></a>
         </div>
     </nav>
@@ -34,8 +34,7 @@
             <div class="col-lg-2 sidebar d-none d-lg-block" id="sidebar">
                 <div class="menu-title">Main Menu</div>
                 <a href="/Employee/Dashboard"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
-                <a asp-action="ServiceRequests" asp-controller="Employee"><i class="bi bi-person me-2"></i>All Booking</a>
-
+                <a asp-action="AllQuotation" asp-controller="Employee"><i class="bi bi-person me-2"></i>My Quotation</a>
                 <div class="menu-title">Actions</div>
                 <a href="/Employee/Tasks"><i class="bi bi-list-check me-2"></i>Tasks</a>
                 <a href="/Employee/Settings"><i class="bi bi-gear me-2"></i>Settings</a>
@@ -55,5 +54,9 @@
             document.getElementById("sidebar")?.classList.toggle("active");
         });
     </script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

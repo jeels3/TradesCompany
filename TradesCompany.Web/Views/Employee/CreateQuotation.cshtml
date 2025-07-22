@@ -1,0 +1,39 @@
+﻿@model TradesCompany.Web.ViewModel.QuotationViewModel;
+@{
+    Layout = "~/Views/Shared/Layouts/_EmployeeLayout.cshtml";
+}
+
+<div class="register-container">
+    <div class="form-section">
+        <div class="form-wrapper">
+            <h2>Get Started Now</h2>
+
+            <form method="post" asp-action="CreateQuotation" asp-controller="Employee">
+
+                <span asp-validation-summary="RegistrationError" class="text-danger mb-3"></span>
+
+                <div class="form-group">
+                    <label asp-for="Title">Title</label>
+                    <input asp-for="Title" class="form-control" placeholder="Enter your Title" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Description">Description</label>
+                    <input asp-for="Description" class="form-control" placeholder="Enter your Description" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <input asp-for="BookingId" type="hidden" />
+
+                <div class="form-group">
+                    <label asp-for="Price">Price</label>
+                    <input asp-for="Price" class="form-control" placeholder="Enter your Price"/>
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn-submit">Send Quotation</button>
+            </form>
+        </div>
+    </div>
+    </div>
+</div>

@@ -128,6 +128,136 @@ namespace TradesCompany.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("TradesCompany.Application.DTOs.QuotationByServicerMan", b =>
+                {
+                    b.Property<string>("CustomerName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ServiceName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WorkDetails")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("customerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("quotationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("userId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable("QuotationByServicerMan");
+                });
+
+            modelBuilder.Entity("TradesCompany.Application.DTOs.QuotationByUser", b =>
+                {
+                    b.Property<decimal?>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ServiceManEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ServiceName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ServicemanName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WorkDetails")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("quotationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("userId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable("QuotationByUser");
+                });
+
+            modelBuilder.Entity("TradesCompany.Application.DTOs.ScheduleServiceByUser", b =>
+                {
+                    b.Property<DateTime?>("ScheduleAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ServiceMan")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ServiceManEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ServiceManUserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ServiceName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("WorkDetails")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable("ScheduleServiceByUser");
+                });
+
+            modelBuilder.Entity("TradesCompany.Application.DTOs.ServiceManByServiceType", b =>
+                {
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Feedback")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ServiceName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double?>("ratings")
+                        .HasColumnType("float");
+
+                    b.Property<string>("userId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable("ServiceManByServiceType");
+                });
+
+            modelBuilder.Entity("TradesCompany.Application.DTOs.UsersWithRole", b =>
+                {
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("roleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("userId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable("UsersWithRole");
+                });
+
             modelBuilder.Entity("TradesCompany.Domain.Entities.Address", b =>
                 {
                     b.Property<int>("Id")
@@ -319,6 +449,9 @@ namespace TradesCompany.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("imagepath")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ServiceTypeId");
@@ -440,7 +573,7 @@ namespace TradesCompany.Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("ServiceMen");
+                    b.ToTable("ServiceMan");
                 });
 
             modelBuilder.Entity("TradesCompany.Domain.Entities.ServiceSchedule", b =>
@@ -493,6 +626,10 @@ namespace TradesCompany.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ImgLink")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ServiceName")
                         .IsRequired()

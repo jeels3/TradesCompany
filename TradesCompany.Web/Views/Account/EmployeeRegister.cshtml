@@ -40,9 +40,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label asp-for="ServiceType">Serivce Type</label>
-                    <input asp-for="ServiceType" class="form-control" placeholder="Enter ServiceType" />
-                    <span asp-validation-for="ServiceType" class="text-danger"></span>
+                    <label asp-for="ServiceTypeId">Serivce Type</label>
+                    <select asp-for="ServiceTypeId">
+                        @foreach(var servicetype in Model.ServiceTypes)
+                        {
+                            <option value="@servicetype.Id">@servicetype.ServiceName</option>
+                        }
+                    </select>
                 </div>
 
                 <div class="checkbox">

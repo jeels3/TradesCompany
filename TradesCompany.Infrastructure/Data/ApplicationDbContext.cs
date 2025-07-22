@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Emit;
+using TradesCompany.Application.DTOs;
 using TradesCompany.Domain.Entities;
 
 namespace TradesCompany.Infrastructure.Data
@@ -13,17 +14,31 @@ namespace TradesCompany.Infrastructure.Data
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<Quotation> Quotations { get; set; }
-        public DbSet<ServiceMan> ServiceMen { get; set; }
+        public DbSet<ServiceMan> ServiceMan { get; set; }
         public DbSet<QuotationForm> QuotationForms { get; set; }
         public DbSet<Rating> Ratings { get; set; }
         public DbSet<ServiceSchedule> ServiceSchedules { get; set; }
         public DbSet<ServiceType> serviceTypes { get; set; }
         public DbSet<Bill> Bills { get; set; }
+        public DbSet<Notification> Notification {  get; set; }
 
+        // For Store Procedure
+        public DbSet<UsersWithRole> UsersWithRole { get; set; }
+        public DbSet<ServiceManByServiceType> ServiceManByServiceType { get; set; }
+        public DbSet<QuotationByUser> QuotationByUser { get; set; }
+        public DbSet<QuotationByServicerMan> QuotationByServicerMan { get; set; }
+        public DbSet<ScheduleServiceByUser> ScheduleServiceByUser { get; set; }
+        public DbSet<BookingByServiceType> BookingByServiceType { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
+            builder.Entity<UsersWithRole>().HasNoKey();
+            builder .Entity<ServiceManByServiceType>().HasNoKey();
+            builder.Entity<QuotationByUser>().HasNoKey();
+            builder.Entity<QuotationByServicerMan>().HasNoKey();
+            builder.Entity<ScheduleServiceByUser>().HasNoKey();
+            builder.Entity<BookingByServiceType>().HasNoKey();
             // Configure all relationships FIRST
             // Booking -> User (many-to-one)
             builder.Entity<Booking>()

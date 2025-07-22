@@ -17,9 +17,9 @@ namespace TradesCompany.Web.Controllers
             return View();
         }
 
-        public async Task<IActionResult> Users()
+        public async Task<IActionResult> UsersListing()
         {
-            var users = await _userRepository.GetAllAsync();
+            var users = await _userRepository.GetAllUsersAsync();
             return Ok(users);
         }
     }

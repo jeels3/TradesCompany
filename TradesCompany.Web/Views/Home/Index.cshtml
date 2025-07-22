@@ -5,5 +5,15 @@
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <a asp-controller="Admin" asp-action="Dashboard">Dashboard</a>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <br />
+    <a asp-action="Login" asp-controller="Account">Login</a>
+    <br />
+    <a asp-action="CustomerRegister" asp-controller="Account">singUp as a Customer</a>
+    <br />
+    <a asp-action="EmployeeRegister" asp-controller="Account">singUp as a Employee</a>
 </div>
+
+@* @section Scripts {
+    <script src="~/js/signalr.js"></script>
+     <script src="~/js/Notifications.js"></script> 
+} *@

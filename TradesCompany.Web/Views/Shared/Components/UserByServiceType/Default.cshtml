@@ -1,0 +1,52 @@
+﻿@{
+
+}
+
+<table id="booksTable" class="display table table-bordered">
+    <thead>
+        <tr>
+            <th>User Name</th>
+            <th>Email</th>
+        </tr>
+    </thead>
+</table>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            var object = {
+                0 : "User Name",
+                1 : "Email",
+            }
+            $('#booksTable').DataTable({
+                processing: true,
+                serverSide: true,
+                searching: true,
+                ajax: {
+                    url: '/User/GetServiceMenListingByServiceType',
+                    type: 'POST',
+                    data: function (d) {
+                        console.log(d);
+                        console.log(object[d.order[0].column]);
+                        return {
+                            ServiceTypeId: @Model.Id,
+                            Draw : d.draw,
+                            start: d.start,
+                            length: d.length,
+                            SearchValue: d.search.value,
+                            SortColumn:object[d.order[0].column],
+                            SortDirection:d.order[0].dir,
+                        };
+                    }
+                },
+                columns: [
+                    { data: 'User Name' },
+                    { data: 'Email' },
+                ]
+            });
+        });
+    </script>
+}

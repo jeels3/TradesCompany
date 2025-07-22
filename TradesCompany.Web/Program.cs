@@ -2,9 +2,12 @@
  using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TradesCompany.Application.Interfaces;
+using TradesCompany.Application.Services;
 using TradesCompany.Domain.Entities;
 using TradesCompany.Infrastructure.Data;
 using TradesCompany.Infrastructure.Repository;
+using TradesCompany.Infrastructure.Services;
+using TradesCompany.Shared.Hubs;
 
 namespace TradesCompany.Web
 {
@@ -42,6 +45,13 @@ namespace TradesCompany.Web
 
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+            builder.Services.AddScoped<IQuotationRepository, QuotationRepository>();
+            builder.Services.AddScoped<IEmployeeServices , EmployeeServices>();
+            builder.Services.AddScoped<IServiceManRepository,ServiceManRepositor>();
+            builder.Services.AddScoped<INotificationService, NotificationService>();
+
+            builder.Services.AddSignalR();
 
             var app = builder.Build();
 
@@ -64,6 +74,7 @@ namespace TradesCompany.Web
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
+            app.MapHub<NotificationHub>("/notificationHub");
             app.Run();
         }
     }

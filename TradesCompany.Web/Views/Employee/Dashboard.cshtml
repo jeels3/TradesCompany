@@ -1,5 +1,7 @@
-﻿@{
+﻿@model IEnumerable<TradesCompany.Application.DTOs.BookingByServiceType>
+@{
     Layout = "~/Views/Shared/Layouts/_EmployeeLayout.cshtml"; 
 }
 
 <h1>Emplopyee Dashboard</h1>
+@Html.Partial("~/Views/PartialView/_BookingListing.cshtml",Model)

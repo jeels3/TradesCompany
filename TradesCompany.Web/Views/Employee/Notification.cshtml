@@ -1,0 +1,10 @@
+﻿@using System.Security.Claims
+@{
+    string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+}
+
+<input  value="@userId" type="hidden" id="userId"/>
+@section Scripts{
+    <script src="~/js/signalr.js"></script>
+    <script src="~/js/Notifications.js"></script>
+}

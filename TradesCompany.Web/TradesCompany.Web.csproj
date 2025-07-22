@@ -18,6 +18,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TradesCompany.Infrastructure\TradesCompany.Infrastructure.csproj" />
+    <ProjectReference Include="..\TradesCompany.Shared\TradesCompany.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\lib\microsoft\signalr\dist\browser\" />
   </ItemGroup>
 
 </Project>

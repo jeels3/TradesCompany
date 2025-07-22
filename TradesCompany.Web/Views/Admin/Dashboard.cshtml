@@ -1,5 +1,76 @@
 ﻿@{
+    ViewData["Title"] = "Dashboard";
     Layout = "~/Views/Shared/Layouts/_AdminLayout.cshtml";
 }
 
-<h1>Admin Dashboard</h1>
+<div class="px-40 flex flex-1 justify-center py-5">
+    <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+        <h2 class="text-[28px] font-bold leading-tight px-4 pb-3 pt-5">Dashboard</h2>
+
+        <!-- Summary Cards -->
+        <div class="flex flex-wrap gap-4 p-4">
+            @* Card 1 *@
+            <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 border border-[#cedce8]">
+                <p class="text-base font-medium">Total Users</p>
+                <p class="text-2xl font-bold">1,250</p>
+                <p class="text-[#078838] text-base font-medium">+10%</p>
+            </div>
+            @* Card 2 *@
+            <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 border border-[#cedce8]">
+                <p class="text-base font-medium">Active Bookings</p>
+                <p class="text-2xl font-bold">345</p>
+                <p class="text-[#078838] text-base font-medium">+5%</p>
+            </div>
+            @* Card 3 *@
+            <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 border border-[#cedce8]">
+                <p class="text-base font-medium">New Claims</p>
+                <p class="text-2xl font-bold">78</p>
+                <p class="text-[#078838] text-base font-medium">+12%</p>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <h2 class="text-[22px] font-bold px-4 pb-3 pt-5">Users Listing</h2>
+        <div class="px-4 py-3">
+            <label class="flex flex-col min-w-40 h-12 w-full">
+                <div class="flex w-full items-stretch rounded-xl h-full">
+                    <div class="text-[#49749c] flex items-center justify-center pl-4 rounded-l-xl bg-[#e7edf4]">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                            <path d="..." />
+                        </svg>
+                    </div>
+                    <input type="text" placeholder="Search users or bookings"
+                           class="form-input w-full rounded-r-xl bg-[#e7edf4] px-4 text-base placeholder:text-[#49749c]" />
+                </div>
+            </label>
+        </div>
+
+        <!-- Users Table -->
+        <div class="px-4 py-3">
+            <div class="overflow-hidden rounded-xl border border-[#cedce8] bg-slate-50">
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="bg-slate-50">
+                            <th class="px-4 py-3 text-left text-sm font-medium text-[#0d151c]">User</th>
+                            <th class="px-4 py-3 text-left text-sm font-medium text-[#0d151c]">Service</th>
+                            <th class="px-4 py-3 text-left text-sm font-medium text-[#0d151c]">Booking Date</th>
+                            <th class="px-4 py-3 text-left text-sm font-medium text-[#0d151c]">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @* Sample Row - Repeat using foreach if needed *@
+                        <tr class="border-t border-[#cedce8]">
+                            <td class="px-4 py-2 text-sm text-[#0d151c]">Olivia Bennett</td>
+                            <td class="px-4 py-2 text-sm text-[#49749c]">Home Cleaning</td>
+                            <td class="px-4 py-2 text-sm text-[#49749c]">2024-03-15</td>
+                            <td class="px-4 py-2 text-sm">
+                                <button class="rounded-full bg-[#e7edf4] px-4 py-1 text-sm text-[#0d151c]">Completed</button>
+                            </td>
+                        </tr>
+                        @* Repeat more rows here *@
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

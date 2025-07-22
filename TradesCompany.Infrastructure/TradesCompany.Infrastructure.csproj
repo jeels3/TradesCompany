@@ -19,10 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TradesCompany.Application\TradesCompany.Application.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Services\" />
+    <ProjectReference Include="..\TradesCompany.Shared\TradesCompany.Shared.csproj" />
   </ItemGroup>
 
 </Project>

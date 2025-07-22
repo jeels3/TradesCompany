@@ -1,27 +1,36 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using TradesCompany.Application.Interfaces;
+using TradesCompany.Domain.Entities;
 using TradesCompany.Web.ViewModel;
 
 namespace TradesCompany.Web.Controllers
 {
     public class AccountController : Controller
     {
-       private readonly  UserManager<IdentityUser> _userManager;
-       private readonly SignInManager<IdentityUser> _signInManager;
-       private readonly RoleManager<IdentityRole> _roleManager;
+       private readonly  UserManager<ApplicationUser> _userManager;
+       private readonly SignInManager<ApplicationUser> _signInManager;
+       private readonly RoleManager<ApplicationRole> _roleManager;
+       private readonly IRepository<ServiceType> _serviceTypeGRepository;
+        private readonly IRepository<ServiceMan> _serviceManGRepository;
 
-        public AccountController(UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
-            RoleManager<IdentityRole> roleManager
+        public AccountController(UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            RoleManager<ApplicationRole> roleManager,
+            IRepository<ServiceType> serviceTypeGRepository,
+            IRepository<ServiceMan> serviceManGRepository
             )
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
+            _serviceTypeGRepository = serviceTypeGRepository;
+            _serviceManGRepository = serviceManGRepository;
         }
 
         [HttpGet]
@@ -39,8 +48,10 @@ namespace TradesCompany.Web.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> EmployeeRegister()
         {
+            var serviceTypes = await _serviceTypeGRepository.GetAllAsync();
             EmployeeRegisterViewModel model = new EmployeeRegisterViewModel
             {
+                ServiceTypes = (List<ServiceType>)serviceTypes,
                 ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
             };
             return View(model);
@@ -52,7 +63,7 @@ namespace TradesCompany.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new IdentityUser
+                var user = new ApplicationUser
                 {
                     UserName = model.UserName,
                     Email = model.Email
@@ -80,7 +91,7 @@ namespace TradesCompany.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new IdentityUser
+                var user = new ApplicationUser
                 {
                     UserName = model.UserName,
                     Email = model.Email
@@ -91,6 +102,14 @@ namespace TradesCompany.Web.Controllers
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(user, model.Role);
+
+                    var serviceman = new ServiceMan
+                    {
+                        UserId = user.Id,
+                        ServiceTypeId = model.ServiceTypeId,
+                    };
+                    await _serviceManGRepository.InsertAsync(serviceman);
+                    await _serviceManGRepository.SaveAsync();
                     return RedirectToAction("Dashboard", "Employee");
                 }
 
@@ -132,11 +151,11 @@ namespace TradesCompany.Web.Controllers
                 if (result.Succeeded)
                 {
                     var roles = await _userManager.GetRolesAsync(user);
-                    if (roles.Contains("Employee"))
+                    if (roles.Contains("EMPLOYEE "))
                     {
                         return RedirectToAction("Dashboard", "Employee");
                     }
-                    else if (roles.Contains("User"))
+                    else if (roles.Contains("USER"))
                     {
                         return RedirectToAction("Dashboard", "User");
                     }
@@ -237,7 +256,7 @@ namespace TradesCompany.Web.Controllers
                 }
                 else
                 {
-                    user = new IdentityUser
+                    user = new ApplicationUser
                     {
                         Email = email,
                         UserName = name
@@ -283,7 +302,7 @@ namespace TradesCompany.Web.Controllers
                 return Content("<script>alert('External login info not found.'); window.close();</script>", "text/html");
             }
 
-            var user = new IdentityUser
+            var user = new ApplicationUser
             {
                 UserName = model.UserName,
                 Email = model.Email,

@@ -10,6 +10,7 @@ namespace TradesCompany.Domain.Entities
     {
         public int Id { get; set; }
         public string ServiceName { get; set; }
+        public string ImgLink { get; set; } = string.Empty;
         public ICollection<ServiceMan> ServiceMen { get; set; } = new List<ServiceMan>();
         public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
     }
