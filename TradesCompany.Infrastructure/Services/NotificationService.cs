@@ -24,8 +24,14 @@ namespace TradesCompany.Infrastructure.Services
             _notificationGRepository = notificationGRepository;
             _hubContext = hubContext;
         }
+
+        public async Task sendhelo()
+        {
+            await _hubContext.Clients.All.SendAsync("Hello", "Hello");
+        }
         public async Task SendNotificationOfNewBooking(int ServiceTypeId, string NotificationType, string Message)
         {
+            
             // Get All User Which Is this ServiceTypeId
             var users =await _userRepository.GetAllByServiceTypeServicemenAsync(ServiceTypeId);
             foreach (var user in users)
@@ -37,12 +43,52 @@ namespace TradesCompany.Infrastructure.Services
                     Message = Message
                 };
                 await _notificationGRepository.InsertAsync(model);
-                Console.WriteLine("Hello");
-                await _hubContext.Clients.All.SendAsync("ReceiveBookingNotification",Message);
                 await _notificationGRepository.SaveAsync();
-                //await _hubContext.Clients.Group($"UserGroup_{user.userId}")
-                //                        .SendAsync("ReceiveBookingNotification", NotificationType , Message);
+                await _hubContext.Clients.Group($"UserGroup_{user.userId}")
+                                        .SendAsync("ReceiveBookingNotification", NotificationType, Message);
             }
+        }
+
+        public async Task SendNotificationOfNewQuotation(string userId , string NotificationType, string Message)
+        {
+            Notification model = new Notification
+            {
+                userId = userId,
+                NotificationType = NotificationType,
+                Message = Message
+            };
+            await _notificationGRepository.InsertAsync(model);
+            await _notificationGRepository.SaveAsync();
+            await _hubContext.Clients.Group($"UserGroup_{userId}")
+                                        .SendAsync("ReceiveNewQuotation", NotificationType, Message);
+
+        }
+        public async Task SendNotificationOfScheduleService(string userId, string NotificationType, string Message)
+        {
+            Notification model = new Notification
+            {
+                userId = userId,
+                NotificationType = NotificationType,
+                Message = Message
+            };
+            await _notificationGRepository.InsertAsync(model);
+            await _notificationGRepository.SaveAsync();
+            await _hubContext.Clients.Group($"UserGroup_{userId}")
+                                        .SendAsync("ReceiveNewSchedule", NotificationType, Message);
+        }
+        
+        public async Task SendNotificationOfScheduleServiceToEmployee(string userId, string NotificationType, string Message)
+        {
+            Notification model = new Notification
+            {
+                userId = userId,
+                NotificationType = NotificationType,
+                Message = Message
+            };
+            await _notificationGRepository.InsertAsync(model);
+            await _notificationGRepository.SaveAsync();
+            await _hubContext.Clients.Group($"UserGroup_{userId}")
+                                        .SendAsync("RecieveScheduleSeviceReminder", NotificationType, Message);
         }
     }
 }

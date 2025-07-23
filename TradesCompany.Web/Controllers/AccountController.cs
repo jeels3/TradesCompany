@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -152,11 +152,13 @@ namespace TradesCompany.Web.Controllers
                 {
                     var roles = await _userManager.GetRolesAsync(user);
                     if (roles.Contains("EMPLOYEE "))
-                    {
+                    { 
+                        if(model.ReturnUrl != null) return Redirect(model.ReturnUrl);
                         return RedirectToAction("Dashboard", "Employee");
                     }
                     else if (roles.Contains("USER"))
                     {
+                        if (model.ReturnUrl != null) return Redirect(model.ReturnUrl);
                         return RedirectToAction("Dashboard", "User");
                     }
                     //return RedirectToAction(nameof(HomeController.Index), "Home");
@@ -282,9 +284,14 @@ namespace TradesCompany.Web.Controllers
             }
         }
 
-        public IActionResult ExternalRegisterWorker()
+        public async Task<IActionResult> ExternalRegisterWorker()
         {
-            return View();
+            var serviceTypes = await _serviceTypeGRepository.GetAllAsync();
+            ExternalRegisterWorkerViewModel model = new ExternalRegisterWorkerViewModel
+            {
+                ServiceType = (List<ServiceType>)serviceTypes
+            };
+            return View(model);
         }
 
         [HttpPost]
@@ -315,11 +322,20 @@ namespace TradesCompany.Web.Controllers
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
-                return View(model);
+                return View(model); 
             }
 
             await _userManager.AddLoginAsync(user, info);
+
             await _userManager.AddToRoleAsync(user, model.Role);
+            var serviceman = new ServiceMan
+            {
+                UserId = user.Id,
+                ServiceTypeId = model.ServiceTypeId,
+            };
+            await _serviceManGRepository.InsertAsync(serviceman);
+            await _serviceManGRepository.SaveAsync();
+
             await _signInManager.SignInAsync(user, isPersistent: false);
             // add into service type
             return RedirectToAction("Dashboard", "Employee");

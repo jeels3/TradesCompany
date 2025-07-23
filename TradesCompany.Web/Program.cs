@@ -4,10 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using TradesCompany.Application.Interfaces;
 using TradesCompany.Application.Services;
 using TradesCompany.Domain.Entities;
+using TradesCompany.Infrastructure;
 using TradesCompany.Infrastructure.Data;
 using TradesCompany.Infrastructure.Repository;
 using TradesCompany.Infrastructure.Services;
 using TradesCompany.Shared.Hubs;
+using TradesCompany.Web.Middlewares;
 
 namespace TradesCompany.Web
 {
@@ -40,7 +42,10 @@ namespace TradesCompany.Web
             builder.Services.AddAuthorization(options =>
             {
                 options.AddPolicy("CreateRolePolicy", policy => policy.RequireClaim("Create Role"));
-                options.AddPolicy("BookingServicePolicy", policy => policy.RequireClaim(" Booking Service"));
+                options.AddPolicy("BookingServicePolicy", policy => policy.RequireClaim("Booking Service"));
+                options.AddPolicy("SendQuotationPolicy", policy => policy.RequireClaim(" Send Quotation"));
+                options.AddPolicy("ScheduleServicePolicy", policy => policy.RequireClaim(" Schedule Service"));
+                options.AddPolicy("CancelSchedulePolicy", policy => policy.RequireClaim(" Cancel Schedule"));
             });
 
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -50,31 +55,43 @@ namespace TradesCompany.Web
             builder.Services.AddScoped<IEmployeeServices , EmployeeServices>();
             builder.Services.AddScoped<IServiceManRepository,ServiceManRepositor>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
-
+            builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+            builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
+            builder.Services.AddInfrastructure();
             builder.Services.AddSignalR();
+            builder.Services.AddTransient<EmailService>();
+
+            // Exception
+            builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+            builder.Services.AddProblemDetails();
+            builder.Services.AddExceptionHandler<BadRequestExceptionHandler>();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseExceptionHandler();
+
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
+
 
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.MapHub<NotificationHub>("/notificationHub");
+
             app.Run();
         }
     }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TradesCompany.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using TradesCompany.Infrastructure.Data;
 namespace TradesCompany.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250723070717_sp02")]
+    partial class sp02
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -654,30 +657,6 @@ namespace TradesCompany.Infrastructure.Migrations
                     b.ToTable("Ratings");
                 });
 
-            modelBuilder.Entity("TradesCompany.Domain.Entities.Schedule", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date");
-
-                    b.Property<int>("ServiceManId")
-                        .HasColumnType("int");
-
-                    b.Property<TimeOnly>("Time")
-                        .HasColumnType("time");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ServiceManId");
-
-                    b.ToTable("Schedule");
-                });
-
             modelBuilder.Entity("TradesCompany.Domain.Entities.ServiceMan", b =>
                 {
                     b.Property<int>("Id")
@@ -887,17 +866,6 @@ namespace TradesCompany.Infrastructure.Migrations
                     b.Navigation("ServiceSchedule");
                 });
 
-            modelBuilder.Entity("TradesCompany.Domain.Entities.Schedule", b =>
-                {
-                    b.HasOne("TradesCompany.Domain.Entities.ServiceMan", "ServiceMan")
-                        .WithMany("Schedules")
-                        .HasForeignKey("ServiceManId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ServiceMan");
-                });
-
             modelBuilder.Entity("TradesCompany.Domain.Entities.ServiceMan", b =>
                 {
                     b.HasOne("TradesCompany.Domain.Entities.ServiceType", "ServiceTypes")
@@ -967,8 +935,6 @@ namespace TradesCompany.Infrastructure.Migrations
             modelBuilder.Entity("TradesCompany.Domain.Entities.ServiceMan", b =>
                 {
                     b.Navigation("Quotations");
-
-                    b.Navigation("Schedules");
 
                     b.Navigation("ServiceSchedules");
                 });

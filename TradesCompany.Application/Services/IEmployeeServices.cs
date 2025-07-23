@@ -12,5 +12,8 @@ namespace TradesCompany.Application.Services
     {
         Task<List<QuotationByServicerMan>> QuotationByServicerMan(string userId);
         Task<List<ScheduleServiceByUser>> GettAllScheduleServiceByUser(string userId);
+        Task<List<ScheduleServiceByEmployee>> GetAllScheduleServiceByEmployee(string userId);
+        Task<List<string>> GetAllServiceManForSreviceNotification();
+        Task<Bill> GetBillByScheduleId (int scheduleId);
     }
 }

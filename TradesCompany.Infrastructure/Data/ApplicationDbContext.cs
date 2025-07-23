@@ -21,6 +21,7 @@ namespace TradesCompany.Infrastructure.Data
         public DbSet<ServiceType> serviceTypes { get; set; }
         public DbSet<Bill> Bills { get; set; }
         public DbSet<Notification> Notification {  get; set; }
+        public DbSet<Schedule> Schedule { get; set; }
 
         // For Store Procedure
         public DbSet<UsersWithRole> UsersWithRole { get; set; }
@@ -29,6 +30,7 @@ namespace TradesCompany.Infrastructure.Data
         public DbSet<QuotationByServicerMan> QuotationByServicerMan { get; set; }
         public DbSet<ScheduleServiceByUser> ScheduleServiceByUser { get; set; }
         public DbSet<BookingByServiceType> BookingByServiceType { get; set; }
+        public DbSet<ScheduleServiceByEmployee> ScheduleServiceByEmployee  { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -39,6 +41,8 @@ namespace TradesCompany.Infrastructure.Data
             builder.Entity<QuotationByServicerMan>().HasNoKey();
             builder.Entity<ScheduleServiceByUser>().HasNoKey();
             builder.Entity<BookingByServiceType>().HasNoKey();
+            builder.Entity<ScheduleServiceByEmployee>().HasNoKey();
+
             // Configure all relationships FIRST
             // Booking -> User (many-to-one)
             builder.Entity<Booking>()

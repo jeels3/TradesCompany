@@ -10,6 +10,7 @@ namespace TradesCompany.Domain.Entities
     {
         public int Id { get; set; }
         public string userId { get; set; }
+        public ApplicationUser? User { get; set; }
         public bool IsRead { get; set; }  = false;
         public string NotificationType { get; set; }
         public string Message { get; set; }

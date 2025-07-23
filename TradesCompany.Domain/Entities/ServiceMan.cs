@@ -16,5 +16,6 @@ namespace TradesCompany.Domain.Entities
         public ServiceType ServiceTypes { get; set; }
         public ICollection<Quotation>? Quotations { get; set; } = new List<Quotation>();
         public ICollection<ServiceSchedule>? ServiceSchedules { get; set; } = new List<ServiceSchedule>();
+        public ICollection<Schedule>? Schedules { get; set; } = new List<Schedule>();
     }
 }

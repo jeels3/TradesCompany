@@ -18,10 +18,15 @@
                 <input type="hidden" asp-for="Role" />
 
                 <div class="form-group">
-                    <label asp-for="ServiceType">Service Type</label>
-                    <input asp-for="ServiceType" class="form-control" placeholder="e.g. Plumbing, Electrician" />
-                    <span asp-validation-for="ServiceType" class="text-danger"></span>
+                    <label asp-for="ServiceTypeId">Serivce Type</label>
+                    <select asp-for="ServiceTypeId">
+                        @foreach (var servicetype in Model.ServiceType)
+                        {
+                            <option value="@servicetype.Id">@servicetype.ServiceName</option>
+                        }
+                    </select>
                 </div>
+
                 <button type="submit" class="btn-submit">Complete Registration</button>
             </form>
 

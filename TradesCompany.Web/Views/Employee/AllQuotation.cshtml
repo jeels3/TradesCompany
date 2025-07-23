@@ -43,7 +43,7 @@
                 <div class="table-responsive">
                     @if (!Model.Any())
                     {
-                        <h1>ServiceMan Not Found</h1>
+                        <h1>No Quotation Found</h1>
                     }
                     else
                     {
@@ -100,14 +100,28 @@
     </div>
 </div>
 
+@* <div id="schedulepopup">
+    <input asp-for="@Model.date" type="date"/>
+    <input asp-for="@Model.time" type="time"/>
+</div> *@
+
 @section Scripts{
     <script>
         $(document).on('click', '.schedule-btn', function () {
         const quotationId = $(this).data('id');
+        const date = $('#date').value;
+        const time = $('#time').value;
+        var data = {
+            date:"Hello",
+            time:"jii",
+            quotationId:quotationId
+        }
 
         if (confirm('Are you sure you want to Schedule this Booking?')) {
             $.ajax({
-                url: `/Employee/ScheduleServices?quotationId=${quotationId}`,
+                url: `/Employee/ScheduleServices`,
+                ContentType:'application/json',
+                data:JSON.stringify(data),
                 success: function (res) {
                     alert(res.message);
                     location.reload();

@@ -4,27 +4,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TradesCompany.Application.DTOs;
 using TradesCompany.Application.Interfaces;
 using TradesCompany.Domain.Entities;
 using TradesCompany.Infrastructure.Data;
 
 namespace TradesCompany.Infrastructure.Repository
 {
-    public class QuotationRepository : IQuotationRepository
+    public class ScheduleRepository : IScheduleRepository
     {
         private readonly ApplicationDbContext _context;
 
-        public QuotationRepository(ApplicationDbContext context)
+        public ScheduleRepository(ApplicationDbContext context)
         {
             _context = context;
         }
-        public async Task<List<QuotationByUser>> GetQuotationForUser(string userId)
+
+        public async Task<List<Schedule>> GetAllScheduleSlotByServiceManId(string userId)
         {
-            return await _context.QuotationByUser
-                .FromSqlInterpolated($"EXEC GetAllQuotationForUser {userId}")
-                .ToListAsync();
+            var serviceman = await _context.ServiceMan.Where(sm => sm.UserId == userId).FirstOrDefaultAsync();
+            return await _context.Schedule.Where(s => s.ServiceManId == serviceman.Id).ToListAsync();
         }
     }
 }
- 

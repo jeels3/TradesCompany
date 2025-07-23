@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TradesCompany.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using TradesCompany.Infrastructure.Data;
 namespace TradesCompany.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250723044620_notificationtableupdate")]
+    partial class notificationtableupdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -214,44 +217,6 @@ namespace TradesCompany.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.ToTable("QuotationByUser");
-                });
-
-            modelBuilder.Entity("TradesCompany.Application.DTOs.ScheduleServiceByEmployee", b =>
-                {
-                    b.Property<string>("CustomerEmail")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CustomerName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CustomerUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ScheduleServiceId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("ScheduledAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ServiceMan")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ServiceManUserId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ServiceName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("TotalPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("WorkDetails")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.ToTable("ScheduleServiceByEmployee");
                 });
 
             modelBuilder.Entity("TradesCompany.Application.DTOs.ScheduleServiceByUser", b =>
@@ -654,30 +619,6 @@ namespace TradesCompany.Infrastructure.Migrations
                     b.ToTable("Ratings");
                 });
 
-            modelBuilder.Entity("TradesCompany.Domain.Entities.Schedule", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date");
-
-                    b.Property<int>("ServiceManId")
-                        .HasColumnType("int");
-
-                    b.Property<TimeOnly>("Time")
-                        .HasColumnType("time");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ServiceManId");
-
-                    b.ToTable("Schedule");
-                });
-
             modelBuilder.Entity("TradesCompany.Domain.Entities.ServiceMan", b =>
                 {
                     b.Property<int>("Id")
@@ -887,17 +828,6 @@ namespace TradesCompany.Infrastructure.Migrations
                     b.Navigation("ServiceSchedule");
                 });
 
-            modelBuilder.Entity("TradesCompany.Domain.Entities.Schedule", b =>
-                {
-                    b.HasOne("TradesCompany.Domain.Entities.ServiceMan", "ServiceMan")
-                        .WithMany("Schedules")
-                        .HasForeignKey("ServiceManId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ServiceMan");
-                });
-
             modelBuilder.Entity("TradesCompany.Domain.Entities.ServiceMan", b =>
                 {
                     b.HasOne("TradesCompany.Domain.Entities.ServiceType", "ServiceTypes")
@@ -967,8 +897,6 @@ namespace TradesCompany.Infrastructure.Migrations
             modelBuilder.Entity("TradesCompany.Domain.Entities.ServiceMan", b =>
                 {
                     b.Navigation("Quotations");
-
-                    b.Navigation("Schedules");
 
                     b.Navigation("ServiceSchedules");
                 });

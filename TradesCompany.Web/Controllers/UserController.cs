@@ -15,6 +15,7 @@ using TradesCompany.Web.ViewModel;
 
 namespace TradesCompany.Web.Controllers
 {
+    
     public class UserController : Controller
     {
         private readonly IRepository<ServiceType> _serviceGRepository;
@@ -55,29 +56,52 @@ namespace TradesCompany.Web.Controllers
             }
             catch(Exception ex)
             {
+                ModelState.AddModelError("", "Something Went Wrong During Access Dashboard");
                 return View("Error", new { message = ex.Message });
             }
         }
         public async Task<IActionResult> GetUserByServiceType(int serviceTypeId)
         {
-            var service = await _userRepository.GetAllByServiceTypeServicemenAsync(serviceTypeId);
-            return View(service);
+            try
+            {
+                var service = await _userRepository.GetAllByServiceTypeServicemenAsync(serviceTypeId);
+                return View(service);
+            }
+            catch(Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Something Went Wrong : {ex.Message}";
+                return View();
+            }
         }
 
         [HttpGet]
+        [Authorize(Policy ="BookingServicePolicy")]
         public async Task<IActionResult> BookService()
         {
-            BookingViewModel model = new BookingViewModel
+            try
             {
-                ServiceTypes = (List<ServiceType>)await _serviceGRepository.GetAllAsync()
-            };
-            return View(model);
+                BookingViewModel model = new BookingViewModel
+                {
+                    ServiceTypes = (List<ServiceType>)await _serviceGRepository.GetAllAsync()
+                };
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Something Went Wrong : {ex.Message}";
+                return View();
+            }
         }
 
         [HttpPost]
+        //[Authorize(Policy = "BookingServicePolicy")]
         public async Task<IActionResult> BookService(BookingViewModel model)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) 
+            {
+                return RedirectToAction("Login", "Account");
+            }
 
             if (ModelState.IsValid)
             {
@@ -97,6 +121,7 @@ namespace TradesCompany.Web.Controllers
                 }
                 catch (Exception ex)
                 {
+                    TempData["ErrorMessage"] = $"Something Went Wrong : {ex.Message}";
                     return View(model);
                 }
             }
@@ -104,6 +129,7 @@ namespace TradesCompany.Web.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "BookingServicePolicy")]
         public async Task<IActionResult> AllQuotation()
         {
             // Fatch By Booking -> User -> Quotation
@@ -113,6 +139,7 @@ namespace TradesCompany.Web.Controllers
         }
 
         //[HttpPost] // Customer Accept 
+        [Authorize(Policy = "BookingServicePolicy")]
         public async Task<IActionResult> RequestAccept(int quotationId)
         {
             try
@@ -131,6 +158,7 @@ namespace TradesCompany.Web.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "BookingServicePolicy")]
         public async Task<IActionResult> MyScheduleServices()
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

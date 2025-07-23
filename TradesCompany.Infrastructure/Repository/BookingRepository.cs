@@ -18,25 +18,21 @@ namespace TradesCompany.Infrastructure.Repository
         {
             _context = context;
         }
-
         public async Task <List<BookingByServiceType>> GetAllBookingAsync(int ServiceTypeId)
         {
             return await _context.BookingByServiceType
                 .FromSqlInterpolated($"EXEC GetAllBookingByServiceType {ServiceTypeId}")
                 .ToListAsync();
         }
-
         public async Task<List<BookingByServiceType>> GetAllNewBookingAsync()
         {
             return await _context.BookingByServiceType
                 .ToListAsync();
         }
-
         public async Task<BookingByServiceType> GetBookingByAsync(int id)
         {
             return await _context.BookingByServiceType
                 .FirstOrDefaultAsync();
         }
-
     }
 }

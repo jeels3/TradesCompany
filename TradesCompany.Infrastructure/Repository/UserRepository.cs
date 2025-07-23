@@ -35,17 +35,14 @@ namespace TradesCompany.Infrastructure.Repository
         //{
         //    return await _context.Users.FromSqlRaw("EXEC SelectAllCustomers").ToListAsync();
         //}
-
         public async Task<List<UsersWithRole>> GetAllUsersAsync()
         {
             return await _context.UsersWithRole.FromSqlRaw("EXEC GetAllUsersWithRole").ToListAsync();
         }
-
         public async Task<List<ServiceManByServiceType>> GetAllByServiceTypeServicemenAsync(int ServiceTypeId)
         {
             return await _context.ServiceManByServiceType.FromSqlInterpolated($"EXEC GetAllServicemanByServiceType {ServiceTypeId}").ToListAsync();
         }
-
         //public async Task<(List<ApplicationUser>, int)> GetFilteredEmployee(DataTable model)
         //{
            

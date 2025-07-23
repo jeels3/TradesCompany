@@ -10,6 +10,9 @@ namespace TradesCompany.Domain.Entities
     {
         public int Id { get; set; }
         public string Title { get; set; } = null!;
+        public double serviceCharge { get; set; }
+        public double Gst {  get; set; }
+        public double PlatFormFees { get; set; }
         public double TotalPrice { get; set; }
         public string? FilePath { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

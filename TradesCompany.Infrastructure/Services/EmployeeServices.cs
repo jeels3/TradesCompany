@@ -24,11 +24,38 @@ namespace TradesCompany.Infrastructure.Services
                         .FromSqlInterpolated($"EXEC GetAllQuotationByEmployee {userId}")
                         .ToListAsync();
         }
-
         public async Task<List<ScheduleServiceByUser>> GettAllScheduleServiceByUser(string userId)
         {
             return await _context.ScheduleServiceByUser.FromSqlInterpolated($"EXEC GetAllScheduleServiceByUser {userId}").ToListAsync();
         }
-    }
+
+        public async Task<List<ScheduleServiceByEmployee>> GetAllScheduleServiceByEmployee(string userId)
+        {
+            return await _context.ScheduleServiceByEmployee.FromSqlInterpolated($"EXEC GetAllScheduleServiceByEmployee {userId}").ToListAsync();
+        }
+
+        public async Task<List<string>> GetAllServiceManForSreviceNotification()
+        {
+            return await _context.ServiceSchedules
+                                 .Where(ss => ss.ScheduledAt <= DateTime.Now.AddMinutes(30) && ss.ScheduledAt.AddMinutes(31) >= DateTime.Now && ss.Status != "Completed")
+                                 .Select(ss => ss.Id.ToString())
+                                 .ToListAsync();
+        }
+
+        public async Task<Bill> GetBillByScheduleId(int scheduleId)
+        {
+            var scheduleservice = await _context.ServiceSchedules.FirstOrDefaultAsync(ss => ss.Id == scheduleId);
+            Bill model = new Bill
+            {
+                Title = scheduleservice.ServiceMan.ServiceTypes.ServiceName,
+                serviceCharge = (double)scheduleservice.TotalPrice,
+                PlatFormFees = 50,
+                Gst = 18,
+                TotalPrice = (double)scheduleservice.TotalPrice,
+                CreatedAt = DateTime.Now,
+            };
+            return model;
+        }
+    } 
 }
  

@@ -1,6 +1,6 @@
-﻿@model IEnumerable<TradesCompany.Application.DTOs.ScheduleServiceByUser>
+﻿@model IEnumerable<TradesCompany.Application.DTOs.ScheduleServiceByEmployee>
 @{
-    // Layout = "~/Views/Shared/Layouts/_EmployeeLayout.cshtml";
+    Layout = "~/Views/Shared/Layouts/_EmployeeLayout.cshtml";
 }
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 <style>
@@ -38,7 +38,7 @@
         <div class="col-12 mb-3 mb-lg-5">
             <div class="overflow-hidden card table-nowrap table-card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Customer Schedule Services</h5>
+                    <h5 class="mb-0">Service Man Schedule Services</h5>
                 </div>
                 <div class="table-responsive">
                     @if (!Model.Any())
@@ -51,6 +51,8 @@
                             <thead class="small text-uppercase bg-body text-muted">
                                 <tr>
                                     <th>Service Name</th>
+                                    <th>Customer Name</th>
+                                    <th>Customer Email</th>
                                     <th>Work Details</th>
                                     <th>Service Type</th>
                                     <th>Rating</th>
@@ -72,6 +74,8 @@
                                             </div>
                                         </td>
                                         <td>@service.WorkDetails</td>
+                                        <td>@service.CustomerName</td>
+                                        <td>@service.CustomerEmail</td>
                                         <td> <span class="d-inline-block align-middle">@service.TotalPrice</span></td>
                                         <td><span>@service.ServiceName</span></td>
                                         <td>@service.ScheduledAt</td>
@@ -98,7 +102,7 @@
     </div>
 </div>
 
-@section Scripts {
+@* @section Scripts {
     <script>
         $(document).on('click', '.schedule-btn', function () {
         const quotationId = $(this).data('id');
@@ -118,4 +122,4 @@
         }
         });
     </script>
-}
+} *@
