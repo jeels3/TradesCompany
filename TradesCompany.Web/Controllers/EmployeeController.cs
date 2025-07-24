@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using TradesCompany.Application.Interfaces;
@@ -89,7 +90,7 @@ namespace TradesCompany.Web.Controllers
                     {
                         BookingId = model.BookingId,
                         ServiceManId = servicemen.Id,
-                        Price = model.Price,
+                        Price = model.Price + 50,
                         Status = "Pending",
                         QuotationPdf = "soon"
                     };
@@ -169,6 +170,28 @@ namespace TradesCompany.Web.Controllers
                 return View();
             }
             return View();
+        }
+
+        public async Task<IActionResult> ServiceCompleted(int ScheduleServiceId)
+        {
+            try
+            {
+                // Update Status : Booking , Quoation
+                var serviceSchedule = await _serviceGSchedule.GetByIdAsync(ScheduleServiceId);
+                var quotation = await _quotationGRepository.GetByIdAsync(serviceSchedule.QuotationId);
+                var booking = await _bookingGRepository.GetByIdAsync(quotation.BookingId);
+
+                serviceSchedule.Status = "Completed";
+                quotation.Status = "Completed";
+                booking.Status = "Completed";
+                _quotationGRepository.SaveAsync();
+                // send notification            
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            return Ok(new { message = "Service Complete successfully." });
         }
 
         public async Task<IActionResult> IsSlotBooked(DateOnly date , TimeOnly time)

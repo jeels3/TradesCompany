@@ -161,9 +161,17 @@ namespace TradesCompany.Web.Controllers
         [Authorize(Policy = "BookingServicePolicy")]
         public async Task<IActionResult> MyScheduleServices()
         {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var scheduleservices = await _employeeServices.GettAllScheduleServiceByUser(userId);
-            return View(scheduleservices);
+            try
+            {
+                string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var scheduleservices = await _employeeServices.GettAllScheduleServiceByUser(userId);
+                return View(scheduleservices);
+            }
+            catch(Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Something Went Wrong : {ex.Message}";
+                return View();
+            }
         }
     } 
 }

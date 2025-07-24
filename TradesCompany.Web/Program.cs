@@ -43,9 +43,9 @@ namespace TradesCompany.Web
             {
                 options.AddPolicy("CreateRolePolicy", policy => policy.RequireClaim("Create Role"));
                 options.AddPolicy("BookingServicePolicy", policy => policy.RequireClaim("Booking Service"));
-                options.AddPolicy("SendQuotationPolicy", policy => policy.RequireClaim(" Send Quotation"));
-                options.AddPolicy("ScheduleServicePolicy", policy => policy.RequireClaim(" Schedule Service"));
-                options.AddPolicy("CancelSchedulePolicy", policy => policy.RequireClaim(" Cancel Schedule"));
+                options.AddPolicy("SendQuotationPolicy", policy => policy.RequireClaim("Send Quotation"));
+                options.AddPolicy("ScheduleServicePolicy", policy => policy.RequireClaim("Schedule Service"));
+                options.AddPolicy("CancelSchedulePolicy", policy => policy.RequireClaim("Cancel Schedule"));
             });
 
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));

@@ -340,5 +340,10 @@ namespace TradesCompany.Web.Controllers
             // add into service type
             return RedirectToAction("Dashboard", "Employee");
         }
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("index", "home");
+        }
     }
 }

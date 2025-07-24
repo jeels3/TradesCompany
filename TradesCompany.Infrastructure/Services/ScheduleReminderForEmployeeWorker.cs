@@ -44,7 +44,7 @@ namespace TradesCompany.Infrastructure.Services
                     _logger.LogError(ex, "Error occurred while sending reminders.");
                 }
 
-                // Wait for 24 hours before running again
+                // Wait for 30 Minutes before running again
                 await Task.Delay(TimeSpan.FromMinutes(29), stoppingToken);
             }
             _logger.LogInformation("ScheduleReminderForEmployeeWorker stopping.");
