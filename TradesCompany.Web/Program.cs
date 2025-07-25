@@ -1,5 +1,4 @@
-
- using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TradesCompany.Application.Interfaces;
 using TradesCompany.Application.Services;
@@ -23,7 +22,9 @@ namespace TradesCompany.Web
             builder.Services.AddControllersWithViews();
             var connectionString = builder.Configuration.GetConnectionString("SQLServerIdentityConnection") ?? throw new InvalidOperationException("Connection string 'SQLServerIdentityConnection' not found.");
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString));
+
+            options.UseSqlServer(connectionString));
+
             builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
                             .AddEntityFrameworkStores<ApplicationDbContext>()
                             .AddDefaultTokenProviders();
@@ -62,6 +63,7 @@ namespace TradesCompany.Web
             builder.Services.AddTransient<EmailService>();
             builder.Services.AddScoped<ChartServices>();
             builder.Services.AddScoped<ExcelService>();
+            builder.Services.AddScoped<IChatRepository, ChatRepository>();
 
             // Exception
             builder.Services.AddExceptionHandler<GlobalExceptionHandler>();

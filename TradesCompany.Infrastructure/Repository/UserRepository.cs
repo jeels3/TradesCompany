@@ -35,7 +35,7 @@ namespace TradesCompany.Infrastructure.Repository
         //{
         //    return await _context.Users.FromSqlRaw("EXEC SelectAllCustomers").ToListAsync();
         //}
-        public async Task<List<UsersWithRole>> GetAllUsersAsync()
+        public async Task<List<UserWithRole>> GetAllUsersAsync()
         {
             //var data = _context.Database.ExecuteSqlAsync($"EXEC GetAllUsersWithRole");
             //var data =  _context.Database.ExecuteSqlAsync($"EXEC GetAllUsersWithRole"); 
@@ -46,7 +46,7 @@ namespace TradesCompany.Infrastructure.Repository
             return await _context.ServiceManByServiceType.FromSqlInterpolated($"EXEC GetAllServicemanByServiceType {ServiceTypeId}").ToListAsync();
         }
 
-        public async Task<(List<UsersWithRole>, int)> GetFilteredUsersAsync(UserDataTable model)
+        public async Task<(List<UserWithRole>, int)> GetFilteredUsersAsync(UserDataTable model)
         {
             //var query = _context.UsersWithRole.FromSqlInterpolated($"EXEC GetAllUsersWithRole").AsQueryable();
             var datas = await _context.UsersWithRole.FromSqlInterpolated($"EXEC GetAllUsersWithRole").ToListAsync();

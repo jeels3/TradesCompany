@@ -22,9 +22,12 @@ namespace TradesCompany.Infrastructure.Data
         public DbSet<Bill> Bills { get; set; }
         public DbSet<Notification> Notification {  get; set; }
         public DbSet<Schedule> Schedule { get; set; }
+        public DbSet<Channel> Channel { get; set; }
+        public DbSet<ChannelUser> ChannelUser { get; set; }
+        public DbSet<ChannelMessage> ChannelMessage { get; set; }
 
         // For Store Procedure
-        public DbSet<UsersWithRole> UsersWithRole { get; set; }
+        public DbSet<UserWithRole> UsersWithRole { get; set; }
         public DbSet<ServiceManByServiceType> ServiceManByServiceType { get; set; }
         public DbSet<QuotationByUser> QuotationByUser { get; set; }
         public DbSet<QuotationByServicerMan> QuotationByServicerMan { get; set; }
@@ -35,7 +38,12 @@ namespace TradesCompany.Infrastructure.Data
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<UsersWithRole>().HasNoKey();
+            // Composite Key 
+            builder.Entity<ChannelUser>().HasKey(e => new {e.UserId , e.ChannelName});
+            // Unique key 
+            builder.Entity<Channel>().HasIndex(c => c.ChannelName).IsUnique();
+
+            builder.Entity<UserWithRole>().HasNoKey();
             builder .Entity<ServiceManByServiceType>().HasNoKey();
             builder.Entity<QuotationByUser>().HasNoKey();
             builder.Entity<QuotationByServicerMan>().HasNoKey();
@@ -43,7 +51,6 @@ namespace TradesCompany.Infrastructure.Data
             builder.Entity<BookingByServiceType>().HasNoKey();
             builder.Entity<ScheduleServiceByEmployee>().HasNoKey();
 
-            // Configure all relationships FIRST
             // Booking -> User (many-to-one)
             builder.Entity<Booking>()
                 .HasOne(b => b.User)

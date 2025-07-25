@@ -13,9 +13,9 @@ namespace TradesCompany.Application.Interfaces
     {
         Task<IEnumerable<ApplicationUser>> GetAllAsync();
         //Task <List<ApplicationUser>> GetAllCustomerDetailsAsync();
-        Task <List<UsersWithRole>> GetAllUsersAsync();
+        Task <List<UserWithRole>> GetAllUsersAsync();
         Task<List<ServiceManByServiceType>> GetAllByServiceTypeServicemenAsync(int ServiceTypeId);
-        Task<(List<UsersWithRole>, int)> GetFilteredUsersAsync(UserDataTable model);
+        Task<(List<UserWithRole>, int)> GetFilteredUsersAsync(UserDataTable model);
         Task<int> GetAllNotificationCount(string userId);
     }
 }

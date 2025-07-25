@@ -1,0 +1,54 @@
+﻿@using Microsoft.IdentityModel.Claims
+@model IEnumerable<TradesCompany.Domain.Entities.ChannelMessage>
+@{
+    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+}
+<link href="~/css/OneToOneChat.css" rel="stylesheet">
+
+<div class="container content">
+    <div class="row">
+
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+            <div class="card">
+                <div class="card-header">Chat</div>
+                <div class="card-body height3">
+                    <ul class="chat-list">
+                        @foreach (var message in Model)
+                        {
+                            if (message.SenderId != userId)
+                            {
+                                @* Receiver Message *@
+                                <li class="in">
+                                    <div class="chat-img">
+                                        <img alt="Avtar" src="https://bootdey.com/img/Content/avatar/avatar1.png">
+                                    </div>
+                                    <div class="chat-body">
+                                        <div class="chat-message">
+                                            <h5>@message.User.UserName</h5>
+                                            <p>@message.Message</p>
+                                        </div>
+                                    </div>
+                                </li>
+                            }else{
+                            @* Sender Message *@
+                                <li class="out">
+                                    <div class="chat-img">
+                                        <img alt="Avtar" src="https://bootdey.com/img/Content/avatar/avatar6.png">
+                                    </div>
+                                    <div class="chat-body">
+                                        <div class="chat-message">
+                                            <div class="chat-message">
+                                                <h5>@message.User.UserName</h5>
+                                                <p>@message.Message</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
