@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
+using System.Security.Claims;
 using TradesCompany.Application.DTOs;
 using TradesCompany.Application.Interfaces;
 using DataTable = TradesCompany.Application.DTOs.UserDataTable;
@@ -18,6 +19,21 @@ namespace TradesCompany.Web.Controllers
         public IActionResult Dashboard()
         {
             return View("Dashboard");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ShowNotificationCount()
+        {
+            try
+            {
+                string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var count = await _userRepository.GetAllNotificationCount(userId);
+                return Json(userId);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         //[HttpPost]

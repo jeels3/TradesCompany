@@ -10,7 +10,7 @@
     <option value="bar">Bar</option>
     <option value="pie">Pie</option>
 </select>
-
+<button id="downloadbtn">DOWNLOAD</button>
 <canvas id="myChart"></canvas>
 
 <div class="px-40 flex flex-1 justify-center py-5">
@@ -40,11 +40,11 @@
 </div>
 @section Scripts{
     <script>
+        var data = @Html.Raw(JsonConvert.SerializeObject(Model.Data));
         const selectbtn = document.getElementById("charttype");
         selectbtn.addEventListener('change',(e)=>{
             e.preventDefault();
             const charttype = document.getElementById("charttype").value;
-            var data = @Html.Raw(JsonConvert.SerializeObject(Model.Data));
             var ctx = document.getElementById('myChart').getContext('2d');
             var chart = new Chart(ctx, {
                 type: charttype,
@@ -62,6 +62,41 @@
                 }
             });
         })
+
+        // AJAX CALL FOR EXCEL FILE
+        $(document).on('click', '#downloadbtn', function () {
+            debugger
+        if (confirm('Are you sure you want to Download this Excel?')) {
+            $.ajax({
+            type: 'POST',
+            url: '/Admin/DownloadExcel',
+            data:{
+                data : data
+            },
+            xhrFields: {
+                responseType: 'blob' // Important for handling binary data
+            },
+            success: function(response) {
+                // Handle the successful response
+                var blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                var downloadUrl = URL.createObjectURL(blob);
+
+                var a = document.createElement("a");
+                a.href = downloadUrl;
+                a.download = "your_excel_file.xlsx"; // Desired filename
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a); // Clean up the temporary link
+                URL.revokeObjectURL(downloadUrl); // Release the object URL
+            },
+            error: function(xhr, status, error) {
+                console.error("Error downloading Excel:", error);
+            }
+        });
+        }
+        });
+
+        // Random rgb generator
         function generateRandomRGB() {
           const red = Math.floor(Math.random() * 256); // Generates a random integer between 0 and 255 for red
           const green = Math.floor(Math.random() * 256); // Generates a random integer between 0 and 255 for green

@@ -21,7 +21,7 @@ namespace TradesCompany.Shared.Hubs
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
             Console.WriteLine($"Connection {Context.ConnectionId} joined group {groupName}");
         }
-        public async Task LeaveGroup(string groupName)
+        public async Task LeaveGroup(string groupName)  
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
         }

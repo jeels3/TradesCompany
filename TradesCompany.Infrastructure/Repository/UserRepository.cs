@@ -83,5 +83,10 @@ namespace TradesCompany.Infrastructure.Repository
 
             return (data, totalRecords);
         }
+
+        public async Task<int> GetAllNotificationCount(string userId)
+        {
+            return _context.Notification.Where(n => n.IsRead == false && n.userId == userId).Count();
+        }
     }
 }

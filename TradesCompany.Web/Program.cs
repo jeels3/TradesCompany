@@ -61,6 +61,7 @@ namespace TradesCompany.Web
             builder.Services.AddSignalR();
             builder.Services.AddTransient<EmailService>();
             builder.Services.AddScoped<ChartServices>();
+            builder.Services.AddScoped<ExcelService>();
 
             // Exception
             builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
