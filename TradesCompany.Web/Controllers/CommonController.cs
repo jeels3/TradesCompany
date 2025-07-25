@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using TradesCompany.Application.DTOs;
 using TradesCompany.Application.Interfaces;
-using DataTable = TradesCompany.Application.DTOs.DataTable;
+using DataTable = TradesCompany.Application.DTOs.UserDataTable;
 
 namespace TradesCompany.Web.Controllers
 {

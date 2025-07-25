@@ -32,7 +32,7 @@ namespace TradesCompany.Infrastructure.Services
                 {
                     using var scope = _serviceProvider.CreateScope();
                     var employeeServices = scope.ServiceProvider.GetRequiredService<IEmployeeServices>();
-                    var notificationservice = scope.ServiceProvider.GetRequiredService<NotificationService>();
+                    var notificationservice = scope.ServiceProvider.GetRequiredService<INotificationService>();
                     var data = await employeeServices.GetAllServiceManForSreviceNotification();
                     foreach ( var employee in data )
                     {

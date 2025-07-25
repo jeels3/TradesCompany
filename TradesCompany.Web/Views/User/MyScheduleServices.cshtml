@@ -1,6 +1,7 @@
 ﻿@model IEnumerable<TradesCompany.Application.DTOs.ScheduleServiceByUser>
+
 @{
-    // Layout = "~/Views/Shared/Layouts/_EmployeeLayout.cshtml";
+    Layout = "~/Views/Shared/Layouts/_UserLayout.cshtml";
 }
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 <style>
@@ -50,11 +51,12 @@
                         <table class="table mb-0">
                             <thead class="small text-uppercase bg-body text-muted">
                                 <tr>
-                                    <th>Service Name</th>
+                                    <th>Service Man</th>
                                     <th>Work Details</th>
                                     <th>Service Type</th>
-                                    <th>Rating</th>
+                                    <th>Price</th>
                                     <th>Status</th>
+                                    <th>Schedule At</th>
                                     <th class="text-end">Action</th>
                                 </tr>
                             </thead>
@@ -72,8 +74,9 @@
                                             </div>
                                         </td>
                                         <td>@service.WorkDetails</td>
+                                        <td>@service.ServiceName</td>
                                         <td> <span class="d-inline-block align-middle">@service.TotalPrice</span></td>
-                                        <td><span>@service.ServiceName</span></td>
+                                        <td><span>@service.status</span></td>
                                         <td>@service.ScheduledAt</td>
                                         <td class="text-end">
                                             <div class="drodown">
@@ -81,9 +84,12 @@
                                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-end" style="">
-                                                    <a href="#!" class="dropdown-item">View Details</a>
+                                                    @* <a href="#!" class="dropdown-item">View Details</a> *@
+                                                    @if (service.status == "Scheduled")
+                                                    {
                                                     <button data-id="@service.ScheduleServiceId"
-                                                    class="dropdown-item schedule-btn">Schedule Cancel</button>
+                                                    class="dropdown-item schedule-btn">Schedule Cancel</button>    
+                                                    }
                                                 </div>
                                             </div>
                                         </td>

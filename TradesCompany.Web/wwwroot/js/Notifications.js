@@ -9,7 +9,7 @@ connection.on("ReceiveBookingNotification", (NotificationType, Message) => {
 
     if (currentPage !== "Notification") {
         //showComplaintCount();
-        console.log("Notification");
+        document.getElementById("notificationcnt").value += 1;
         return;
     }
     connection.invoke("ReadNotification",userId);

@@ -156,6 +156,24 @@ namespace TradesCompany.Web.Controllers
             }
             return Ok(new { message = "Request Accept successfully." });
         }
+        
+        public async Task<IActionResult> RequestReject(int quotationId)
+        {
+            try
+            {
+                // Update Status : Booking , Quoation
+                var quotation = await _quotationGRepository.GetByIdAsync(quotationId);
+                quotation.Status = "Rejected";
+                _quotationGRepository.SaveAsync();
+                // send notification            
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            return Ok(new { message = "Request Reject successfully." });
+        }
 
         [HttpGet]
         [Authorize(Policy = "BookingServicePolicy")]

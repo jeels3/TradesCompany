@@ -1,7 +1,10 @@
 ﻿@model IEnumerable<TradesCompany.Application.DTOs.BookingByServiceType>
 @{
-    Layout = "~/Views/Shared/Layouts/_EmployeeLayout.cshtml"; 
+    Layout = "~/Views/Shared/Layouts/_ELayout.cshtml";
+    ViewData["Title"] = "Employee Dashboard";
 }
 
-<h1>Emplopyee Dashboard</h1>
+<div>
+    <p>Total Booking :@Model.Count()</p>
+</div>
 @Html.Partial("~/Views/PartialView/_BookingListing.cshtml",Model)

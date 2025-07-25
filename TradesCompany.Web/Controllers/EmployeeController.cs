@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using TradesCompany.Application.Interfaces;
 using TradesCompany.Application.Services;
 using TradesCompany.Domain.Entities;
+using TradesCompany.Infrastructure.Services;
 using TradesCompany.Web.ViewModel;
 
 namespace TradesCompany.Web.Controllers
@@ -26,6 +27,7 @@ namespace TradesCompany.Web.Controllers
         private readonly INotificationRepository _notificationRepository;
         private readonly INotificationService _notificationService;
         private readonly IScheduleRepository _scheduleRepository;
+        private readonly EmailService _emailService;
         public EmployeeController(IBookingRepository bookingRepository,
                                   IRepository<Quotation> quotationGRepository,
                                   IRepository<ServiceMan> servicemanGRepository,
@@ -36,7 +38,8 @@ namespace TradesCompany.Web.Controllers
                                   IRepository<Notification> notificationGRepository,
                                   INotificationRepository notificationRepository,
                                   INotificationService notificationService,
-                                  IScheduleRepository scheduleRepository
+                                  IScheduleRepository scheduleRepository,
+                                  EmailService emailService
                                  )
         {
             _bookingRepository = bookingRepository;
@@ -50,6 +53,7 @@ namespace TradesCompany.Web.Controllers
             _notificationRepository = notificationRepository;
             _notificationService = notificationService;
             _scheduleRepository = scheduleRepository;
+            _emailService = emailService;
         }
 
         [HttpGet]
@@ -119,15 +123,15 @@ namespace TradesCompany.Web.Controllers
         }
 
         [Authorize(Policy = "ScheduleServicePolicy")]
-        public async Task<IActionResult> ScheduleServices([FromBody] AllQuotationEmployeeViewModel model)
+        public async Task<IActionResult> ScheduleServices(int quotationId)
         {
-            var quotation = await _quotationGRepository.GetByIdAsync(model.quotationId);
+            var quotation = await _quotationGRepository.GetByIdAsync(quotationId);
             ServiceSchedule ss = new ServiceSchedule
             {
                 BookingId = quotation.BookingId,
                 ServiceManId = quotation.ServiceManId,
                 QuotationId = quotation.Id,
-                ScheduledAt = DateTime.Now.AddDays(1),
+                ScheduledAt = DateTime.Now.AddMinutes(15),
                 TotalPrice = quotation.Price,
                 Status = "Scheduled"
             };
@@ -184,8 +188,11 @@ namespace TradesCompany.Web.Controllers
                 serviceSchedule.Status = "Completed";
                 quotation.Status = "Completed";
                 booking.Status = "Completed";
-                _quotationGRepository.SaveAsync();
-                // send notification            
+                await _quotationGRepository.SaveAsync();
+                // send notification
+                // send Email 
+                var emailbody = "<p> Your Service Completed , Thank You </p>";
+                await _emailService.SendEmailAsync("jeell72004@gmail.com", "Service Completede", emailbody, true);
             }
             catch (Exception ex)
             {

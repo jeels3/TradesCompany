@@ -1,7 +1,15 @@
 ﻿@model IEnumerable<TradesCompany.Domain.Entities.Notification>
 @using System.Security.Claims
-
 @{
+    if (User.FindFirst(ClaimTypes.Role)?.Value == "USER")
+    {
+        Layout = "~/Views/Shared/Layouts/_UserLayout.cshtml";
+    }
+    else
+    {
+    Layout = "~/Views/Shared/Layouts/_ELayout.cshtml";
+    }
+    ViewData["Title"] = "Notification";
     string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 }
 <input  value="@userId" type="hidden" id="userId"/>
@@ -41,12 +49,12 @@
         <div class="col-12 mb-3 mb-lg-5">
             <div class="overflow-hidden card table-nowrap table-card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Service Man</h5>
+                    <h5 class="mb-0">Notification</h5>
                 </div>
                 <div class="table-responsive">
                     @if (!Model.Any())
                     {
-                        <h1>ServiceMan Not Found</h1>
+                        <h1>Not Notification</h1>
                     }
                     else
                     {

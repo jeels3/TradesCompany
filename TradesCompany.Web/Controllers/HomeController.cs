@@ -9,6 +9,8 @@ using TradesCompany.Web.Models;
 using Microsoft.AspNetCore.SignalR;
 using TradesCompany.Application.Services;
 using TradesCompany.Infrastructure.Services;
+using TradesCompany.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace TradesCompany.Web.Controllers
 {
@@ -18,20 +20,30 @@ namespace TradesCompany.Web.Controllers
        private readonly IRepository<ServiceMan> repository;
         private readonly IEmployeeServices employeeServices;
         private readonly EmailService emailService;
+        private readonly ApplicationDbContext _context;
         public HomeController(ILogger<HomeController> logger  , IRepository<ServiceMan> repository,IEmployeeServices employeeServices,EmailService emailService
-                              
+                              , ApplicationDbContext context
                                )
         {
             _logger = logger;
             this.repository = repository;
             this.employeeServices = employeeServices;
             this.emailService = emailService;
+            _context = context;
         }
 
         public async Task<IActionResult> Index()
         {
             //var data = await employeeServices.GetAllServiceManForSreviceNotification();
             //await emailService.SendEmailAsync("jeell372004@gmail.com", "check", "<h1>hello</h1>", true);
+            try
+            {
+            var data = await _context.Database.ExecuteSqlAsync($"EXEC GetAllUsersWithRole");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
             return View();
         }
 

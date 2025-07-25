@@ -1,6 +1,7 @@
 ﻿@model IEnumerable<TradesCompany.Application.DTOs.QuotationByServicerMan>
 @{
-    // Layout = "~/Views/Shared/Layouts/_EmployeeLayout.cshtml";
+    Layout = "~/Views/Shared/Layouts/_ELayout.cshtml";
+    ViewData["Title"] = "My Quotation";
 }
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 <style>
@@ -53,7 +54,7 @@
                                 <th>Customer Name</th>
                                 <th>Work Details</th>
                                 <th>Service Type</th>
-                                <th>Rating</th>
+                                <th>Price</th>
                                 <th>Status</th>
                                 <th class="text-end">Action</th>
                             </tr>
@@ -72,8 +73,8 @@
                                 </div>
                             </td>
                             <td>@service.WorkDetails</td>
-                            <td> <span class="d-inline-block align-middle">@service.Price</span></td>
                             <td><span>@service.ServiceName</span></td>
+                            <td> <span class="d-inline-block align-middle">@service.Price</span></td>
                             <td>@service.Status</td>
                             <td class="text-end">
                                 <div class="drodown">
@@ -119,7 +120,7 @@
 
         if (confirm('Are you sure you want to Schedule this Booking?')) {
             $.ajax({
-                url: `/Employee/ScheduleServices`,
+                url: `/Employee/ScheduleServices?quotationId=${quotationId}`,
                 ContentType:'application/json',
                 data:JSON.stringify(data),
                 success: function (res) {

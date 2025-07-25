@@ -1,6 +1,7 @@
 ﻿@model IEnumerable<TradesCompany.Application.DTOs.QuotationByUser>
-@{
 
+@{
+    Layout = "~/Views/Shared/Layouts/_UserLayout.cshtml";
 }
 
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
@@ -84,10 +85,13 @@
                                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-end" style="">
-                                                    <button class="dropdown-item" data-id="@quotation.quotationId">View Details</button>
-                                                    @if(quotation.status != "Accepted")
+                                                    @if(quotation.status == "Pending")
                                                     {
-                                                    <button class="dropdown-item accept-btn" data-id="@quotation.quotationId">Accept Service</button>
+                                                        <button class="dropdown-item accept-btn" data-id="@quotation.quotationId">Accept Service</button>
+                                                    }
+                                                    else if (quotation.status == "Accepted")
+                                                    {
+                                                    <button class="dropdown-item reject-btn" data-id="@quotation.quotationId">Reject Service</button>
                                                     }
                                                 </div>
                                             </div>
@@ -118,6 +122,25 @@
                 },
                 error: function (xhr) {
                     const err = xhr.responseJSON?.message || 'Error Accepting Request';
+                    alert(err);
+                }
+            });
+        }
+        });
+
+        $(document).on('click', '.reject-btn', function () {
+        const quotationId = $(this).data('id');
+        console.log(quotationId);
+
+        if (confirm('Are you sure you want to reject this Request?')) {
+            $.ajax({
+                url: `/User/RequestReject?quotationId=${quotationId}`,
+                success: function (res) {
+                    alert(res.message);
+                    location.reload();
+                },
+                error: function (xhr) {
+                    const err = xhr.responseJSON?.message || 'Error Rejecting Request';
                     alert(err);
                 }
             });

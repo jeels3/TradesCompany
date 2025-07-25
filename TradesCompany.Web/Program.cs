@@ -60,6 +60,7 @@ namespace TradesCompany.Web
             builder.Services.AddInfrastructure();
             builder.Services.AddSignalR();
             builder.Services.AddTransient<EmailService>();
+            builder.Services.AddScoped<ChartServices>();
 
             // Exception
             builder.Services.AddExceptionHandler<GlobalExceptionHandler>();

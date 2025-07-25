@@ -14,5 +14,6 @@ namespace TradesCompany.Application.DTOs
         public string Email { get; set; }
         public string roleId { get; set; }
         public string RoleName { get; set; }
+        public bool IsBlocked { get; set; }
     }
 }

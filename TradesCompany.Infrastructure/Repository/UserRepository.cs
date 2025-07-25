@@ -9,7 +9,7 @@ using TradesCompany.Application.DTOs;
 using TradesCompany.Application.Interfaces;
 using TradesCompany.Domain.Entities;
 using TradesCompany.Infrastructure.Data;
-using DataTable = TradesCompany.Application.DTOs.DataTable;
+using DataTable = TradesCompany.Application.DTOs.UserDataTable;
 
 namespace TradesCompany.Infrastructure.Repository
 {
@@ -37,15 +37,51 @@ namespace TradesCompany.Infrastructure.Repository
         //}
         public async Task<List<UsersWithRole>> GetAllUsersAsync()
         {
+            //var data = _context.Database.ExecuteSqlAsync($"EXEC GetAllUsersWithRole");
+            //var data =  _context.Database.ExecuteSqlAsync($"EXEC GetAllUsersWithRole"); 
             return await _context.UsersWithRole.FromSqlRaw("EXEC GetAllUsersWithRole").ToListAsync();
         }
         public async Task<List<ServiceManByServiceType>> GetAllByServiceTypeServicemenAsync(int ServiceTypeId)
         {
             return await _context.ServiceManByServiceType.FromSqlInterpolated($"EXEC GetAllServicemanByServiceType {ServiceTypeId}").ToListAsync();
         }
-        //public async Task<(List<ApplicationUser>, int)> GetFilteredEmployee(DataTable model)
-        //{
-           
-        //}
+
+        public async Task<(List<UsersWithRole>, int)> GetFilteredUsersAsync(UserDataTable model)
+        {
+            //var query = _context.UsersWithRole.FromSqlInterpolated($"EXEC GetAllUsersWithRole").AsQueryable();
+            var datas = await _context.UsersWithRole.FromSqlInterpolated($"EXEC GetAllUsersWithRole").ToListAsync();
+            var query = datas.AsQueryable();
+            // Filter
+            if (!string.IsNullOrEmpty(model.SearchValue))
+            {
+                query = query.Where(b =>
+                    b.UserName.Contains(model.SearchValue) ||
+                    b.RoleName.Contains(model.SearchValue) ||
+                    b.Email.Contains(model.SearchValue)
+                    );
+            }
+
+            int totalRecords =  query.Count();
+
+            //if (!string.IsNullOrEmpty(model.SortColumn))
+            //{
+            //    if (model.SortDirection == "asc")
+            //    {
+            //        query = query.OrderByDescending(model.SortColumn, true , ?  );
+            //    }
+            //    else
+            //    {
+            //        query = query.OrderByDescending(model.SortColumn, false);
+            //    }
+            //}
+
+            // Paging
+            var data =  query
+                .Skip(model.start)
+                .Take(model.length)
+                .ToList();
+
+            return (data, totalRecords);
+        }
     }
 }

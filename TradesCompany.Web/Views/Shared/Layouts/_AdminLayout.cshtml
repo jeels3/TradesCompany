@@ -1,44 +1,205 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <title>@ViewData["Title"] - Admin Panel</title>
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?display=swap&family=Inter:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900" />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-</head>
-<body>
-    <div class="relative flex size-full min-h-screen flex-col bg-slate-50 group/design-root overflow-x-hidden" style='font-family: Inter, "Noto Sans", sans-serif;'>
-        <div class="layout-container flex h-full grow flex-col">
-            <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#e7edf4] px-10 py-3">
-                <div class="flex items-center gap-4 text-[#0d151c]">
-                    <div class="size-4">
-                        <!-- Logo -->
-                        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z" fill="currentColor" />
-                        </svg>
-                    </div>
-                    <h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">Admin Panel</h2>
-                </div>
-                <div class="flex flex-1 justify-end gap-8">
-                    <div class="flex items-center gap-9">
-                        <a class="text-sm font-medium leading-normal text-[#0d151c]" href="#">Users Listing</a>
-                        <a class="text-sm font-medium leading-normal text-[#0d151c]" href="#">Service Booking Listing</a>
-                        <a class="text-sm font-medium leading-normal text-[#0d151c]" href="#">Manage Role & User Claims</a>
-                    </div>
-                    <button class="flex h-10 items-center justify-center rounded-full bg-[#e7edf4] px-2.5 text-sm font-bold text-[#0d151c]">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
-                            <path d="..." />
-                        </svg>
-                    </button>
-                    <div class="rounded-full size-10 bg-center bg-cover bg-no-repeat" style="background-image: url('https://lh3.googleusercontent.com/...');"></div>
-                </div>
-            </header>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-            <main class="flex-1">
+    <!-- Bootstrap & Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" />
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f8f9fa;
+            overflow: scroll;
+        }
+
+        .sidebar {
+            height: 100vh;
+            background: linear-gradient(to bottom right, #6f42c1, #0d6efd);
+            color: #fff;
+            padding-top: 20px;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+            position: fixed;
+            <figcaption>text</figcaption> </figure>
+        }
+
+            .sidebar .nav-link {
+                color: #e0e0e0;
+                font-size: 16px;
+                padding: 12px 20px;
+                border-radius: 8px;
+                transition: all 0.3s ease;
+            }
+
+                .sidebar .nav-link i {
+                    margin-right: 10px;
+                }
+
+                .sidebar .nav-link:hover,
+                .sidebar .nav-link.active,
+                .sidebar .nav-link.bg-white {
+                    background-color: rgba(255, 255, 255, 0.15);
+                    color: #ffffff;
+                }
+
+        .hover-nav:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .brand-title {
+            font-size: 22px;
+            font-weight: bold;
+            text-align: center;
+            color: #fff;
+            margin-bottom: 30px;
+        }
+
+        .logout-link {
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+            .logout-link:hover {
+                background-color: rgba(220, 53, 69, 0.1);
+                transform: translateX(4px);
+                border-color: #dc3545;
+            }
+
+        .admin-header {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0px 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        .hover-nav {
+            color: #6c757d;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+            .hover-nav:hover {
+                background-color: #f8f9fa;
+                color: #0d6efd;
+                font-weight: 500;
+            }
+
+        .transition {
+            transition: all 0.3s ease-in-out;
+        }
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block sidebar text-white shadow-sm">
+                <div class="py-4 text-center border-bottom">
+                    <h4 class="fw-bold mb-0">
+                        <i class="bi bi-journal-bookmark-fill me-2"></i> Quarto Admin
+                    </h4>
+                </div>
+
+                <nav class="nav flex-column px-3 mt-3">
+                    <a class="nav-link d-flex align-items-center gap-2 py-2 px-3 rounded @(currentAction == "Dashboard" ? "bg-white text-primary fw-semibold" : "hover-nav")"
+                       asp-controller="Admin" asp-action="Dashboard">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+
+                    <a class="nav-link d-flex align-items-center gap-2 py-2 px-3 rounded @(currentAction == "UsersListing" ? "bg-white text-primary fw-semibold" : "hover-nav")"
+                       asp-controller="Admin" asp-action="UsersListing">
+                        <i class="bi bi-people"></i> Manage Users
+                    </a>
+
+                    <a class="nav-link d-flex align-items-center gap-1 py-2 px-3 rounded @(currentAction == "BookListing" ? "bg-white text-primary fw-semibold" : "hover-nav")"
+                       asp-controller="Common" asp-action="BookListing">
+                        <i class="bi bi-book"></i>Manage Books
+                    </a>
+
+                    <a class="nav-link d-flex align-items-center gap-2 py-2 px-3 rounded @(currentAction == "CreateBook" ? "bg-white text-primary fw-semibold" : "hover-nav")"
+                       asp-controller="Book" asp-action="CreateBook">
+                        <i class="bi bi-plus-circle"></i> Add Book
+                    </a>
+
+                    <a class="nav-link d-flex align-items-center gap-2 py-2 px-3 rounded @(currentAction == "IssueBookListing" ? "bg-white text-primary fw-semibold" : "hover-nav")"
+                       asp-controller="Book" asp-action="IssueBookListing">
+                        <i class="bi bi-journal-check"></i> Issued Book
+                    </a>
+
+                    <a class="nav-link d-flex align-items-center gap-2 py-2 px-3 rounded @(currentAction == "RolePermission" ? "bg-white text-primary fw-semibold" : "hover-nav")"
+                       asp-controller="Admin" asp-action="RolePermission">
+                        <i class="bi bi-shield-lock"></i> Manage Roles
+                    </a>
+
+                    <a class="nav-link d-flex align-items-center gap-2 py-2 px-3 rounded @(currentAction == "Notify" ? "bg-white text-primary fw-semibold" : "hover-nav")"
+                       asp-controller="Common" asp-action="Notify">
+                        <i class="bi bi-bell-fill"></i> Notification
+                    </a>
+
+                    <a class="nav-link d-flex align-items-center gap-2 py-2 px-3 rounded @(currentAction == "BookListingDT" ? "bg-white text-primary fw-semibold" : "hover-nav")"
+                       asp-controller="Common" asp-action="BookListingDT">
+                        <i class="bi bi-bell-fill"></i> BookListingDT
+                    </a>
+
+                    <a class="nav-link d-flex align-items-center justify-content-between gap-2 py-2 px-3 rounded transition @(currentAction == "GetAllComplaints" ? "bg-white text-primary fw-semibold shadow-sm" : "hover-nav")"
+                       asp-controller="Admin" asp-action="GetAllComplaints">
+
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-chat-dots-fill fs-5"></i>
+                            <span>Complaints</span>
+                        </div>
+
+                        <span id="notificationdot" class="badge bg-danger rounded-pill px-2 py-1 small d-none">0</span>
+                    </a>
+
+
+                    <a class="nav-link d-flex align-items-center gap-2 py-2 px-3 rounded @(currentAction == "Notice" ? "bg-white text-primary fw-semibold" : "hover-nav")"
+                       asp-controller="Admin" asp-action="Notice">
+                        <i class="bi bi-send-fill"></i> Send Notice
+                    </a>
+
+                    <a asp-controller="Account" asp-action="Logout"
+                       class="nav-link d-flex align-items-center gap-2 py-2 px-3 rounded text-danger bg-white fw-semibold mt-4 logout-link">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10">
+                <div class="admin-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">@ViewData["Title"]</h4>
+                    <span class="text-muted small">Admin Panel</span>
+                </div>
                 @RenderBody()
             </main>
         </div>
     </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="~/js/signalr.js"></script>
+    <script src="~/js/site.js"></script>
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

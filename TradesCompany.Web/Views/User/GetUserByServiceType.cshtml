@@ -1,6 +1,7 @@
 ﻿@model IEnumerable<TradesCompany.Application.DTOs.ServiceManByServiceType>
+
 @{
-   
+    Layout = "~/Views/Shared/Layouts/_UserLayout.cshtml";
 }
 
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
@@ -48,9 +49,6 @@
                     }
                     else
                     {
-                        @foreach(var service in Model)
-                        {
-                            
                         <table class="table mb-0">
                         <thead class="small text-uppercase bg-body text-muted">
                             <tr>
@@ -62,6 +60,9 @@
                             </tr>
                         </thead>
                         <tbody>
+                        @foreach(var service in Model)
+                        {
+                            
 
                             <tr class="align-middle">
                                 <td>
@@ -86,12 +87,13 @@
                                     </div>
                                 </td>
                             </tr>
+                        }
                         </tbody>
                     </table>
-                        }
                     }
                 </div>
             </div>
         </div>
     </div>
 </div>
+
