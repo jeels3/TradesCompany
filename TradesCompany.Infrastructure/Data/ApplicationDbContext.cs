@@ -22,6 +22,9 @@ namespace TradesCompany.Infrastructure.Data
         public DbSet<Bill> Bills { get; set; }
         public DbSet<Notification> Notification {  get; set; }
         public DbSet<Schedule> Schedule { get; set; }
+        public DbSet<Channel> Channel { get; set; }
+        public DbSet<ChannelMessage> ChannelMessage { get; set; }
+        public DbSet<ChannelUser> ChannelUser { get; set; }
 
         // For Store Procedure
         public DbSet<UsersWithRole> UsersWithRole { get; set; }
@@ -34,6 +37,11 @@ namespace TradesCompany.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            // Composite Key 
+            builder.Entity<ChannelUser>().HasKey(e => new { e.UserId, e.ChannelName });
+            // Unique key 
+            builder.Entity<Channel>().HasIndex(c => c.ChannelName).IsUnique();
 
             builder.Entity<UsersWithRole>().HasNoKey();
             builder .Entity<ServiceManByServiceType>().HasNoKey();

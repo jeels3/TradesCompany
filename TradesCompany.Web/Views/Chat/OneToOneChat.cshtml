@@ -1,0 +1,91 @@
+﻿@using Microsoft.IdentityModel.Claims
+@model IEnumerable<TradesCompany.Domain.Entities.ChannelMessage>
+@{
+    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+}
+<link href="~/css/OneToOneChat.css" rel="stylesheet">
+<input value="@userId" type="hidden" id="userId"/>
+<input value="@TempData["ChannelName"]" type="hidden" id="ChannelName" />
+
+
+<div class="container content">
+    <div class="row">
+
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+            <div class="card">
+                <div class="card-header">Chat</div>
+                <div class="card-body height3">
+                    <ul class="chat-list" id="chatlist">
+                        @foreach (var message in Model)
+                        {
+                            if (message.SenderId != userId)
+                            {
+                                @* Receiver Message *@
+                                <li class="in">
+                                    <div class="chat-img">
+                                        <img alt="Avtar" src="https://bootdey.com/img/Content/avatar/avatar1.png">
+                                    </div>
+                                    <div class="chat-body">
+                                        <div class="chat-message">
+                                            <p>Ye wala</p>
+                                            <h5>@message.User.UserName</h5>
+                                            <p>@message.Message</p>
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                            else
+                            {
+                                @* Sender Message *@
+                                <li class="out">
+                                    <div class="chat-img">
+                                        <img alt="Avtar" src="https://bootdey.com/img/Content/avatar/avatar6.png">
+                                    </div>
+                                    <div class="chat-body">
+                                        <div class="chat-message">
+                                            <div class="chat-message">
+                                                <p>This wala</p>
+                                                <h5>@message.User.UserName</h5>
+                                                <p>@message.Message</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="text" id="message"/>
+<button onclick="sendMessage()">Send</button>
+
+@section Scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
+   <script src="~/js/signalr.js"></script>
+   <script src="~/js/Chat.js"></script>
+   @* <script>
+    $(document).on('click', '.send-btn', function () {
+        const data = {
+            message : $('message').value(),
+            ChannelName : ChannelName
+        }
+
+        if (confirm('Are you sure you want to Schedule this Booking?')) {
+            $.ajax({
+                url: `/Employee/ScheduleServices?quotationId=${quotationId}`,
+                success: function (res) {
+                    alert(res.message);
+                    location.reload();
+                },
+                error: function (xhr) {
+                    const err = xhr.responseJSON?.message || 'Error Scheduling Request';
+                    alert(err);
+                }
+            });
+        }
+        });
+   </script> *@
+}

@@ -62,6 +62,8 @@ namespace TradesCompany.Web
             builder.Services.AddTransient<EmailService>();
             builder.Services.AddScoped<ChartServices>();
             builder.Services.AddScoped<ExcelService>();
+            builder.Services.AddScoped<IChatRepository, ChatRepository>();
+            builder.Services.AddScoped<IChatService, ChatService>();
 
             // Exception
             builder.Services.AddExceptionHandler<GlobalExceptionHandler>();

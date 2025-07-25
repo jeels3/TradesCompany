@@ -12,9 +12,11 @@ namespace TradesCompany.Shared.Hubs
     public  class NotificationHub : Hub
     {
         private readonly IRepository<Notification> _notificationGRepository;
-        public NotificationHub(IRepository<Notification> notificationGRepository)
+        private readonly IRepository<ChannelMessage> _channelMessage;
+        public NotificationHub(IRepository<Notification> notificationGRepository, IRepository<ChannelMessage> channelMessage)
         {
             _notificationGRepository = notificationGRepository;
+            _channelMessage = channelMessage;
         }
         public async Task JoinGroup(string groupName)
         {
@@ -38,6 +40,22 @@ namespace TradesCompany.Shared.Hubs
             }
             await _notificationGRepository.SaveAsync();
         }
+
+        public async Task SendMessage(string message , string SenderId , string ChannelName)
+        {
+            Console.WriteLine(message);
+            ChannelMessage model = new ChannelMessage
+            {
+                ChannelName = ChannelName,
+                Message = message,
+                SenderId = SenderId,
+            };
+            await _channelMessage.InsertAsync(model);
+            await _channelMessage.SaveAsync();
+            await Clients.Group(ChannelName)
+                .SendAsync("RecieveMessage", message , SenderId);
+        }
+
 
         // Automatic disconnect when user change page or view the client side
         public override async Task OnDisconnectedAsync(Exception? exception)

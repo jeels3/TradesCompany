@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TradesCompany.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using TradesCompany.Infrastructure.Data;
 namespace TradesCompany.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250725095929_add_channelmessage_table")]
+    partial class add_channelmessage_table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -558,7 +561,7 @@ namespace TradesCompany.Infrastructure.Migrations
 
                     b.Property<string>("ChannelName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatorId")
                         .IsRequired()
@@ -568,9 +571,6 @@ namespace TradesCompany.Infrastructure.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ChannelName")
-                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -584,6 +584,9 @@ namespace TradesCompany.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ChannelId")
+                        .HasColumnType("int");
 
                     b.Property<string>("ChannelName")
                         .IsRequired()
@@ -601,31 +604,18 @@ namespace TradesCompany.Infrastructure.Migrations
 
                     b.Property<string>("SenderId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SenderId");
-
-                    b.ToTable("ChannelMessage");
-                });
-
-            modelBuilder.Entity("TradesCompany.Domain.Entities.ChannelUser", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ChannelName")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("ChannelId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId", "ChannelName");
-
                     b.HasIndex("ChannelId");
 
-                    b.ToTable("ChannelUser");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ChannelMessage");
                 });
 
             modelBuilder.Entity("TradesCompany.Domain.Entities.Notification", b =>
@@ -956,17 +946,6 @@ namespace TradesCompany.Infrastructure.Migrations
 
             modelBuilder.Entity("TradesCompany.Domain.Entities.ChannelMessage", b =>
                 {
-                    b.HasOne("TradesCompany.Domain.Entities.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("TradesCompany.Domain.Entities.ChannelUser", b =>
-                {
                     b.HasOne("TradesCompany.Domain.Entities.Channel", "Channel")
                         .WithMany()
                         .HasForeignKey("ChannelId")
@@ -975,9 +954,7 @@ namespace TradesCompany.Infrastructure.Migrations
 
                     b.HasOne("TradesCompany.Domain.Entities.ApplicationUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Channel");
 

@@ -1,0 +1,78 @@
+﻿@model IEnumerable<TradesCompany.Domain.Entities.ApplicationUser>
+
+<link href="https://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+<style>
+    #userimage {
+        width: 100px;
+        height: 100px;
+    }
+
+    .userlist {
+        display: flex;
+        align-content: center;
+        align-items: center;
+        column-gap: 10px;
+    }
+
+    .jumbotron .btn {
+        color: #FFFFFF;
+        padding: 5px !important;
+        font-size: 12px !important;
+        margin-left: 20px;
+    }
+
+    .jumbotron label {
+        font-size: 12px;
+    }
+
+    .img-user {
+        height: 120px;
+        width: 120px;
+        margin-right: 20px;
+    }
+
+    .prj-name {
+        font-weight: bold;
+        color: #5bc0de;
+    }
+
+    .user-item img, .user-item h3 {
+        display: inline-block;
+    }
+
+    .jumbotron .btn .user-item h3 a {
+        color: #5bc0de;
+        padding: 5px !important;
+        font-size: 12px !important;
+    }
+</style>
+<div class="container bootstrap snippets bootdey">
+    <div class="header">
+        <p class="text-muted prj-name">
+            <span class="fa fa-users fa-2x"></span>
+            Users
+        </p>
+    </div>
+
+    <div class="jumbotron" style="min-height:400px;height:auto;">
+        <ul class="list-group">
+            @foreach (var user in Model)
+            {
+                <li class="list-group-item user-item text-left">
+                    <div class="userlist">
+                        <div>
+                            <img id="userimage" class="img-circle img-user img-thumbnail rounded-circle" src="https://bootdey.com/img/Content/avatar/avatar7.png">
+                        </div>
+                        <div>
+                            <h3>
+                                <a asp-controller="Chat" asp-action="OneToOneChat" asp-route-receiverId="@user.Id">@user.UserName</a><br>
+                            </h3>
+                        </div>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+
+</div>   

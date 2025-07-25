@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TradesCompany.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using TradesCompany.Infrastructure.Data;
 namespace TradesCompany.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250725100120_add_channeluser_table")]
+    partial class add_channeluser_table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -585,6 +588,9 @@ namespace TradesCompany.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("ChannelId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ChannelName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -601,11 +607,16 @@ namespace TradesCompany.Infrastructure.Migrations
 
                     b.Property<string>("SenderId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SenderId");
+                    b.HasIndex("ChannelId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("ChannelMessage");
                 });
@@ -956,11 +967,17 @@ namespace TradesCompany.Infrastructure.Migrations
 
             modelBuilder.Entity("TradesCompany.Domain.Entities.ChannelMessage", b =>
                 {
-                    b.HasOne("TradesCompany.Domain.Entities.ApplicationUser", "User")
+                    b.HasOne("TradesCompany.Domain.Entities.Channel", "Channel")
                         .WithMany()
-                        .HasForeignKey("SenderId")
+                        .HasForeignKey("ChannelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("TradesCompany.Domain.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Channel");
 
                     b.Navigation("User");
                 });
