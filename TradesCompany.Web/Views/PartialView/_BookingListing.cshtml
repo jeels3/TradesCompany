@@ -80,9 +80,10 @@
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-end" style="">
                                         <a href="#!" class="dropdown-item">View Details</a>
+                                        @if(booking.Status != "Completed")
+                                        {
                                         <a asp-action="Createquotation" asp-controller="Employee" asp-route-bookingId="@booking.bookingId" class="dropdown-item">Send Quotation</a>
-                                        @* <button class="dropdown-item open-quotation-modal" data-id="@booking.bookingId">Send Quotation</button> *@
-
+                                        }
                                     </div>
                                 </div>
                             </td>

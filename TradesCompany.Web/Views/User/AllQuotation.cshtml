@@ -36,6 +36,12 @@
     }
 </style>
 <div class="container">
+    <nav aria-label="breadcrumb" class="breadcrumb-custom">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Dashboard" asp-controller="User" class="text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">All Quotation</li>
+        </ol>
+    </nav>
     <div class="row">
         <div class="col-12 mb-3 mb-lg-5">
             <div class="overflow-hidden card table-nowrap table-card">
@@ -55,6 +61,7 @@
                                     <th>Service Man</th>
                                     <th>Service Type</th>
                                     <th>Work Details</th>
+                                    <th>Work Description</th>
                                     <th>Email</th>
                                     <th>Price</th>
                                     <th>Status</th>
@@ -76,6 +83,7 @@
                                         </td>
                                         <td>@quotation.ServiceManEmail</td>
                                         <td> <span class="d-inline-block align-middle">@quotation.WorkDetails</span></td>
+                                        <td>@quotation.Description</td>
                                         <td><span>@quotation.ServiceName</span></td>
                                         <td>@quotation.Price</td>
                                         <td>@quotation.status</td>

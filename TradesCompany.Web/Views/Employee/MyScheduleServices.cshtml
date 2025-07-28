@@ -34,6 +34,7 @@
         font-weight: 600;
         background-color: #eeecfd !important;
     }
+    
 </style>
 
 <div class="container">
@@ -46,7 +47,7 @@
                 <div class="table-responsive">
                     @if (!Model.Any())
                     {
-                        <h1>ServiceMan Not Found</h1>
+                        <h5 class="notfound">No Service Scheduled</h5>
                     }
                     else
                     {
@@ -136,6 +137,7 @@
         if (confirm('Service Completed ?')) {
             $.ajax({
                 url: `/Employee/ServiceCompleted?ScheduleServiceId=${ScheduleServiceId}`,
+                method:'POST',
                 success: function (res) {
                     alert(res.message);
                     location.reload();

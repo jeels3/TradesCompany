@@ -2,13 +2,110 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <a asp-controller="Admin" asp-action="Dashboard">Dashboard</a>
-    <br />
-    <a asp-action="Login" asp-controller="Account">Login</a>
-    <br />
-    <a asp-action="CustomerRegister" asp-controller="Account">singUp as a Customer</a>
-    <br />
-    <a asp-action="EmployeeRegister" asp-controller="Account">singUp as a Employee</a>
+<link rel="stylesheet" href="~/css/IndexStyleSheet.css" asp-append-version="true" />
+
+<!-- Welcome Section -->
+<div class="welcome-section text-center">
+    <div class="container">
+        <h1 class="welcome-title">Welcome to TradesCompany</h1>
+        <p class="welcome-subtitle">Your trusted platform for professional home services</p>
+        <p class="mb-0">Connect with verified professionals • Quality guaranteed • Transparent pricing</p>
+    </div>
+</div>
+
+<!-- Action Cards -->
+<div class="action-cards">
+    <!-- Admin Dashboard Card -->
+    <a class="action-card admin-card" asp-controller="User" asp-action="Dashboard">
+        <div class="card-icon">
+            <i class="fas fa-chart-line"></i>
+        </div>
+        <h3 class="card-title">User Dashboard</h3>
+        <p class="card-description">
+            Manage platform operations, monitor services, track performance metrics,
+            and oversee user activities from a comprehensive admin panel.
+        </p>
+        <span class="card-link">
+            Access Dashboard <i class="fas fa-arrow-right"></i>
+        </span>
+    </a>
+
+    <!-- Login Card -->
+    <a class="action-card login-card" asp-action="Login" asp-controller="Account">
+        <div class="card-icon">
+            <i class="fas fa-sign-in-alt"></i>
+        </div>
+        <h3 class="card-title">Member Login</h3>
+        <p class="card-description">
+            Already have an account? Sign in to access your personalized dashboard,
+            manage bookings, and track your service history.
+        </p>
+        <span class="card-link">
+            Sign In <i class="fas fa-arrow-right"></i>
+        </span>
+    </a>
+
+    <!-- Customer Registration Card -->
+    <a class="action-card customer-card" asp-action="CustomerRegister" asp-controller="Account">
+        <div class="card-icon">
+            <i class="fas fa-user-plus"></i>
+        </div>
+        <h3 class="card-title">Join as Customer</h3>
+        <p class="card-description">
+            Book trusted professionals for home cleaning, repairs, beauty services,
+            and more. Quick registration with instant access to all services.
+        </p>
+        <span class="card-link">
+            Register Now <i class="fas fa-arrow-right"></i>
+        </span>
+    </a>
+
+    <!-- Employee Registration Card -->
+    <a class="action-card employee-card" asp-action="EmployeeRegister" asp-controller="Account">
+        <div class="card-icon">
+            <i class="fas fa-briefcase"></i>
+        </div>
+        <h3 class="card-title">Become a Professional</h3>
+        <p class="card-description">
+            Join our network of skilled professionals. Showcase your expertise,
+            connect with customers, and grow your business with us.
+        </p>
+        <span class="card-link">
+            Apply Today <i class="fas fa-arrow-right"></i>
+        </span>
+    </a>
+</div>
+
+<!-- Features Section -->
+<div class="features-section">
+    <h2 class="features-title">Why Choose TradesCompany?</h2>
+    <div class="row">
+        <div class="col-md-4 feature-item">
+            <div class="feature-icon">
+                <i class="fas fa-shield-check"></i>
+            </div>
+            <h4 class="feature-title">Verified Professionals</h4>
+            <p class="feature-description">
+                All service providers are background verified and skill-tested for your safety and satisfaction.
+            </p>
+        </div>
+        <div class="col-md-4 feature-item">
+            <div class="feature-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <h4 class="feature-title">On-Time Service</h4>
+            <p class="feature-description">
+                Punctual service delivery with real-time tracking and instant updates on your bookings.
+            </p>
+        </div>
+        <div class="col-md-4 feature-item">
+            <div class="feature-icon">
+                <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <h4 class="feature-title">Transparent Pricing</h4>
+            <p class="feature-description">
+                No hidden charges. Get upfront pricing with secure payment options and clear billing.
+            </p>
+        </div>
+    </div>
 </div>

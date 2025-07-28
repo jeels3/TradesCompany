@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TradesCompany.Application.Interfaces;
 using TradesCompany.Application.Services;
@@ -10,14 +11,18 @@ namespace TradesCompany.Web.Controllers
     {
         private readonly IChatRepository _chatRepository;
         private readonly IRepository<Channel> _channelRepository;
+        private readonly IRepository<ApplicationUser> _userGRepository;
         private readonly IChatService _chatService;
         public ChatController(IChatRepository chatRepository,
             IRepository<Channel> channelRepository,
-            IChatService chatService)
+            IChatService chatService,
+            IRepository<ApplicationUser> userGRepository
+            )
         {
             _chatRepository = chatRepository;
             _channelRepository = channelRepository;
             _chatService = chatService;
+            _userGRepository = userGRepository;
         }
 
         private string? userId => User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -26,6 +31,10 @@ namespace TradesCompany.Web.Controllers
             try
             {
                 var users = await _chatRepository.GetAllUserListing(userId);
+                if(users == null)
+                {
+                    return View(new List<ApplicationUser>());
+                }
                 return View(users);
             }
             catch (Exception ex)
@@ -37,6 +46,7 @@ namespace TradesCompany.Web.Controllers
 
         public async Task<IActionResult> OneToOneChat(string receiverId)
         {
+            var receiver = await _userGRepository.GetByIdAsync(receiverId);
             // Create ChannelId 
             string channelName1 = $"P_{userId}_{receiverId}";
             string channelName2 = $"P_{receiverId}_{userId}";
@@ -52,12 +62,14 @@ namespace TradesCompany.Web.Controllers
                     {
                         var chatdata = await _chatRepository.GetChatMessageByChannelName(channelName1);
                         TempData["ChannelName"] = channelName1;
+                        TempData["ReceiverName"] = receiver.UserName;
                         return View(chatdata);
                     }
                     else
                     {
                         var chatdata = await _chatRepository.GetChatMessageByChannelName(channelName2);
                         TempData["ChannelName"] = channelName2;
+                        TempData["ReceiverName"] = receiver.UserName;
                         return View(chatdata);
                     }
                 }
@@ -71,13 +83,11 @@ namespace TradesCompany.Web.Controllers
                     };
                     await _channelRepository.InsertAsync(channel);
                     await _channelRepository.SaveAsync();
-                    ChannelMessage model = new ChannelMessage
-                    {
-                        ChannelName = channel.ChannelName,
-                        Message = "",
-                        SenderId = userId
-                    };
-                    return View(model);
+
+                    TempData["ChannelName"] = channel.ChannelName;
+                    TempData["ReceiverName"] = receiver.UserName;
+
+                    return View(new List<ChannelMessage>());
                 }
             }
             catch (Exception ex)

@@ -4,8 +4,8 @@
 <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
 <style>
     #userimage {
-        width: 100px;
-        height: 100px;
+        width: 70px;
+        height: 70px;
     }
 
     .userlist {
@@ -13,6 +13,13 @@
         align-content: center;
         align-items: center;
         column-gap: 10px;
+    }
+
+    .username{
+        text-decoration:none;
+        color:black;
+        text-transform:capitalize;
+        font-size:25px;
     }
 
     .jumbotron .btn {
@@ -46,6 +53,9 @@
         padding: 5px !important;
         font-size: 12px !important;
     }
+    .list-group{
+        width: 420px;
+    }
 </style>
 <div class="container bootstrap snippets bootdey">
     <div class="header">
@@ -66,7 +76,7 @@
                         </div>
                         <div>
                             <h3>
-                                <a asp-controller="Chat" asp-action="OneToOneChat" asp-route-receiverId="@user.Id">@user.UserName</a><br>
+                                <a class="username" asp-controller="Chat" asp-action="OneToOneChat" asp-route-receiverId="@user.Id">@user.UserName</a><br>
                             </h3>
                         </div>
                     </div>

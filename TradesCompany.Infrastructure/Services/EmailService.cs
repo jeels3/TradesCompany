@@ -16,7 +16,7 @@ namespace TradesCompany.Infrastructure.Services
         {
             _configuration = configuration;
         }
-        public Task SendEmailAsync(string ToEmail, string Subject, string Body, bool IsBodyHtml = false)
+        public Task SendEmailAsync(Attachment? attachment ,string ToEmail, string Subject, string Body, bool IsBodyHtml = false)
         {
             string? MailServer = _configuration["EmailSettings:MailServer"];
             string? FromEmail = _configuration["EmailSettings:FromEmail"];
@@ -38,6 +38,10 @@ namespace TradesCompany.Infrastructure.Services
                 Body = Body,
             };
             mailMessage.To.Add(ToEmail);
+            if(attachment != null)
+            {
+                mailMessage.Attachments.Add(attachment);
+            }
             return client.SendMailAsync(mailMessage);
         }
     }

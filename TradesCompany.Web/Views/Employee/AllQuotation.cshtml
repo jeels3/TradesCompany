@@ -101,38 +101,125 @@
     </div>
 </div>
 
-@* <div id="schedulepopup">
-    <input asp-for="@Model.date" type="date"/>
-    <input asp-for="@Model.time" type="time"/>
-</div> *@
+<!-- Schedule Service Modal -->
+<div id="scheduleModal" class="modal-overlay w-25">
+    <div class="modal-content">
+        <h4 style="margin-bottom: 20px;">Schedule Service</h4>
+        <div class="form-group card-body">
+            <label for="scheduleDate" class="form-label">Select Date:</label>
+            <input type="date" id="scheduleDate" class="form-control" name="scheduleDate" required />
+        </div>
+        <div class="form-group">
+            <label for="scheduleTime" class="form-label">Select Time:</label>
+            <input type="time" id="scheduleTime" class="form-control" name="scheduleTime" required />
+        </div>
+        <div class="btn-group form-group">
+            <button type="button" id="cancelSchedule">Cancel</button>
+            <button type="button" class="btn-primary" id="confirmSchedule">Schedule Service</button>
+        </div>
+    </div>
+</div>
 
-@section Scripts{
+@section Scripts {
     <script>
-        $(document).on('click', '.schedule-btn', function () {
-        const quotationId = $(this).data('id');
-        const date = $('#date').value;
-        const time = $('#time').value;
-        var data = {
-            date:"Hello",
-            time:"jii",
-            quotationId:quotationId
-        }
+        let currentQuotationId = null;
 
-        if (confirm('Are you sure you want to Schedule this Booking?')) {
+        // Set minimum date to today
+        $(document).ready(function() {
+            const today = new Date().toISOString().split('T')[0];
+            $('#scheduleDate').attr('min', today);
+        });
+
+        // Show modal when schedule button is clicked
+        $(document).on('click', '.schedule-btn', function () {
+            currentQuotationId = $(this).data('id');
+            $('#scheduleModal').show();
+        });
+
+        // Hide modal when cancel is clicked
+        $('#cancelSchedule').click(function() {
+            $('#scheduleModal').hide();
+            resetForm();
+        });
+
+        // Hide modal when clicking outside
+        $('#scheduleModal').click(function(e) {
+            if (e.target === this) {
+                $('#scheduleModal').hide();
+                resetForm();
+            }
+        });
+
+        // Handle form submission
+        $('#confirmSchedule').click(function() {
+            const date = $('#scheduleDate').val();
+            const time = $('#scheduleTime').val();
+
+            if (!date || !time) {
+                alert('Please select both date and time.');
+                return;
+            }
+
+            // Validate that selected datetime is in the future
+            const selectedDateTime = new Date(date + 'T' + time);
+            const now = new Date();
+
+            if (selectedDateTime <= now) {
+                alert('Please select a future date and time.');
+                return;
+            }
+
+            const data = {
+                quotationId: currentQuotationId,
+                date: date,
+                time: time
+            };
+            console.log(data);
+
+            // Show loading state
+            $('#confirmSchedule').prop('disabled', true).text('Scheduling...');
+
             $.ajax({
-                url: `/Employee/ScheduleServices?quotationId=${quotationId}`,
-                ContentType:'application/json',
-                data:JSON.stringify(data),
-                success: function (res) {
-                    alert(res.message);
-                    location.reload();
+                url: '/Employee/ScheduleServices',
+                type: 'POST',
+                data: data,
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
                 },
                 error: function (xhr) {
-                    const err = xhr.responseJSON?.message || 'Error Scheduling Request';
-                    alert(err);
+                    let errorMessage = 'Error scheduling service. Please try again.';
+
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    } else if (xhr.responseText) {
+                        try {
+                            const errorResponse = JSON.parse(xhr.responseText);
+                            errorMessage = errorResponse.message || errorMessage;
+                        } catch (e) {
+                            // Use default error message
+                        }
+                    }
+
+                    alert(errorMessage);
+                },
+                complete: function() {
+                    // Reset button state
+                    $('#confirmSchedule').prop('disabled', false).text('Schedule Service');
+                    $('#scheduleModal').hide();
+                    resetForm();
                 }
             });
-        }
         });
+
+        function resetForm() {
+            $('#scheduleDate').val('');
+            $('#scheduleTime').val('');
+            currentQuotationId = null;
+        }
     </script>
 }

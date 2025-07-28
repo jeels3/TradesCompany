@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using TradesCompany.Application.DTOs;
@@ -7,17 +8,24 @@ using TradesCompany.Infrastructure.Services;
 
 namespace TradesCompany.Web.Controllers
 {
+    [Authorize(Roles = "ADMIN")]
     public class AdminController : Controller
     {
         private readonly IUserRepository _userRepository;
         private readonly ChartServices _chartServices;
         private readonly ExcelService excelService;
+        private readonly ConnectionService _connectionService;
 
-        public AdminController(IUserRepository userRepository, ChartServices chartServices, ExcelService excelService)
+        public AdminController(IUserRepository userRepository, 
+            ChartServices chartServices, 
+            ExcelService excelService,
+            ConnectionService connectionService
+            )
         {
             _userRepository = userRepository;
             _chartServices = chartServices;
             this.excelService = excelService;
+            _connectionService = connectionService;
         }
 
         public async Task<IActionResult> Dashboard()
@@ -26,12 +34,26 @@ namespace TradesCompany.Web.Controllers
             return View(data);
         }
 
-        //public async Task<IActionResult> DownloadExcel([FromForm] ChartModel model)
-        //{
-        //    Console.WriteLine(model);
-        //    excelService.GenerateExcelFile(model);
-        //    return Ok();
-        //}
+        public async Task<IActionResult> ChartData(string type)
+        {
+            var procedure = "";
+            if(type == null)
+            {
+                procedure = "GetRevenueVSServiceType";
+                return Json(await _connectionService.GetDataFromSP(procedure));
+            }
+            else if(type == "Month")
+            {
+                procedure = "GetRevenueVSServiceTypeByMonth";
+                return Json(await _connectionService.GetDataFromSP(procedure));
+            }
+            else if(type == "year")
+            {
+                procedure = "GetRevenueVSServiceTypeByYear";
+                return Json(await _connectionService.GetDataFromSP(procedure));
+            }
+            return BadRequest();
+        }
 
         [HttpPost]
         public IActionResult DownloadExcel([FromForm] ChartModel model)

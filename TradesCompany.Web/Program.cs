@@ -64,6 +64,7 @@ namespace TradesCompany.Web
             builder.Services.AddScoped<ExcelService>();
             builder.Services.AddScoped<IChatRepository, ChatRepository>();
             builder.Services.AddScoped<IChatService, ChatService>();
+            builder.Services.AddScoped<ConnectionService>();
 
             // Exception
             builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -95,6 +96,7 @@ namespace TradesCompany.Web
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.MapHub<NotificationHub>("/notificationHub");
+            app.MapHub<NotificationHub>("/chatHub");
 
             app.Run();
         }

@@ -19,7 +19,9 @@ namespace TradesCompany.Infrastructure.Repository
         }
         public async Task<List<Notification>> GetAllNotificationByUserId(string userId)
         {
-            return await _context.Notification.Where(n => n.userId == userId).ToListAsync();
+            return await _context.Notification.Where(n => n.userId == userId)
+                                .OrderByDescending(n => n.Created)
+                                .ToListAsync();
         }
     }
 }

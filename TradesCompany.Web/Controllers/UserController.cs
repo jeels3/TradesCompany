@@ -2,11 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using NuGet.Protocol;
 using System.Data;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using TradesCompany.Application.DTOs;
 using TradesCompany.Application.Interfaces;
 using TradesCompany.Application.Services;
 using TradesCompany.Domain.Entities;
@@ -15,7 +17,7 @@ using TradesCompany.Web.ViewModel;
 
 namespace TradesCompany.Web.Controllers
 {
-    
+    [Authorize(Roles = "USER")]
     public class UserController : Controller
     {
         private readonly IRepository<ServiceType> _serviceGRepository;
@@ -45,8 +47,10 @@ namespace TradesCompany.Web.Controllers
             _quotationRepository = quotationRepository;
             _employeeServices = employeeServices;
             _notificationService = notificationService;
-        }           
+        }
 
+        [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> Dashboard()
         {
             try
@@ -60,6 +64,9 @@ namespace TradesCompany.Web.Controllers
                 return View("Error", new { message = ex.Message });
             }
         }
+
+        [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetUserByServiceType(int serviceTypeId)
         {
             try
@@ -94,10 +101,10 @@ namespace TradesCompany.Web.Controllers
         }
 
         [HttpPost]
-        //[Authorize(Policy = "BookingServicePolicy")]
+        [Authorize(Policy = "BookingServicePolicy")]
         public async Task<IActionResult> BookService(BookingViewModel model)
         {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null) 
             {
                 return RedirectToAction("Login", "Account");
@@ -135,6 +142,10 @@ namespace TradesCompany.Web.Controllers
             // Fatch By Booking -> User -> Quotation
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var quotations = await _quotationRepository.GetQuotationForUser(userId);
+            if(quotations == null)
+            {
+                return View(new List<QuotationByUser>());
+            }
             return View(quotations);
         }
 
@@ -147,7 +158,7 @@ namespace TradesCompany.Web.Controllers
             // Update Status : Booking , Quoation
                 var quotation =await _quotationGRepository.GetByIdAsync(quotationId);
                 quotation.Status = "Accepted";
-                _quotationGRepository.SaveAsync();
+                await _quotationGRepository.SaveAsync();
                 // send notification            
 
             }catch(Exception ex)
@@ -164,7 +175,7 @@ namespace TradesCompany.Web.Controllers
                 // Update Status : Booking , Quoation
                 var quotation = await _quotationGRepository.GetByIdAsync(quotationId);
                 quotation.Status = "Rejected";
-                _quotationGRepository.SaveAsync();
+                await _quotationGRepository.SaveAsync();
                 // send notification            
 
             }

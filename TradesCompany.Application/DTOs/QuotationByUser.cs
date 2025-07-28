@@ -17,5 +17,6 @@ namespace TradesCompany.Application.DTOs
         public string? ServiceName { get; set; }
         public string? WorkDetails {  get; set; }
         public string? status { get; set; }
+        public string? Description { get; set; }
     }
 }

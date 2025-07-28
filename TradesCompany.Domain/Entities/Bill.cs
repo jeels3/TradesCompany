@@ -15,6 +15,8 @@ namespace TradesCompany.Domain.Entities
         public double PlatFormFees { get; set; }
         public double TotalPrice { get; set; }
         public string? FilePath { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public int serviceScheduleId { get; set; }
+        public ServiceSchedule? serviceSchedule { get; set; }
     }
 }
