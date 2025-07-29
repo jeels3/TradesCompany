@@ -4,12 +4,11 @@ const connection = new signalR.HubConnectionBuilder()
     .withUrl("/notificationHub")
     .build();
 
-connection.on("ReceiveBookingNotification", (NotificationType, Message) => {
+connection.on("ReceiveBookingNotification", (NotificationType, message) => {
+    alert(message);
     const currentPage = window.location.href.split("/").pop().toLowerCase();
-
-    if (currentPage !== "Notification") {
-        //showComplaintCount();
-        document.getElementById("notificationcnt").value += 1;
+    if (currentPage !== "notification") {
+        //document.getElementById("notificationcnt").value += 10;
         return;
     }
     connection.invoke("ReadNotification",userId);
@@ -18,8 +17,7 @@ connection.on("ReceiveBookingNotification", (NotificationType, Message) => {
 connection.on("ReceiveNewQuotation", (NotificationType, Message) => {
     const currentPage = window.location.href.split("/").pop().toLowerCase();
 
-    if (currentPage !== "Notification") {
-        //showComplaintCount();
+    if (currentPage !== "notification") {
         console.log("Notification");
         return;
     }
@@ -29,8 +27,7 @@ connection.on("ReceiveNewQuotation", (NotificationType, Message) => {
 connection.on("ReceiveNewSchedule", (NotificationType, Message) => {
     const currentPage = window.location.href.split("/").pop().toLowerCase();
 
-    if (currentPage !== "Notification") {
-        //showComplaintCount();
+    if (currentPage !== "notification") {
         console.log("Notification");
         return;
     }
@@ -40,7 +37,7 @@ connection.on("ReceiveNewSchedule", (NotificationType, Message) => {
 connection.on("RecieveScheduleSeviceReminder", (NotificationType, Message) => {
     const currentPage = window.location.href.split("/").pop().toLowerCase();
 
-    if (currentPage !== "Notification") {
+    if (currentPage !== "notification") {
         //showComplaintCount();
         console.log("Notification");
         return;
@@ -56,5 +53,6 @@ function fullfill() {
 function reject() {
     console.log("Reject called");
 }
+
 connection.start().then(fullfill, reject);
 

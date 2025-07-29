@@ -1,14 +1,6 @@
 ﻿@using Microsoft.IdentityModel.Claims
 @model IEnumerable<TradesCompany.Domain.Entities.ChannelMessage>
 @{
-    if (User.FindFirst(ClaimTypes.Role)?.Value == "USER")
-    {
-        Layout = "~/Views/Shared/Layouts/_UserLayout.cshtml";
-    }
-    else
-    {
-        Layout = "~/Views/Shared/Layouts/_ELayout.cshtml";
-    }
     var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 }
 <link href="~/css/OneToOneChat.css" rel="stylesheet" />
@@ -20,7 +12,7 @@
         <div class="col-xl-6 col-lg-8 col-md-10 col-sm-12">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white fw-bold">
-                    Chat: @TempData["ReceiverName"]
+                    Chat: @TempData["GroupName"]
                 </div>
                 <div class="card-body chat-body height3 overflow-auto">
                     <ul class="chat-list list-unstyled mb-0" id="chatlist">
@@ -66,12 +58,12 @@
                                 }
 
                             }
-                                var lastSentMessage = Model.LastOrDefault(m => m.SenderId == userId);
-                                if (lastSentMessage != null && lastSentMessage.IsSeen.Any(s => s.Seen && s.ReceiverId != userId) && seenbyreceiver == false)
-                                {
-                                    seenbyreceiver = true;
-                                    <li class="text-end in text-muted small">Seen : @lastSentMessage.IsSeen.Count()</li>
-                                }
+                            var lastSentMessage = Model.LastOrDefault(m => m.SenderId == userId);
+                            if (lastSentMessage != null && lastSentMessage.IsSeen.Any(s => s.Seen && s.ReceiverId != userId) && seenbyreceiver == false)
+                            {
+                                seenbyreceiver = true;
+                                <li class="text-end in text-muted small" id="seenCount">Seen : @lastSentMessage.IsSeen.Count()</li>
+                            }
                         }
                     </ul>
                 </div>
@@ -83,8 +75,7 @@
         </div>
     </div>
 </div>
-
-@section Scripts {
+@section Scripts{
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
     <script src="~/js/signalr.js"></script>
     <script src="~/js/Chat.js"></script>

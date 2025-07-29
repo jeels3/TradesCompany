@@ -12,5 +12,6 @@ namespace TradesCompany.Domain.Entities
         public string ChannelName { get; set; }
         public string CreatorId { get; set; }
         public ApplicationUser User { get; set; }
+        public List<ChannelUser> ChannelUsers { get; set; } = new List<ChannelUser>();
     }
 }

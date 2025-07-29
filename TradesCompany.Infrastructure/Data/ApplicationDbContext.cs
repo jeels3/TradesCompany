@@ -39,7 +39,6 @@ namespace TradesCompany.Infrastructure.Data
             base.OnModelCreating(builder);
 
             // Composite Key 
-            builder.Entity<ChannelUser>().HasKey(e => new { e.UserId, e.ChannelName });
             // Unique key 
             builder.Entity<Channel>().HasIndex(c => c.ChannelName).IsUnique();
 
@@ -111,7 +110,7 @@ namespace TradesCompany.Infrastructure.Data
             builder.Entity<Rating>()
                 .HasOne(r => r.ServiceSchedule)
                 .WithOne(ss => ss.Rating)
-                .HasForeignKey<Rating>(r => r.ServiceScheduleId);  
+                .HasForeignKey<Rating>(r => r.ServiceScheduleId);
         }
     }
 }

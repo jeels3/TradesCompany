@@ -90,7 +90,7 @@
 
                     <a class="nav-link @(currentAction == "Notification" ? "bg-white text-primary fw-semibold" : "hover-nav")"
                        asp-controller="Employee" asp-action="Notification">
-                        <i class="bi bi-bell-fill"><spam id="notificationcnt">1</spam></i> Notification
+                        <i class="bi bi-bell-fill"><spam id="notificationcnt"></spam></i> Notification
                     </a>
 
                     <a class="nav-link @(currentAction == "MyScheduleServices" ? "bg-white text-primary fw-semibold" : "hover-nav")"
@@ -106,9 +106,9 @@
                             <span>Chat</span>
                         </div>
 
-                        <span id="notificationdot" class="badge bg-danger rounded-pill px-2 py-1 small d-none">0</span>
+                        <span id="chatnotificationcnt"></span>
                     </a>
-
+                            
                     <a asp-controller="Account" asp-action="Logout"
                        class="nav-link d-flex align-items-center gap-2 py-2 px-3 rounded text-danger bg-white fw-semibold mt-4 logout-link">
                         <i class="bi bi-box-arrow-right"></i> Logout
@@ -146,8 +146,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-    <script src="~/js/signalr.js></script>
-    <script src="~/js/Notifications.js"></script>
+    <script src="~/js/signalr.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script> 
+    @* <script src="~/js/Notifications.js" asp-append-version="true"></script> *@
     @RenderSection("Scripts", required: false)
+    @* <script src="~/js/ShowNotificationCount.js" asp-append-version="true"></script> *@
 </body>
 </html>

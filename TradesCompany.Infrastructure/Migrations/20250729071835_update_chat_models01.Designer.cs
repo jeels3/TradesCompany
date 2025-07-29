@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TradesCompany.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using TradesCompany.Infrastructure.Data;
 namespace TradesCompany.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250729071835_update_chat_models01")]
+    partial class update_chat_models01
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -671,9 +674,14 @@ namespace TradesCompany.Infrastructure.Migrations
                     b.Property<DateTime?>("SeenDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ChannelMessageId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("IsSeen");
                 });
@@ -1063,7 +1071,13 @@ namespace TradesCompany.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("TradesCompany.Domain.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
                     b.Navigation("ChannelMessage");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TradesCompany.Domain.Entities.Notification", b =>

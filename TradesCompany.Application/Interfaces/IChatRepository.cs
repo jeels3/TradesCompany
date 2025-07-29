@@ -12,5 +12,9 @@ namespace TradesCompany.Application.Interfaces
         Task<List<ApplicationUser>> GetAllUserListing(string userId);
         Task<bool> CheckChennelNameIsExists(string ChannelName);
         Task<List<ChannelMessage>> GetChatMessageByChannelName(string ChannelName);
+        Task<int> GetChannelIdByChannelName(string ChannelName);
+        Task<bool> CheckUserInChannel(int channelId, string userId);
+        Task<List<Channel>> GetGroupByUserId(string userId);
+        Task<int> GetAllUnreadMessageByUserId(string userId);
     }
 }

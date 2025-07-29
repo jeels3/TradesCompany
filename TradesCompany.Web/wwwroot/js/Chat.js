@@ -1,17 +1,37 @@
 ﻿var userId = document.getElementById("userId").value;
 var ChannelName = document.getElementById("ChannelName").value;
 
-const connection = new signalR.HubConnectionBuilder()
+const connection2 = new signalR.HubConnectionBuilder()
     .withUrl("/chatHub")
     .build();
 function fullfill() {
     console.log("Fullfill called");
-    //alert(userId);
-    connection.invoke("JoinGroup", `UserGroup_${userId}`);
-    connection.invoke("JoinGroup", ChannelName);
+    connection2.invoke("JoinGroup", ChannelName);
+    connection2.invoke("ReadMessage", userId, ChannelName);
+    //connection.invoke("JoinGroup", `UserGroup_${userId}`);
+    //connection.invoke("ChatNotificationCount", userId);
+}
+function reject() {
+    console.log("rejected connectoin");
 }
 
-connection.on("RecieveMessage", (message, senderId) => {
+connection2.start().then(fullfill, reject);
+
+debugger
+document.addEventListener("DOMContentLoaded", function () {
+    const currentPage = window.location.href.split("/").pop().toLowerCase();
+    if (currentPage.startsWith("groupchat")) {
+        return;
+    }
+});
+
+
+connection2.on("RecieveMessage", (message, senderId) => {
+    //const currentPage = window.location.href.split("/").pop().toLowerCase();
+    //if (currentPage.startsWith("userlisting")) {
+       
+    //}
+
     if (senderId != userId) {
         const ui = document.getElementById("chatlist");
 
@@ -37,7 +57,7 @@ function sendMessage() {
     debugger
     const message = document.getElementById("message").value;
     if (message.trim() != "") {
-    connection.invoke("SendMessage", message, userId, ChannelName).catch(err => console.error(err.toString()));
+    connection2.invoke("SendMessage", message, userId, ChannelName).catch(err => console.error(err.toString()));
     const ui = document.getElementById("chatlist");
     const now = new Date();
     const hours = now.getHours().toString().padStart(2, '0');
@@ -56,7 +76,3 @@ function sendMessage() {
     }
     document.getElementById("message").value = "";
 }
-function reject() {
-    console.log("Reject called");
-}
-connection.start().then(fullfill, reject);

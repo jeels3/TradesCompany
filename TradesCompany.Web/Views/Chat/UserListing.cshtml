@@ -1,4 +1,4 @@
-﻿@model IEnumerable<TradesCompany.Domain.Entities.ApplicationUser>
+﻿@model TradesCompany.Web.ViewModel.UserAndGroupListing;
 
 <link href="https://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
@@ -56,6 +56,9 @@
     .list-group{
         width: 420px;
     }
+    .Group-elements{
+        display:none;
+    }
 </style>
 <div class="container bootstrap snippets bootdey">
     <div class="header">
@@ -65,9 +68,13 @@
         </p>
     </div>
 
+    <button type="button" id="showCheckBox">Group</button>
+    <input id="ChannelName" type="text" class="Group-elements" placeholder="Enter Group Name"/>
+    <button type="button" id="CreateGroup" class="Group-elements">Create Group</button>
+
     <div class="jumbotron" style="min-height:400px;height:auto;">
         <ul class="list-group">
-            @foreach (var user in Model)
+            @foreach (var user in Model.Users)
             {
                 <li class="list-group-item user-item text-left">
                     <div class="userlist">
@@ -79,10 +86,81 @@
                                 <a class="username" asp-controller="Chat" asp-action="OneToOneChat" asp-route-receiverId="@user.Id">@user.UserName</a><br>
                             </h3>
                         </div>
+                        <input type="checkbox" value="@user.Id" class="Group-elements Group-checkbox" />
+                    </div>
+                </li>
+            }
+            @foreach (var user in Model.channels)
+            {
+                <li class="list-group-item user-item text-left">
+                    <div class="userlist">
+                        <div>
+                            <img id="userimage" class="img-circle img-user img-thumbnail rounded-circle" src="https://bootdey.com/img/Content/avatar/avatar7.png">
+                        </div>
+                        <div>
+                            <h3>
+                                <a class="username" asp-controller="Chat" asp-action="GroupChat" asp-route-channelName="@user.ChannelName">@user.ChannelName</a><br>
+                            </h3>
+                        </div>
+                        <input type="checkbox" value="@user.Id" class="Group-elements Group-checkbox" />
                     </div>
                 </li>
             }
         </ul>
     </div>
-
 </div>   
+@section Scripts{
+    <script>
+        document.getElementById("showCheckBox").addEventListener("click", function () {
+            var elements = document.querySelectorAll(".Group-elements");
+            elements.forEach(function (element) {
+                element.style.display = element.style.display === "none" ? "inline-block" : "none";
+            });
+        });
+        document.getElementById("CreateGroup").addEventListener("click" , function (){
+            var elements = document.querySelectorAll(".Group-checkbox");
+            var GroupIds = [];
+            elements.forEach(function (element) {
+               if(element.checked){
+                   GroupIds.push(element.value);
+               }
+            });
+            // AJAX CALL
+            console.log(GroupIds);
+            var ChannelName = document.getElementById("ChannelName").value;
+            debugger
+            $.ajax({
+                url: '/Chat/CreateGroup',
+                type: 'POST',
+                contentType: 'application/json', // If sending JSON
+                data: JSON.stringify({
+                    GroupIds : GroupIds ,
+                    ChannelName : ChannelName
+                }),
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert("Error"+response.message);
+                    }
+                },
+                error: function (xhr) {
+                    let errorMessage = 'Error Creating Group. Please try again.';
+
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    } else if (xhr.responseText) {
+                        try {
+                            const errorResponse = JSON.parse(xhr.responseText);
+                            errorMessage = errorResponse.message || errorMessage;
+                        } catch (e) {
+                            // Use default error message
+                        }
+                    }
+                    alert(errorMessage);
+                },
+            });
+        });
+    </script>
+}

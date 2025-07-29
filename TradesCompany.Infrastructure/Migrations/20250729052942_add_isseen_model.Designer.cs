@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TradesCompany.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using TradesCompany.Infrastructure.Data;
 namespace TradesCompany.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250729052942_add_isseen_model")]
+    partial class add_isseen_model
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -596,15 +599,15 @@ namespace TradesCompany.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ChannelId")
-                        .HasColumnType("int");
-
                     b.Property<string>("ChannelName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
 
                     b.Property<int?>("IsSeenId")
                         .HasColumnType("int");
@@ -619,7 +622,7 @@ namespace TradesCompany.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChannelId");
+                    b.HasIndex("IsSeenId");
 
                     b.HasIndex("SenderId");
 
@@ -628,24 +631,18 @@ namespace TradesCompany.Infrastructure.Migrations
 
             modelBuilder.Entity("TradesCompany.Domain.Entities.ChannelUser", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("ChannelName")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("ChannelId")
                         .HasColumnType("int");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
+                    b.HasKey("UserId", "ChannelName");
 
                     b.HasIndex("ChannelId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("ChannelUser");
                 });
@@ -658,12 +655,8 @@ namespace TradesCompany.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ChannelMessageId")
+                    b.Property<int>("ReceiverId")
                         .HasColumnType("int");
-
-                    b.Property<string>("ReceiverId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Seen")
                         .HasColumnType("bit");
@@ -671,9 +664,12 @@ namespace TradesCompany.Infrastructure.Migrations
                     b.Property<DateTime?>("SeenDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ChannelMessageId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("IsSeen");
                 });
@@ -1019,11 +1015,9 @@ namespace TradesCompany.Infrastructure.Migrations
 
             modelBuilder.Entity("TradesCompany.Domain.Entities.ChannelMessage", b =>
                 {
-                    b.HasOne("TradesCompany.Domain.Entities.Channel", "Channel")
+                    b.HasOne("TradesCompany.Domain.Entities.IsSeen", "IsSeen")
                         .WithMany()
-                        .HasForeignKey("ChannelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("IsSeenId");
 
                     b.HasOne("TradesCompany.Domain.Entities.ApplicationUser", "User")
                         .WithMany()
@@ -1031,7 +1025,7 @@ namespace TradesCompany.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Channel");
+                    b.Navigation("IsSeen");
 
                     b.Navigation("User");
                 });
@@ -1039,7 +1033,7 @@ namespace TradesCompany.Infrastructure.Migrations
             modelBuilder.Entity("TradesCompany.Domain.Entities.ChannelUser", b =>
                 {
                     b.HasOne("TradesCompany.Domain.Entities.Channel", "Channel")
-                        .WithMany("ChannelUsers")
+                        .WithMany()
                         .HasForeignKey("ChannelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1057,13 +1051,11 @@ namespace TradesCompany.Infrastructure.Migrations
 
             modelBuilder.Entity("TradesCompany.Domain.Entities.IsSeen", b =>
                 {
-                    b.HasOne("TradesCompany.Domain.Entities.ChannelMessage", "ChannelMessage")
-                        .WithMany("IsSeen")
-                        .HasForeignKey("ChannelMessageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("TradesCompany.Domain.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
 
-                    b.Navigation("ChannelMessage");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TradesCompany.Domain.Entities.Notification", b =>
@@ -1180,16 +1172,6 @@ namespace TradesCompany.Infrastructure.Migrations
                     b.Navigation("Quotations");
 
                     b.Navigation("ServiceSchedules");
-                });
-
-            modelBuilder.Entity("TradesCompany.Domain.Entities.Channel", b =>
-                {
-                    b.Navigation("ChannelUsers");
-                });
-
-            modelBuilder.Entity("TradesCompany.Domain.Entities.ChannelMessage", b =>
-                {
-                    b.Navigation("IsSeen");
                 });
 
             modelBuilder.Entity("TradesCompany.Domain.Entities.ServiceMan", b =>

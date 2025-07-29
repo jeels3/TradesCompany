@@ -11,13 +11,14 @@ namespace TradesCompany.Domain.Entities
     {
         public int Id { get; set; }
         public string ChannelName { get; set; }
-        //public int ChannelId { get; set; }
-        //public Channel Channel { get; set; }
+        public int ChannelId { get; set; }
+        public Channel Channel { get; set; }
         public string Message { get; set; }
         public string SenderId { get; set; }
         [ForeignKey("SenderId")]
         public ApplicationUser User { get; set; }
         public DateTime CreateAt { get; set; } = DateTime.Now;
-        public bool IsRead { get; set; } = false;
+        public int? IsSeenId { get; set; }
+        public List<IsSeen>? IsSeen { get; set; } = new List<IsSeen>();
     }
 }

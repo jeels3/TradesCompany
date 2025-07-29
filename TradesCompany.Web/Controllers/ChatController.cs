@@ -1,9 +1,15 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Grpc.Core;
 using Microsoft.AspNetCore.Mvc;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
+using System.Text.Json;
+using System.Threading.Tasks;
 using TradesCompany.Application.Interfaces;
 using TradesCompany.Application.Services;
 using TradesCompany.Domain.Entities;
+using TradesCompany.Web.ViewModel;
+using Channel = TradesCompany.Domain.Entities.Channel;
 
 namespace TradesCompany.Web.Controllers
 {
@@ -13,16 +19,19 @@ namespace TradesCompany.Web.Controllers
         private readonly IRepository<Channel> _channelRepository;
         private readonly IRepository<ApplicationUser> _userGRepository;
         private readonly IChatService _chatService;
+        private readonly IRepository<ChannelUser> _channelUserGRepository;
         public ChatController(IChatRepository chatRepository,
             IRepository<Channel> channelRepository,
             IChatService chatService,
-            IRepository<ApplicationUser> userGRepository
+            IRepository<ApplicationUser> userGRepository,
+            IRepository<ChannelUser> channelUserGRepository
             )
         {
             _chatRepository = chatRepository;
             _channelRepository = channelRepository;
             _chatService = chatService;
             _userGRepository = userGRepository;
+            _channelUserGRepository = channelUserGRepository;
         }
 
         private string? userId => User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -31,11 +40,22 @@ namespace TradesCompany.Web.Controllers
             try
             {
                 var users = await _chatRepository.GetAllUserListing(userId);
-                if(users == null)
+                var groups = await _chatRepository.GetGroupByUserId(userId);
+                if (users == null && groups == null)
                 {
-                    return View(new List<ApplicationUser>());
+                    UserAndGroupListing nullmodel = new UserAndGroupListing
+                    {
+                        Users = new List<ApplicationUser>(),
+                        channels = new List<Channel>()
+                    };
+                    return View(nullmodel);
                 }
-                return View(users);
+                UserAndGroupListing model = new UserAndGroupListing
+                {
+                    Users = users,
+                    channels = groups
+                };
+                return View(model);
             }
             catch (Exception ex)
             {
@@ -61,6 +81,10 @@ namespace TradesCompany.Web.Controllers
                     if (result1)
                     {
                         var chatdata = await _chatRepository.GetChatMessageByChannelName(channelName1);
+                        if (chatdata == null)
+                        {
+                            return View(new List<ChannelMessage>());
+                        }
                         TempData["ChannelName"] = channelName1;
                         TempData["ReceiverName"] = receiver.UserName;
                         return View(chatdata);
@@ -68,6 +92,10 @@ namespace TradesCompany.Web.Controllers
                     else
                     {
                         var chatdata = await _chatRepository.GetChatMessageByChannelName(channelName2);
+                        if (chatdata == null)
+                        {
+                            return View(new List<ChannelMessage>());
+                        }
                         TempData["ChannelName"] = channelName2;
                         TempData["ReceiverName"] = receiver.UserName;
                         return View(chatdata);
@@ -84,6 +112,24 @@ namespace TradesCompany.Web.Controllers
                     await _channelRepository.InsertAsync(channel);
                     await _channelRepository.SaveAsync();
 
+                    ChannelUser channelUser = new ChannelUser
+                    {
+                        ChannelId = channel.Id,
+                        UserId = userId
+                    };
+
+                    ChannelUser channelUser2 = new ChannelUser
+                    {
+                        ChannelId = channel.Id,
+                        UserId = receiver.Id
+                    };
+
+                    await _channelUserGRepository.InsertAsync(channelUser);
+                    await _channelUserGRepository.InsertAsync(channelUser2);
+                    await _channelUserGRepository.SaveAsync();
+
+
+
                     TempData["ChannelName"] = channel.ChannelName;
                     TempData["ReceiverName"] = receiver.UserName;
 
@@ -97,16 +143,117 @@ namespace TradesCompany.Web.Controllers
             return View();
         }
 
-        public async Task<IActionResult> SendMessage([FromForm] ChannelMessage message)
+        [HttpPost]
+        public async Task<IActionResult> CreateGroup([FromBody] Dictionary<string, object> data)
         {
             try
             {
-                await _chatService.SendMessage(message.ChannelName , message.Message , userId);
-                return Ok(new {message = "Send Succesfully"});
+                var ChannelName = data["ChannelName"].ToString();
+                var GroupIds = ((JsonElement)data["GroupIds"]).EnumerateArray().Select(x => x.GetString()).ToArray();
+                if (string.IsNullOrEmpty(ChannelName) || GroupIds == null || GroupIds.Length <= 1)
+                {
+                    TempData["errorMessage"] = "Channel Name or Group Ids are not valid.";
+                    return BadRequest();
+                }
+                // Check Channel Name is Already Exists
+                var isExists = await _chatRepository.CheckChennelNameIsExists(ChannelName);
+                if (isExists)
+                {
+                    TempData["errorMessage"] = "Channel Name Already Exists.";
+                    return BadRequest();
+                }
+                // Create Channel
+                Channel channel = new Channel
+                {
+                    ChannelName = $"Group_{ChannelName}",
+                    CreatorId = userId,
+                };
+                await _channelRepository.InsertAsync(channel);
+                await _channelRepository.SaveAsync();
+
+                foreach (var ids in GroupIds)
+                {
+                    ChannelUser channelUser = new ChannelUser
+                    {
+                        ChannelId = channel.Id,
+                        UserId = ids
+                    };
+                    await _channelUserGRepository.InsertAsync(channelUser);
+                }
+                ChannelUser channelUser2 = new ChannelUser
+                {
+                    ChannelId = channel.Id,
+                    UserId = userId
+                };
+                await _channelUserGRepository.InsertAsync(channelUser2);
+
+                await _channelUserGRepository.SaveAsync();
+                return Ok();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                TempData["errorMessage"] = $"Something Went Wrong : {ex.Message}";
+                return Ok();
+            }
+        }
+
+        //public async Task<IActionResult> GroupListing()
+        //{
+        //    try
+        //    {
+        //        // Get All Channel By UserId
+        //        var channels = await _channelRepository.GetAllAsync(x => x.ChannelUsers.Any(cu => cu.UserId == userId));
+        //        if (channels == null || !channels.Any())
+        //        {
+        //            return View(new List<Channel>());
+        //        }
+        //        return View(channels);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        TempData["errorMessage"] = "Something Went Wrong";
+        //        return View(new List<Channel>());
+        //    }
+        //}
+
+        [HttpGet]
+        public async Task<IActionResult> GroupChat(string channelName)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(channelName))
+                {
+                    TempData["errorMessage"] = "Channel Name is not valid.";
+                    return RedirectToAction("UserListing", "Chat");
+                }
+                // Get Channel Id By Channel Name
+                var channelId = await _chatRepository.GetChannelIdByChannelName(channelName);
+                if (channelId == 0)
+                {
+                    TempData["errorMessage"] = "Channel Not Found.";
+                    return RedirectToAction("UserListing", "Chat");
+                }
+                // Check User is Exist in Channel
+                var UserInChennel = await _chatRepository.CheckUserInChannel(channelId, userId);
+                if(!UserInChennel)
+                {
+                    TempData["errorMessage"] = "You are not a member of this channel.";
+                    return RedirectToAction("UserListing", "Chat");
+                }
+                // Get Chat Data By Channel Id
+                var chatdata = await _chatRepository.GetChatMessageByChannelName(channelName);
+                if (chatdata == null)
+                {
+                    return View(new List<ChannelMessage>());
+                }
+                TempData["ChannelName"] = channelName;
+                TempData["GroupName"] = channelName;
+                return View(chatdata);
+            }
+            catch (Exception ex)
+            {
+                TempData["errorMessage"] = $"Something Went Wrong : {ex.Message}";
+                return View(new List<ChannelMessage>());
             }
         }
     }

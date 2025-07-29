@@ -42,7 +42,7 @@ namespace TradesCompany.Web.Controllers
                 procedure = "GetRevenueVSServiceType";
                 return Json(await _connectionService.GetDataFromSP(procedure));
             }
-            else if(type == "Month")
+            else if(type == "month")
             {
                 procedure = "GetRevenueVSServiceTypeByMonth";
                 return Json(await _connectionService.GetDataFromSP(procedure));
