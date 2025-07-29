@@ -28,6 +28,8 @@ namespace TradesCompany.Web
                             .AddEntityFrameworkStores<ApplicationDbContext>()
                             .AddDefaultTokenProviders();
 
+
+
             var GoogleClientId = builder.Configuration["Google:AppId"];
             var GoogleClientSecret = builder.Configuration["Google:AppSecret"];
 

@@ -10,8 +10,4 @@
     <ProjectReference Include="..\TradesCompany.Domain\TradesCompany.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Settings\" />
-  </ItemGroup>
-
 </Project>

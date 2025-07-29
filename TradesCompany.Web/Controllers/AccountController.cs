@@ -213,6 +213,8 @@ namespace TradesCompany.Web.Controllers
 
                 if (result.Succeeded)
                 {
+                    // Fatch Claim from user
+                    // Create a Token
                     var roles = await _userManager.GetRolesAsync(user);
                     if (roles.Contains("EMPLOYEE"))
                     {
