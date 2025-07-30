@@ -14,10 +14,10 @@ namespace TradesCompany.Web.Controllers
 {
     public class AccountController : Controller
     {
-       private readonly  UserManager<ApplicationUser> _userManager;
-       private readonly SignInManager<ApplicationUser> _signInManager;
-       private readonly RoleManager<ApplicationRole> _roleManager;
-       private readonly IRepository<ServiceType> _serviceTypeGRepository;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly IRepository<ServiceType> _serviceTypeGRepository;
         private readonly IRepository<ServiceMan> _serviceManGRepository;
         private readonly ILogger<AccountController> _logger;
 
@@ -219,14 +219,15 @@ namespace TradesCompany.Web.Controllers
                     if (roles.Contains("EMPLOYEE"))
                     {
                         if (model.ReturnUrl != null) return Redirect(model.ReturnUrl);
-                        Console.WriteLine("User Role Is Here :=> "+User.FindFirst(ClaimTypes.Role)?.Value);
+                        Console.WriteLine("User Role Is Here :=> " + User.FindFirst(ClaimTypes.Role)?.Value);
                         return RedirectToAction("Dashboard", "Employee");
                     }
                     else if (roles.Contains("USER"))
                     {
                         if (model.ReturnUrl != null) return Redirect(model.ReturnUrl);
                         return RedirectToAction("Dashboard", "User");
-                    } else if (roles.Contains("ADMIN"))
+                    }
+                    else if (roles.Contains("ADMIN"))
                     {
                         return RedirectToAction("Dashboard", "Admin");
                     }
@@ -243,12 +244,12 @@ namespace TradesCompany.Web.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public IActionResult ExternalLogin(string provider, string returnUrl , string role)
+        public IActionResult ExternalLogin(string provider, string returnUrl, string role)
         {
             var redirectUrl = Url.Action(
                 action: "ExternalLoginCallback",
-                controller: "Account",           
-                values: new { ReturnUrl = returnUrl , role} 
+                controller: "Account",
+                values: new { ReturnUrl = returnUrl, role }
             );
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             return new ChallengeResult(provider, properties);
@@ -309,7 +310,7 @@ namespace TradesCompany.Web.Controllers
                         return Content($"<script>alert('Error: {string.Join(", ", createResult.Errors.Select(e => e.Description))}'); window.close();</script>", "text/html");
 
                     await _userManager.AddLoginAsync(user, info);
-                    await _userManager.AddToRoleAsync(user,role);
+                    await _userManager.AddToRoleAsync(user, role);
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return RedirectToAction("Dashboard", "User");
                 }
@@ -361,7 +362,7 @@ namespace TradesCompany.Web.Controllers
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
-                return View(model); 
+                return View(model);
             }
 
             await _userManager.AddLoginAsync(user, info);

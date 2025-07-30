@@ -1,5 +1,20 @@
-﻿@model TradesCompany.Web.ViewModel.UserAndGroupListing;
-
+﻿@using Microsoft.IdentityModel.Claims
+@model TradesCompany.Web.ViewModel.UserAndGroupListing;
+@{
+    if (User.FindFirst(ClaimTypes.Role)?.Value == "USER")
+    {
+        Layout = "~/Views/Shared/Layouts/_UserLayout.cshtml";
+    }
+    else if (User.FindFirst(ClaimTypes.Role)?.Value == "EMPLOYEE")
+    {
+        Layout = "~/Views/Shared/Layouts/_ELayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/Layouts/_AdminLayout.cshtml";
+    }
+    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+}
 <link href="https://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
 <style>
@@ -83,7 +98,7 @@
                         </div>
                         <div>
                             <h3>
-                                <a class="username" asp-controller="Chat" asp-action="OneToOneChat" asp-route-receiverId="@user.Id">@user.UserName</a><br>
+                                <a class="username" asp-controller="Chat" asp-action="OneToOneChat" asp-route-receiverId="@user.Id">@user.UserName <span id="@user.Id" class="text-secondary text-sm-center bg-danger rounded-circle text-black"></span></a><br>
                             </h3>
                         </div>
                         <input type="checkbox" value="@user.Id" class="Group-elements Group-checkbox" />

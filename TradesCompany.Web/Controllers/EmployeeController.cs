@@ -82,8 +82,25 @@ namespace TradesCompany.Web.Controllers
 
         [HttpGet]
         [Authorize(Policy = "SendQuotationPolicy")]
-        public IActionResult CreateQuotation(int bookingId)
+        public async  Task<IActionResult> CreateQuotation(int bookingId)
         {
+            // Check if bookingId is valid
+            if(bookingId <= 0)
+            {
+                TempData["ErrorMessage"] = "Invalid booking ID.";
+                return RedirectToAction("Dashboard");
+            }
+            var booking = await _bookingGRepository.GetByIdAsync(bookingId);
+            if(booking == null)
+            {
+                TempData["ErrorMessage"] = "Invalid booking ID. Please try again.";
+                return RedirectToAction("Dashboard");
+            }
+            if (booking.Status.Equals("Completed") || booking.Status.Equals("Canceled"))
+            {
+                TempData["ErrorMessage"] = "booking Is Completed or Canceled";
+                return RedirectToAction("Dashboard");
+            }
             QuotationViewModel model = new QuotationViewModel
             {
                 BookingId = bookingId,

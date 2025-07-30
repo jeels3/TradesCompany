@@ -18,7 +18,7 @@ namespace TradesCompany.Infrastructure.Repository
         {
             _context = context;
         }
-        public async Task <List<BookingByServiceType>> GetAllBookingAsync(int ServiceTypeId)
+        public async Task<List<BookingByServiceType>> GetAllBookingAsync(int ServiceTypeId)
         {
             return await _context.BookingByServiceType
                 .FromSqlInterpolated($"EXEC GetAllBookingByServiceType {ServiceTypeId}")
@@ -33,6 +33,14 @@ namespace TradesCompany.Infrastructure.Repository
         {
             return await _context.BookingByServiceType
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<Booking>> GetAllBookingByUserId(string userId)
+        {
+            return await _context.Bookings
+                .Where(b => b.UserId == userId)
+                .Include(b => b.ServiceType)
+                .ToListAsync();
         }
     }
 }

@@ -14,7 +14,7 @@ function fullfill() {
     //connection.invoke("JoinGroup", ChannelName);
     connection.invoke("NotificationCount", userId);
     //connection.invoke("ReadMessage", userId, ChannelName); // update this line if needed
-    connection.invoke("ChatNotificationCount", userId);
+    connection.invoke("ChatNotificationCount", userId , "");
 }
 
 connection.start().then(fullfill, reject);
@@ -31,7 +31,8 @@ function showComplaintCount() {
 connection.on("ReceiveBookingNotification", (NotificationType, message) => {
     const currentPage = window.location.href.split("/").pop().toLowerCase();
     if (currentPage !== "notification") {
-        showComplaintCount()
+        connection.invoke("NotificationCount", userId);
+        //showComplaintCount()
         return;
     }
     connection.invoke("ReadNotification", userId);
@@ -41,7 +42,8 @@ connection.on("ReceiveNewQuotation", (NotificationType, Message) => {
     const currentPage = window.location.href.split("/").pop().toLowerCase();
 
     if (currentPage !== "notification") {
-        showComplaintCount()
+        connection.invoke("NotificationCount", userId);
+        //showComplaintCount()
         return;
     }
     connection.invoke("ReadNotification", userId);
@@ -51,7 +53,8 @@ connection.on("ReceiveNewSchedule", (NotificationType, Message) => {
     const currentPage = window.location.href.split("/").pop().toLowerCase();
 
     if (currentPage !== "notification") {
-        showComplaintCount()
+        connection.invoke("NotificationCount", userId);
+        //showComplaintCount()
         return;
     }
     connection.invoke("ReadNotification", userId);
@@ -61,31 +64,35 @@ connection.on("RecieveScheduleSeviceReminder", (NotificationType, Message) => {
     const currentPage = window.location.href.split("/").pop().toLowerCase();
 
     if (currentPage !== "notification") {
-        showComplaintCount()
+        connection.invoke("NotificationCount", userId);
+        //showComplaintCount()
         return;
     }
     connection.invoke("ReadNotification", userId);
 });
 
+
 connection.on("ReceiveNotificationCount", (count) => {
     const currentPage = window.location.href.split("/").pop().toLowerCase();
     if (currentPage !== "notification") {
-        document.getElementById("notificationcnt").innerText = count;
+        document.getElementById("notificationcnt").innerText = count > 0 ? count : '';
         return;
     }
 })
 
-
-
 connection.on("ReceiveChatNotificationCount", (count) => {
-    //alert("Chat Count : ", count);
     const notificationCountElement = document.getElementById("chatnotificationcnt");
     if (notificationCountElement) {
         notificationCountElement.textContent = count > 0 ? count : '';
     }
 });
 
-
-
+connection.on("ReceiveChatNotificationCountByChannelId", (count, appendid) => {
+    const notificationCountElement = document.getElementById(appendid);
+    alert(appendid);
+    if (notificationCountElement) {
+        notificationCountElement.textContent = count > 0 ? count : '';
+    }
+});
 
 

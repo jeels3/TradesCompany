@@ -1,7 +1,9 @@
-﻿@model IEnumerable<TradesCompany.Domain.Entities.ServiceType>
+﻿@using Microsoft.IdentityModel.Claims
+@model IEnumerable<TradesCompany.Domain.Entities.ServiceType>
 
 @{
     Layout = "~/Views/Shared/Layouts/_UserLayout.cshtml";
+    string? userName = User.FindFirst(ClaimTypes.Name)?.Value;
 }
 
 <div class="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden" style='font-family: Inter, "Noto Sans", sans-serif;'>
@@ -12,7 +14,7 @@
                 <!-- Welcome Message -->
                 <div class="flex flex-wrap justify-between gap-3 p-4">
                     <p class="text-[#111418] tracking-light text-[32px] font-bold leading-tight min-w-72">
-                        Welcome back
+                        Welcome back , @userName !
                     </p>
                 </div>
 

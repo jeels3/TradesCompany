@@ -34,20 +34,21 @@ namespace TradesCompany.Web.Controllers
             return View(data);
         }
 
-        public async Task<IActionResult> ChartData(string type)
+        public async Task<IActionResult>
+        ChartData(string type)
         {
             var procedure = "";
-            if(type == null)
+            if (type == "all")
             {
                 procedure = "GetRevenueVSServiceType";
                 return Json(await _connectionService.GetDataFromSP(procedure));
             }
-            else if(type == "month")
+            else if (type == "month")
             {
                 procedure = "GetRevenueVSServiceTypeByMonth";
                 return Json(await _connectionService.GetDataFromSP(procedure));
             }
-            else if(type == "year")
+            else if (type == "year")
             {
                 procedure = "GetRevenueVSServiceTypeByYear";
                 return Json(await _connectionService.GetDataFromSP(procedure));
@@ -84,6 +85,13 @@ namespace TradesCompany.Web.Controllers
         {
             var users = await _userRepository.GetAllUsersAsync();
             return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllDataForAdmin()
+        {
+            var users = await _userRepository.GetAllDataForAdmin();
+            return Json(users);
         }
 
         [HttpPost]

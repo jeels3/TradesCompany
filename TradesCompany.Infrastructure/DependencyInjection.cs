@@ -12,7 +12,6 @@ namespace TradesCompany.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
-            // rgister the OverdueBookReminderWorker as a hosted service
             services.AddHostedService<ScheduleReminderForEmployeeWorker>();
             //services.AddHostedService<DummyWorker>();
             return services;

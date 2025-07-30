@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using TradesCompany.Application.Settings;
+using TradesCompany.Domain.Entities;
 
 namespace TradesCompany.Infrastructure.Authentication
 {
@@ -21,17 +23,31 @@ namespace TradesCompany.Infrastructure.Authentication
             _jwtSettings = jwtSettings.Value;
         }
 
-        public string GenerateAccessToken(IEnumerable<Claim> claims)
+        public string GenerateToken(ApplicationUser user,string role , IList<string> permissions, string secretKey)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, role)
+            };
+
+            // Add each permission as a claim
+            foreach (var permission in permissions)
+            {
+                claims.Add(new Claim("Permission", permission));
+            }
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)); // convert string to byte array
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256); // Tells the JWT generator what key and what algorithm to use.
 
             var token = new JwtSecurityToken(
                 issuer: _jwtSettings.Issuer,
                 audience: _jwtSettings.Audience,
                 claims: claims,
                 expires: DateTime.Now.AddMinutes(_jwtSettings.AccessTokenExpirationMinutes),
-                signingCredentials: creds);
+                signingCredentials: creds
+            );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

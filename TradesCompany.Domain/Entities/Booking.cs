@@ -15,6 +15,7 @@ namespace TradesCompany.Domain.Entities
         public string UserId { get; set; }
         public ApplicationUser User { get; set; } = null!;
         public string WorkDetails { get; set; } = null!;
+        public decimal Price { get; set; }
         public string? QuotationPdf { get; set; } // optional you can add after service completed
         public string? imagepath { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

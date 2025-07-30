@@ -53,6 +53,7 @@
                                 <th>Work Details</th>
                                 <th>CreateAt</th>
                                 <th>Status</th>
+                                <th>Price</th>
                                 <th class="text-end">Action</th>
                             </tr>
                         </thead>
@@ -73,14 +74,15 @@
                             <td> <span class="d-inline-block align-middle">@booking.WorkDetails</span></td>
                             <td><span>@booking.CreatedAt</span></td>
                             <td><span>@booking.Status</span></td>
+                            <td>@booking.Price</td>
                             <td class="text-end">
                                 <div class="drodown">
                                     <a data-bs-toggle="dropdown" href="#" class="btn p-1" aria-expanded="false">
                                         <i class="fa fa-bars" aria-hidden="true"></i>
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-end" style="">
-                                        <a href="#!" class="dropdown-item">View Details</a>
-                                        @if(booking.Status != "Completed")
+                                        @* <a href="#!" class="dropdown-item">View Details</a> *@
+                                        @if(booking.Status != "Completed" && booking.Status != "Canceled")
                                         {
                                         <a asp-action="Createquotation" asp-controller="Employee" asp-route-bookingId="@booking.bookingId" class="dropdown-item">Send Quotation</a>
                                         }

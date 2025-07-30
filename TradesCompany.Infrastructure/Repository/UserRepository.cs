@@ -61,7 +61,7 @@ namespace TradesCompany.Infrastructure.Repository
                     );
             }
 
-            int totalRecords =  query.Count();
+            int totalRecords = query.Count();
 
             //if (!string.IsNullOrEmpty(model.SortColumn))
             //{
@@ -76,7 +76,7 @@ namespace TradesCompany.Infrastructure.Repository
             //}
 
             // Paging
-            var data =  query
+            var data = query
                 .Skip(model.start)
                 .Take(model.length)
                 .ToList();
@@ -87,6 +87,32 @@ namespace TradesCompany.Infrastructure.Repository
         public async Task<int> GetAllNotificationCount(string userId)
         {
             return _context.Notification.Where(n => n.IsRead == false && n.userId == userId).Count();
+        }
+
+        public async Task<List<string>> GetAllUserClaims(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return new List<string>();
+            var claims = await _userManager.GetClaimsAsync(user);
+            return claims.Select(c => c.Type).ToList();
+        }
+
+        public async Task<Dictionary<string, int>> GetAllDataForAdmin()
+        {
+            var userCount = await _context.Users.CountAsync();
+            var serviceManCount = await _context.ServiceMan.CountAsync();
+            var bookingCount = await _context.Bookings.CountAsync();
+            var quotationCount = await _context.Quotations.CountAsync();
+            var BookingComplete = await _context.ServiceSchedules.CountAsync(n => n.Status == "Completed");
+            var TotalRevenue = await _context.ServiceSchedules.Where(ss => ss.Status == "Completed").SumAsync(ss => ss.TotalPrice);
+            return new Dictionary<string, int>
+            {
+                { "UserCount", userCount-serviceManCount },
+                { "ServiceManCount", serviceManCount },
+                { "BookingCount", bookingCount },
+                { "BookingCompleteCount", BookingComplete },
+                { "TotalRevenue", (int)TotalRevenue }
+            };
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using TradesCompany.Application.DTOs;
 using TradesCompany.Application.Interfaces;
 using TradesCompany.Domain.Entities;
 using TradesCompany.Infrastructure.Data;
@@ -65,14 +66,41 @@ namespace TradesCompany.Infrastructure.Repository
 
         public async Task<int> GetAllUnreadMessageByUserId(string userId)
         {
-            return 1;
+            var unreadCount = _context.ChannelMessage
+                            .Where(cm => cm.SenderId != userId) // Not sent by the user
+                            .Where(cm => cm.Channel.ChannelUsers.Any(cu => cu.UserId == userId)) // User is part of the channel
+                            .Where(cm => !cm.IsSeen.Any(s => s.ReceiverId == userId)) // No seen record = unseen
+                            .Count();
+
+            return unreadCount;
         }
 
+        public async Task<int> GetAllUnreadMessageByChannelId(int channelId, string userId)
+        {
+            return _context.ChannelMessage
+                            .Where(cm => cm.ChannelId == channelId)
+                            .Where(cm => cm.SenderId != userId)
+                            .Where(cm => !cm.IsSeen.Any(s => s.ReceiverId == userId)) // No IsSeen row for this user = not seen
+                            .Count();
+        }
         public async Task<List<Channel>> GetGroupByUserId(string userId)
         {
             return await _context.Channel
                 .Where(c => c.ChannelUsers.Any(cu => cu.UserId == userId) && c.ChannelName.StartsWith("Group"))
                 .ToListAsync();
+        }
+
+        public async Task<List<string>> GetUserByChannelId(int channelId)
+        {
+            return await _context.ChannelUser
+                .Where(cu => cu.ChannelId == channelId)
+                .Select(cu => cu.UserId)
+                .ToListAsync();
+        }
+
+        public async Task<List<UserAndGroupListingWithCount>> GetAllChannelsByUserId(string userId)
+        {
+            return null;
         }
     }
 }

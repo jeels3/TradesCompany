@@ -5,9 +5,13 @@
     {
         Layout = "~/Views/Shared/Layouts/_UserLayout.cshtml";
     }
-    else
+    else if (User.FindFirst(ClaimTypes.Role)?.Value == "EMPLOYEE")
     {
         Layout = "~/Views/Shared/Layouts/_ELayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/Layouts/_AdminLayout.cshtml";
     }
     var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 }

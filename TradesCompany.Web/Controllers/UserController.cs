@@ -28,6 +28,7 @@ namespace TradesCompany.Web.Controllers
         private readonly IHubContext<NotificationHub> _hubcontext;
         public readonly  IEmployeeServices _employeeServices;
         private readonly INotificationService _notificationService;
+        private readonly IBookingRepository _bookingRepository;
 
         public UserController(IRepository<ServiceType> serviceGReposuitory,
                               IUserRepository userRepository,
@@ -36,7 +37,8 @@ namespace TradesCompany.Web.Controllers
                               IHubContext<NotificationHub> hubcontext,
                               IQuotationRepository quotationRepository,
                               IEmployeeServices employeeServices,
-                              INotificationService notificationService
+                              INotificationService notificationService,
+                              IBookingRepository bookingRepository
                               )
         {
             _serviceGRepository = serviceGReposuitory;
@@ -47,6 +49,7 @@ namespace TradesCompany.Web.Controllers
             _quotationRepository = quotationRepository;
             _employeeServices = employeeServices;
             _notificationService = notificationService;
+            _bookingRepository = bookingRepository;
         }
 
         [HttpGet]
@@ -119,7 +122,8 @@ namespace TradesCompany.Web.Controllers
                         ServiceTypeId = model.ServiceTypeId,
                         UserId = userId,
                         WorkDetails = model.WorkDetails,
-                        imagepath = model?.imagepath
+                        imagepath = model?.imagepath,
+                        Price = model.price
                     };
 
                     await _bookingGRepository.InsertAsync(booking);
@@ -133,6 +137,46 @@ namespace TradesCompany.Web.Controllers
                 }
             }
             return RedirectToAction("BookService",model);
+        }
+
+        public async Task<IActionResult> MyBooking()
+        {
+            try
+            {
+                string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userId == null)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+                var bookings = await _bookingRepository.GetAllBookingByUserId(userId);
+                if(bookings == null || !bookings.Any())
+                {
+                    TempData["ErrorMessage"] = "No bookings found.";
+                    return View(new List<Booking>());
+                }
+                return View(bookings);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Something Went Wrong : {ex.Message}";
+                return View();
+            }
+        }
+
+        public async Task<IActionResult> BookingCancel(int bookingId)
+        {
+            try
+            {
+                // Update Status : Booking , Quoation
+                var booking = await _bookingGRepository.GetByIdAsync(bookingId);
+                booking.Status = "Canceled";
+                await _bookingGRepository.SaveAsync();       
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            return Ok(new { message = "Booking Canceled successfully." });
         }
 
         [HttpGet]

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<TradesCompany.Application.DTOs.ScheduleServiceByUser>
+﻿@model IEnumerable<TradesCompany.Domain.Entities.Booking>
 
 @{
     Layout = "~/Views/Shared/Layouts/_UserLayout.cshtml";
@@ -50,19 +50,18 @@
                 <div class="table-responsive">
                     @if (!Model.Any())
                     {
-                        <h1 class="ms-3">No Schedule Any Services</h1>
+                        <h1 class="ms-3">No Any Booking</h1>
                     }
                     else
                     {
                         <table class="table mb-0">
                             <thead class="small text-uppercase bg-body text-muted">
                                 <tr>
-                                    <th>Service Man</th>
                                     <th>Work Details</th>
                                     <th>Service Type</th>
                                     <th>Price</th>
                                     <th>Status</th>
-                                    <th>Schedule At</th>
+                                    <th>Create At</th>
                                     <th class="text-end">Action</th>
                                 </tr>
                             </thead>
@@ -75,15 +74,14 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div>
-                                                    <div class="h6 mb-0 lh-1">@service.ServiceMan</div>
+                                                    <div class="h6 mb-0 lh-1">@service.WorkDetails</div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>@service.WorkDetails</td>
-                                        <td>@service.ServiceName</td>
-                                        <td> <span class="d-inline-block align-middle">@service.TotalPrice</span></td>
-                                        <td><span>@service.status</span></td>
-                                        <td>@service.ScheduledAt</td>
+                                        <td>@service.ServiceType.ServiceName</td>
+                                        <td> <span class="d-inline-block align-middle">@service.Price</span></td>
+                                        <td><span>@service.Status</span></td>
+                                        <td>@service.CreatedAt</td>
                                         <td class="text-end">
                                             <div class="drodown">
                                                 <a data-bs-toggle="dropdown" href="#" class="btn p-1" aria-expanded="false">
@@ -91,10 +89,12 @@
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-end" style="">
                                                     @* <a href="#!" class="dropdown-item">View Details</a> *@
-                                                    @if (service.status == "Scheduled")
+                                                    @if (service.Status == "Pending")
                                                     {
-                                                    <button data-id="@service.ScheduleServiceId"
-                                                    class="dropdown-item schedule-btn">Schedule Cancel</button>    
+                                                        <button data-id="@service.Id"
+                                                                class="dropdown-item cancel-btn">
+                                                            Booking Cancel
+                                                        </button>
                                                     }
                                                 </div>
                                             </div>
@@ -112,18 +112,18 @@
 
 @section Scripts {
     <script>
-        $(document).on('click', '.schedule-btn', function () {
-        const quotationId = $(this).data('id');
+        $(document).on('click', '.cancel-btn', function () {
+        const bookingId = $(this).data('id');
 
         if (confirm('Are you sure you want to Schedule this Booking?')) {
             $.ajax({
-                url: `/Employee/ScheduleServices?quotationId=${quotationId}`,
+                url: `/User/BookingCancel?bookingId=${bookingId}`,
                 success: function (res) {
                     alert(res.message);
                     location.reload();
                 },
                 error: function (xhr) {
-                    const err = xhr.responseJSON?.message || 'Error Scheduling Request';
+                    const err = xhr.responseJSON?.message || 'Error Canceling Request';
                     alert(err);
                 }
             });

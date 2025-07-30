@@ -8,6 +8,7 @@ function fullfill() {
     console.log("Fullfill called");
     connection2.invoke("JoinGroup", ChannelName);
     connection2.invoke("ReadMessage", userId, ChannelName);
+    connection2.invoke("ChatNotificationCount", userId , "");
     //connection.invoke("JoinGroup", `UserGroup_${userId}`);
     //connection.invoke("ChatNotificationCount", userId);
 }
@@ -28,13 +29,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 connection2.on("RecieveMessage", (message, senderId) => {
     //const currentPage = window.location.href.split("/").pop().toLowerCase();
-    //if (currentPage.startsWith("userlisting")) {
-       
+    //if (currentPage.startsWith("onetoonechar")) {
+    //    connection.invoke("ChatNotificationCount", userId);
     //}
-
     if (senderId != userId) {
         const ui = document.getElementById("chatlist");
-
         // Get current time formatted as HH:mm
         const now = new Date();
         const hours = now.getHours().toString().padStart(2, '0');
@@ -74,5 +73,20 @@ function sendMessage() {
                 `;
     
     }
+    connection2.invoke("ChatNotificationCount",userId,ChannelName);
     document.getElementById("message").value = "";
 }
+
+connection2.on("ReceiveChatNotificationCount", (count) => {
+    const notificationCountElement = document.getElementById("chatnotificationcnt");
+    if (notificationCountElement) {
+        notificationCountElement.textContent = count > 0 ? count : '';
+    }
+});
+
+connection2.on("ReceiveChatNotificationCountByChannelId", (count, appendid) => {
+    const notificationCountElement = document.getElementById(appendid);
+    if (notificationCountElement) {
+        notificationCountElement.textContent = count > 0 ? count : '';
+    }
+});

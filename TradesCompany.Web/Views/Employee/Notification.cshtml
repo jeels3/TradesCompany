@@ -76,26 +76,29 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div>
-                                                    <div class="h6 mb-0 lh-1">@notication.NotificationType</div>
+                                                    <div class="h6 mb-0 lh-1">
+                                                        @if (notication.NotificationType == "Quotation")
+                                                        {
+                                                            <a asp-action="AllQuotation" asp-controller="User">@notication.NotificationType</a>
+                                                        }
+                                                        else if (notication.NotificationType == "Booking")
+                                                        {
+                                                            <a asp-action="Dashboard" asp-controller="Employee" >@notication.NotificationType</a>
+                                                        }
+                                                        else if (notication.NotificationType.StartsWith("Schedule") || notication.NotificationType.StartsWith("Service"))
+                                                        {
+                                                            <a asp-action="MyScheduleServices" asp-controller="User">@notication.NotificationType</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            @notication.NotificationType
+                                                        }
+                                                    </div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td>@notication.Message</td>
                                         <td> <span class="d-inline-block align-middle">@notication.Created</span></td>
-                                        @* <td class="text-end">
-                                            <div class="drodown">
-                                                <a data-bs-toggle="dropdown" href="#" class="btn p-1" aria-expanded="false">
-                                                    <i class="fa fa-bars" aria-hidden="true"></i>
-                                                </a>
-                                                <div class="dropdown-menu dropdown-menu-end" style="">
-                                                    <button class="dropdown-item" data-id="@quotation.quotationId">View Details</button>
-                                                    @if (quotation.status != "Accepted")
-                                                    {
-                                                        <button class="dropdown-item accept-btn" data-id="@quotation.quotationId">Accept Service</button>
-                                                    }
-                                                </div>
-                                            </div>
-                                        </td> *@
                                     </tr>
                                 }
                             </tbody>

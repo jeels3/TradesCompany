@@ -13,5 +13,6 @@ namespace TradesCompany.Application.Interfaces
         Task<List<BookingByServiceType>> GetAllBookingAsync(int ServiceTypeId);
         Task<List<BookingByServiceType>> GetAllNewBookingAsync();
         Task <BookingByServiceType> GetBookingByAsync(int id);
+        Task<List<Booking>> GetAllBookingByUserId(string userId);
     }
 }

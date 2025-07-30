@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using TradesCompany.Application.Interfaces;
@@ -112,14 +114,46 @@ namespace TradesCompany.Shared.Hubs
                 .SendAsync("RecieveMessage", message , SenderId);
         }
 
-        public async Task ChatNotificationCount(string userId)
+        public async Task ChatNotificationCount(string userId ,  string? ChannelName)
         {
-            var notifications = await _isSeenRepository.GetAllAsync();
-            var userChannels = await _chatRepository.GetAllUserListing(userId);
-            var unreadCount = notifications.Count(n => n.ReceiverId == userId && !n.Seen);
-            await Clients.User(userId).SendAsync("ReceiveChatNotificationCount", unreadCount);
+            if(ChannelName != null && !string.IsNullOrEmpty(ChannelName))
+            {
+                var channelId = await _chatRepository.GetChannelIdByChannelName(ChannelName);
+                if (channelId == 0)
+                {
+                    throw new Exception("Channel does not exist.");
+                }
+                var channeluser = await _chatRepository.GetUserByChannelId(channelId);
+                if (channeluser == null)
+                {
+                    throw new Exception("User is not in the channel.");
+                }
+                //var count = 0; 
+                foreach (var user in channeluser)
+                {
+                    if (user != userId)
+                    {
+                        var unreadCount = await _chatRepository.GetAllUnreadMessageByUserId(user);
+                        await Clients.User(user).SendAsync("ReceiveChatNotificationCount", unreadCount );
+                        var unreadCountByChannelId = await _chatRepository.GetAllUnreadMessageByChannelId(channelId, user);
+                        await Clients.User(user).SendAsync("ReceiveChatNotificationCountByChannelId", unreadCountByChannelId , userId);
+                        //count += unreadCount;
+                    }
+                }
+            }
+            else
+            {
+                var unreadCount = await _chatRepository.GetAllUnreadMessageByUserId(userId);
+                await Clients.User(userId).SendAsync("ReceiveChatNotificationCount", unreadCount );
+            }
         }
 
+        public async Task ChatNotificationCountByChannelId(int channelId, string userId)
+        {
+            var channeluser = await _chatRepository.CheckUserInChannel(channelId, userId);
+            var unreadCount = await _chatRepository.GetAllUnreadMessageByChannelId(channelId, userId);
+            await Clients.User(userId).SendAsync("ReceiveChatNotificationCountByChannelId", unreadCount);
+        }
 
         // Automatic disconnect when user change page or view the client side
         public override async Task OnDisconnectedAsync(Exception? exception)

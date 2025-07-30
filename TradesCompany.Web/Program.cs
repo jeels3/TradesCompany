@@ -1,5 +1,5 @@
 
- using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TradesCompany.Application.Interfaces;
 using TradesCompany.Application.Services;
@@ -23,12 +23,10 @@ namespace TradesCompany.Web
             builder.Services.AddControllersWithViews();
             var connectionString = builder.Configuration.GetConnectionString("SQLServerIdentityConnection") ?? throw new InvalidOperationException("Connection string 'SQLServerIdentityConnection' not found.");
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString));
+            options.UseSqlServer(connectionString));
             builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
                             .AddEntityFrameworkStores<ApplicationDbContext>()
                             .AddDefaultTokenProviders();
-
-
 
             var GoogleClientId = builder.Configuration["Google:AppId"];
             var GoogleClientSecret = builder.Configuration["Google:AppSecret"];
@@ -54,8 +52,8 @@ namespace TradesCompany.Web
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IBookingRepository, BookingRepository>();
             builder.Services.AddScoped<IQuotationRepository, QuotationRepository>();
-            builder.Services.AddScoped<IEmployeeServices , EmployeeServices>();
-            builder.Services.AddScoped<IServiceManRepository,ServiceManRepositor>();
+            builder.Services.AddScoped<IEmployeeServices, EmployeeServices>();
+            builder.Services.AddScoped<IServiceManRepository, ServiceManRepositor>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
             builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
             builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();

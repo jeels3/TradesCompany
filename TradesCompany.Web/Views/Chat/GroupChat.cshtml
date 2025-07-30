@@ -1,6 +1,19 @@
 ﻿@using Microsoft.IdentityModel.Claims
 @model IEnumerable<TradesCompany.Domain.Entities.ChannelMessage>
 @{
+
+    if (User.FindFirst(ClaimTypes.Role)?.Value == "USER")
+    {
+        Layout = "~/Views/Shared/Layouts/_UserLayout.cshtml";
+    }
+    else if (User.FindFirst(ClaimTypes.Role)?.Value == "EMPLOYEE")
+    {
+        Layout = "~/Views/Shared/Layouts/_ELayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/Layouts/_AdminLayout.cshtml";
+    }
     var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 }
 <link href="~/css/OneToOneChat.css" rel="stylesheet" />

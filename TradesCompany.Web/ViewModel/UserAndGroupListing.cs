@@ -7,4 +7,11 @@ namespace TradesCompany.Web.ViewModel
         public List<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
         public List<Channel> channels { get; set; } = new List<Channel>();
     }
+
+    //public class UserAndGroupListingViewModel
+    //{
+    //   public ApplicationUser User { get; set; }
+    //   public Channel Channels { get; set; } 
+    //  public int uReadCount { get; set; }
+    //}
 }
