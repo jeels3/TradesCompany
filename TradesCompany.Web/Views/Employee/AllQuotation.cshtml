@@ -82,7 +82,10 @@
                                         <i class="fa fa-bars" aria-hidden="true"></i>
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-end" style="">
-                                        <a href="#!" class="dropdown-item">View Details</a>
+                                        @if (service.Status == "Accepted")
+                                        {
+                                            <button data-id="@service.quotationId" class="dropdown-item cancel-btn">Cancel Service</button>
+                                        }
                                         @if(service.Status == "Accepted")
                                         {
                                         <button data-id="@service.quotationId" class="dropdown-item schedule-btn">Schedule Service</button>
@@ -221,5 +224,25 @@
             $('#scheduleTime').val('');
             currentQuotationId = null;
         }
+
+        $(document).on('click', '.cancel-btn', function () {
+        const quotationId = $(this).data('id');
+        console.log(quotationId);
+
+        if (confirm('Are you sure you want to reject this Request?')) {
+            $.ajax({
+                url: `/Employee/QuotationCancel?quotationId=${quotationId}`,
+                success: function (res) {
+                    alert(res.message);
+                    location.reload();
+                },
+                error: function (xhr) {
+                    const err = xhr.responseJSON?.message || 'Error Rejecting Request';
+                    alert(err);
+                }
+            });
+        }
+        });
+
     </script>
 }

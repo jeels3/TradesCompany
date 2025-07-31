@@ -27,6 +27,8 @@ namespace TradesCompany.Web.Controllers
         private readonly IRepository<Notification> _notificationGRepository;
         private readonly IRepository<Bill> _billGRepository;
         private readonly IRepository<ApplicationUser> _userGRepository;
+        private readonly IRepository<ServiceSchedule> _serviceScheduleGRepository;
+        private readonly IRepository<ServiceMan> _serviceManGRepository; 
 
         private readonly IBookingRepository _bookingRepository;
         private readonly IEmployeeServices _employeeServices;
@@ -48,7 +50,9 @@ namespace TradesCompany.Web.Controllers
                                   IScheduleRepository scheduleRepository,
                                   EmailService emailService,
                                   IRepository<Bill> billGRepository,
-                                  IRepository<ApplicationUser> userGRepository
+                                  IRepository<ApplicationUser> userGRepository,
+                                  IRepository<ServiceSchedule> serviceScheduleGRepository,
+                                  IRepository<ServiceMan> serviceManGRepository
                                  )
         {
             _bookingRepository = bookingRepository;
@@ -65,6 +69,8 @@ namespace TradesCompany.Web.Controllers
             _emailService = emailService;
             _billGRepository = billGRepository;
             _userGRepository = userGRepository;
+            _serviceScheduleGRepository = serviceScheduleGRepository;
+            _serviceManGRepository = serviceManGRepository;
         }
 
         [HttpGet]
@@ -108,6 +114,25 @@ namespace TradesCompany.Web.Controllers
             return View(model);
         }
 
+        public async Task<IActionResult> QuotationCancel(int quotationId)
+        {
+            try
+            {
+                // Update Status : Quoation
+                var quotation = await _quotationGRepository.GetByIdAsync(quotationId);
+                var booking = await _bookingGRepository.GetByIdAsync(quotation.BookingId);
+                quotation.Status = "Reject";
+                await _quotationGRepository.SaveAsync();
+                // send notification
+                await _notificationService.SendNotificationOfNewQuotation(booking.UserId, "Quotation Rejected", "Your Booking on Quotation Is Rejected");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            return Ok(new { message = "Request Reject successfully." });
+        }
+
         [HttpPost]
         [Authorize(Policy = "SendQuotationPolicy")]
         public async Task<IActionResult> CreateQuotation(QuotationViewModel model)
@@ -139,13 +164,14 @@ namespace TradesCompany.Web.Controllers
                     await _bookingGRepository.SaveAsync();
 
                     await _notificationService.SendNotificationOfNewQuotation(booking.UserId, "Quotation", "New Quotation Send By Service Man");
+                    return RedirectToAction("AllQuotation");
                 }catch (Exception ex)
                 {
                     TempData["ErrorMessage"] = "Something went wrong while creating the quotation. Please try again.";
                     return View(model);
                 }
             }
-            return RedirectToAction("CreateQuotation");
+            return View(model);
         }
 
         [HttpGet]
@@ -270,6 +296,29 @@ namespace TradesCompany.Web.Controllers
                 TempData["ErrorMessage"] = "Something went wrong while fetching your schedule services. Please try again.";
                 return View();
             }
+        }
+
+        public async Task<IActionResult> ScheduleReject(int ScheduleServiceId)
+        {
+            try
+            {
+                // Update Status : Booking , Quoation
+                var serviceSchedule = await _serviceScheduleGRepository.GetByIdAsync(ScheduleServiceId);
+                var quotation = await _quotationGRepository.GetByIdAsync(serviceSchedule.QuotationId);
+                var booking = await _bookingGRepository.GetByIdAsync(quotation.BookingId);
+                var serviceMan = await _serviceManGRepository.GetByIdAsync(quotation.ServiceManId);
+                quotation.Status = "Rejected";
+                serviceSchedule.Status = "Rejected";
+                await _serviceScheduleGRepository.SaveAsync();
+                await _quotationGRepository.SaveAsync();
+                // send notification
+                await _notificationService.SendNotificationOfNewQuotation(booking.UserId, "Schedule Rejected", "Your Booking Schedule Is Rejected");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            return Ok(new { message = "Request Reject successfully." });
         }
 
         [HttpGet]

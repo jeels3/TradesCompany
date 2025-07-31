@@ -94,7 +94,7 @@
                                                     @if (service.status == "Scheduled")
                                                     {
                                                     <button data-id="@service.ScheduleServiceId"
-                                                    class="dropdown-item schedule-btn">Schedule Cancel</button>    
+                                                    class="dropdown-item cancel-btn">Schedule Cancel</button>    
                                                     }
                                                 </div>
                                             </div>
@@ -112,12 +112,12 @@
 
 @section Scripts {
     <script>
-        $(document).on('click', '.schedule-btn', function () {
-        const quotationId = $(this).data('id');
+        $(document).on('click', '.cancel-btn', function () {
+        const ScheduleServiceId = $(this).data('id');
 
-        if (confirm('Are you sure you want to Schedule this Booking?')) {
+        if (confirm('Are you sure you want to cancel Schedule?')) {
             $.ajax({
-                url: `/Employee/ScheduleServices?quotationId=${quotationId}`,
+                url: `/User/ScheduleReject?ScheduleServiceId=${ScheduleServiceId}`,
                 success: function (res) {
                     alert(res.message);
                     location.reload();

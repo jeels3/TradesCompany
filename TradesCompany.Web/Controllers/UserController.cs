@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using NuGet.Protocol;
 using System.Data;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using TradesCompany.Application.DTOs;
@@ -23,12 +24,14 @@ namespace TradesCompany.Web.Controllers
         private readonly IRepository<ServiceType> _serviceGRepository;
         private readonly IRepository<Quotation> _quotationGRepository;
         private readonly IRepository<Booking> _bookingGRepository;
+        private readonly IRepository<ServiceMan> _serviceManGRepository;
         private readonly IUserRepository  _userRepository;
         private readonly IQuotationRepository _quotationRepository;
         private readonly IHubContext<NotificationHub> _hubcontext;
         public readonly  IEmployeeServices _employeeServices;
         private readonly INotificationService _notificationService;
         private readonly IBookingRepository _bookingRepository;
+        private readonly IRepository<ServiceSchedule> _serviceScheduleGRepository;
 
         public UserController(IRepository<ServiceType> serviceGReposuitory,
                               IUserRepository userRepository,
@@ -38,7 +41,9 @@ namespace TradesCompany.Web.Controllers
                               IQuotationRepository quotationRepository,
                               IEmployeeServices employeeServices,
                               INotificationService notificationService,
-                              IBookingRepository bookingRepository
+                              IBookingRepository bookingRepository,
+                              IRepository<ServiceMan> serviceManGRepository,
+                              IRepository<ServiceSchedule> serviceScheduleGRepository
                               )
         {
             _serviceGRepository = serviceGReposuitory;
@@ -50,6 +55,8 @@ namespace TradesCompany.Web.Controllers
             _employeeServices = employeeServices;
             _notificationService = notificationService;
             _bookingRepository = bookingRepository;
+            _serviceManGRepository = serviceManGRepository;
+            _serviceScheduleGRepository = serviceScheduleGRepository;
         }
 
         [HttpGet]
@@ -170,7 +177,7 @@ namespace TradesCompany.Web.Controllers
                 // Update Status : Booking , Quoation
                 var booking = await _bookingGRepository.GetByIdAsync(bookingId);
                 booking.Status = "Canceled";
-                await _bookingGRepository.SaveAsync();       
+                await _bookingGRepository.SaveAsync();
             }
             catch (Exception ex)
             {
@@ -201,11 +208,13 @@ namespace TradesCompany.Web.Controllers
             {
             // Update Status : Booking , Quoation
                 var quotation =await _quotationGRepository.GetByIdAsync(quotationId);
+                var serviceMan = await _serviceManGRepository.GetByIdAsync(quotation.ServiceManId);
                 quotation.Status = "Accepted";
                 await _quotationGRepository.SaveAsync();
-                // send notification            
-
-            }catch(Exception ex)
+                // send notification
+                await _notificationService.SendNotificationOfNewQuotation(serviceMan.UserId, "Quotation Accepted", "Your Quotation Is Accepted");
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -218,10 +227,11 @@ namespace TradesCompany.Web.Controllers
             {
                 // Update Status : Booking , Quoation
                 var quotation = await _quotationGRepository.GetByIdAsync(quotationId);
+                var serviceMan = await _serviceManGRepository.GetByIdAsync(quotation.ServiceManId);
                 quotation.Status = "Rejected";
                 await _quotationGRepository.SaveAsync();
-                // send notification            
-
+                // send notification
+                await _notificationService.SendNotificationOfNewQuotation(serviceMan.UserId, "Quotation Rejected", "Your Quotation Is Rejected");
             }
             catch (Exception ex)
             {
@@ -245,6 +255,28 @@ namespace TradesCompany.Web.Controllers
                 TempData["ErrorMessage"] = $"Something Went Wrong : {ex.Message}";
                 return View();
             }
+        }
+
+        public async Task<IActionResult> ScheduleReject(int ScheduleServiceId)
+        {
+            try
+            {
+                // Update Status : Booking , Quoation
+                var serviceSchedule = await _serviceScheduleGRepository.GetByIdAsync(ScheduleServiceId);
+                var quotation = await _quotationGRepository.GetByIdAsync(serviceSchedule.QuotationId);
+                var serviceMan = await _serviceManGRepository.GetByIdAsync(quotation.ServiceManId);
+                quotation.Status = "Rejected";
+                serviceSchedule.Status = "Rejected";
+                await _serviceScheduleGRepository.SaveAsync();
+                await _quotationGRepository.SaveAsync();
+                // send notification
+                await _notificationService.SendNotificationOfNewQuotation(serviceMan.UserId, "Schedule Rejected", "Your Schedule Is Rejected");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            return Ok(new { message = "Request Reject successfully." });
         }
     } 
 }
