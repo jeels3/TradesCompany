@@ -250,6 +250,7 @@ namespace TradesCompany.Web.Controllers
             }
         }
 
+        [Authorize(Policy = "ScheduleServicePolicy")]
         [HttpGet]
         public async Task<IActionResult> MyScheduleServices()
         {

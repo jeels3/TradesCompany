@@ -45,7 +45,7 @@ namespace TradesCompany.Infrastructure.Services
                 }
 
                 // Wait for 30 Minutes before running again
-                await Task.Delay(TimeSpan.FromMinutes(29), stoppingToken);
+                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
             }
             _logger.LogInformation("ScheduleReminderForEmployeeWorker stopping.");
         }

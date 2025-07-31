@@ -85,10 +85,14 @@
                                                         {
                                                             <a asp-action="Dashboard" asp-controller="Employee" >@notication.NotificationType</a>
                                                         }
-                                                        else if (notication.NotificationType.StartsWith("Schedule") || notication.NotificationType.StartsWith("Service"))
+                                                        else if (notication.NotificationType.StartsWith("Schedule") || notication.NotificationType.EndsWith("Schedule"))
                                                         {
                                                             <a asp-action="MyScheduleServices" asp-controller="User">@notication.NotificationType</a>
                                                         }
+                                                        else if (notication.NotificationType.EndsWith("Reminder") && notication.NotificationType.StartsWith("Service"))
+                                                        {
+                                                            <a asp-action="MyScheduleServices" asp-controller="Employee">@notication.NotificationType</a>
+                                                        } 
                                                         else
                                                         {
                                                             @notication.NotificationType
