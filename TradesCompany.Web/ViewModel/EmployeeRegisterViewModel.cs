@@ -25,7 +25,7 @@ namespace TradesCompany.Web.ViewModel
         public string Role { get; set; } = "Employee"; // Default role for employees
         [Required(ErrorMessage = "Service Type is Required")]
         public int ServiceTypeId { get; set; }
-        public List<ServiceType>? ServiceTypes { get; set; }
-        public IList<AuthenticationScheme>? ExternalLogins { get; set; }
+        public List<ServiceType>? ServiceTypes { get; set; } = new List<ServiceType>();
+        public IList<AuthenticationScheme>? ExternalLogins { get; set; } = new List<AuthenticationScheme>();
     }
 }

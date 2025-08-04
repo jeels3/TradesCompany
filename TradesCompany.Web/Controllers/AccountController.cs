@@ -53,6 +53,12 @@ namespace TradesCompany.Web.Controllers
         public async Task<IActionResult> EmployeeRegister()
         {
             var serviceTypes = await _serviceTypeGRepository.GetAllAsync();
+            if(serviceTypes == null)
+            {
+                _logger.LogWarning("No service types found for employee registration.");
+                ModelState.AddModelError(string.Empty, "No service types available for registration.");
+                return View(new EmployeeRegisterViewModel());
+            }
             EmployeeRegisterViewModel model = new EmployeeRegisterViewModel
             {
                 ServiceTypes = (List<ServiceType>)serviceTypes,
@@ -181,6 +187,7 @@ namespace TradesCompany.Web.Controllers
                     ModelState.AddModelError("RegistrationError", error.Description);
                 }
             }
+            model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             return View(model);
         }
 
@@ -205,6 +212,7 @@ namespace TradesCompany.Web.Controllers
                 var user = await _userManager.FindByEmailAsync(model.Email);
                 if (user == null)
                 {
+                    model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
                     ModelState.AddModelError("", "Invalid login attempt.");
                     return View(model);
                 }
@@ -234,11 +242,13 @@ namespace TradesCompany.Web.Controllers
                 }
                 else
                 {
+                    model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                     return View(model);
                 }
             }
             // If we got this far, something failed, redisplay form
+            model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             return View(model);
         }
 
@@ -362,7 +372,7 @@ namespace TradesCompany.Web.Controllers
 
             var user = new ApplicationUser
             {
-                UserName = model.UserName,
+                UserName = model.UserName,  
                 Email = model.Email,
             };
 
@@ -378,7 +388,7 @@ namespace TradesCompany.Web.Controllers
 
             await _userManager.AddLoginAsync(user, info);
 
-            await _userManager.AddToRoleAsync(user, model.Role);
+            await _userManager.AddToRoleAsync(user, model.Role.ToUpper());
             var serviceman = new ServiceMan
             {
                 UserId = user.Id,
