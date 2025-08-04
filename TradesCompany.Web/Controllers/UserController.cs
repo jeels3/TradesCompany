@@ -136,6 +136,7 @@ namespace TradesCompany.Web.Controllers
                     await _bookingGRepository.InsertAsync(booking);
                     await _bookingGRepository.SaveAsync();
                     await _notificationService.SendNotificationOfNewBooking(model.ServiceTypeId, "Booking", $"New Service Booked");
+                    return RedirectToAction("MyBooking");
                 }
                 catch (Exception ex)
                 {

@@ -34,8 +34,6 @@ namespace TradesCompany.Web.Controllers
 
         public async Task<IActionResult> Index()
         {
-            //var data = await employeeServices.GetAllServiceManForSreviceNotification();
-            //await emailService.SendEmailAsync("jeell372004@gmail.com", "check", "<h1>hello</h1>", true);
             try
             {
             var data = await _context.Database.ExecuteSqlAsync($"EXEC GetAllUsersWithRole");
@@ -49,7 +47,6 @@ namespace TradesCompany.Web.Controllers
 
         public IActionResult Privacy()
         {
-            throw new Exception ("hello ji");
             return View();
         }
 

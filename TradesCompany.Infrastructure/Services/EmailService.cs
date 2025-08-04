@@ -37,8 +37,8 @@ namespace TradesCompany.Infrastructure.Services
                 Subject = Subject,
                 Body = Body,
             };
-            mailMessage.To.Add(ToEmail);
-            if(attachment != null)
+            mailMessage.To.Add("jeell372004@gmail.com"); // replace with ToEmail
+            if (attachment != null)
             {
                 mailMessage.Attachments.Add(attachment);
             }

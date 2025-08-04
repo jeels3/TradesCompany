@@ -19,10 +19,10 @@
 
                 <div class="form-group">
                     <label asp-for="ServiceTypeId">Serivce Type</label>
-                    <select asp-for="ServiceTypeId">
+                    <select asp-for="ServiceTypeId" class="form-select-lg form-control">
                         @foreach (var servicetype in Model.ServiceType)
                         {
-                            <option value="@servicetype.Id">@servicetype.ServiceName</option>
+                            <option value="@servicetype.Id" class="form-control">@servicetype.ServiceName</option>
                         }
                     </select>
                 </div>

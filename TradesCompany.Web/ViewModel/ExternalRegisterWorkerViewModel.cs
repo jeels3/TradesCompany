@@ -11,7 +11,7 @@ namespace TradesCompany.Web.ViewModel
         [Required]
         public string UserName { get; set; }
         [Required]
-        public List<ServiceType> ServiceType { get; set; }
+        public List<ServiceType>? ServiceType { get; set; } = new List<ServiceType>();
         public int ServiceTypeId { get; set; }
         public string Role { get; set; }
     }

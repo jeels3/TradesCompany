@@ -401,7 +401,7 @@ namespace TradesCompany.Web.Controllers
                 // send pdf throgh email
                 var emailbody = "Please find the attached PDF document.";
                 Attachment attachment = new Attachment(new MemoryStream(pdfbytes), $"invoice-{invoice.BillId}.pdf", MediaTypeNames.Application.Pdf);
-                await _emailService.SendEmailAsync(attachment ,"jeell372004@gmail.com", "Service Completede", emailbody, false );
+                await _emailService.SendEmailAsync(attachment , customer.Email, "Service Completede", emailbody, false );
             }
             catch (Exception ex)
             {

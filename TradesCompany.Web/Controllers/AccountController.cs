@@ -271,7 +271,16 @@ namespace TradesCompany.Web.Controllers
 
             if (signInResult.Succeeded)
             {
+                var cuser = await _userManager.FindByEmailAsync(info.Principal.FindFirstValue(ClaimTypes.Email));
+                var cuserrole = await _userManager.GetRolesAsync(cuser);
+                if (cuserrole.Contains("USER"))
+                {
                 return RedirectToAction("Dashboard", "User");
+                }
+                else if(cuserrole.Contains("EMPLOYEE"))
+                {
+                    return RedirectToAction("Dashboard", "Employee");
+                }
             }
 
             if (signInResult.IsLockedOut)
@@ -289,11 +298,13 @@ namespace TradesCompany.Web.Controllers
             {
                 if (role == "Employee")
                 {
+                    var serviceTypes = await _serviceTypeGRepository.GetAllAsync();
                     var model = new ExternalRegisterWorkerViewModel
                     {
                         Email = email,
                         UserName = name,
-                        Role = "Employee"
+                        Role = "Employee",
+                        ServiceType = (List<ServiceType>)serviceTypes
                     };
                     return View("ExternalRegisterWorker", model);
                 }
@@ -310,7 +321,7 @@ namespace TradesCompany.Web.Controllers
                         return Content($"<script>alert('Error: {string.Join(", ", createResult.Errors.Select(e => e.Description))}'); window.close();</script>", "text/html");
 
                     await _userManager.AddLoginAsync(user, info);
-                    await _userManager.AddToRoleAsync(user, role);
+                    await _userManager.AddToRoleAsync(user, role.ToUpper());
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return RedirectToAction("Dashboard", "User");
                 }
