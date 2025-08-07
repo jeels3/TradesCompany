@@ -1,0 +1,192 @@
+﻿@using Microsoft.IdentityModel.Claims
+@model List<TradesCompany.Application.DTOs.UserAndGroupListingWithCount>;
+@{
+    if (User.FindFirst(ClaimTypes.Role)?.Value == "USER")
+    {
+        Layout = "~/Views/Shared/Layouts/_UserLayout.cshtml";
+    }
+    else if (User.FindFirst(ClaimTypes.Role)?.Value == "EMPLOYEE")
+    {
+        Layout = "~/Views/Shared/Layouts/_ELayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/Layouts/_AdminLayout.cshtml";
+    }
+    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+}
+<link href="https://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+<style>
+    #userimage {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+    }
+
+    .userlist {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .username {
+        text-decoration: none;
+        color: #333;
+        font-weight: 600;
+        text-transform: capitalize;
+        font-size: 18px;
+    }
+
+    .unread-badge {
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: bold;
+        display: inline-block;
+        min-width: 25px;
+        text-align: center;
+    }
+
+    .list-group-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .Group-elements {
+        display: none;
+    }
+
+    .checkbox-align {
+        margin-left: 10px;
+    }
+</style>
+<div class="container bootstrap snippets bootdey">
+    <div class="header">
+        <p class="text-muted prj-name">
+            <span class="fa fa-users fa-2x"></span>
+            Users
+        </p>
+    </div>
+
+    <button type="button" id="showCheckBox">Group</button>
+    <input id="ChannelName" type="text" class="Group-elements" placeholder="Enter Group Name"/>
+    <button type="button" id="CreateGroup" class="Group-elements">Create Group</button>
+
+    <div class="jumbotron" style="min-height:400px;height:auto;">
+        <ul class="list-group">
+            @foreach (var users in Model)
+            {
+                @foreach(var user in users.Users)
+                {
+                   <li class="list-group-item user-item">
+                    <div class="userlist">
+                        <div class="user-info">
+                            <img id="userimage" class="img-circle img-thumbnail rounded-circle" src="https://bootdey.com/img/Content/avatar/avatar7.png">
+                            <a class="username" asp-controller="Chat" asp-action="OneToOneChat" asp-route-receiverId="@user.UserId">
+                                @user.UserName
+                            </a>
+                        </div>
+                        <div>
+                            @if (user.uReadCount > 0)
+                            {
+                                <span class="unread-badge">@user.uReadCount</span>
+                            }
+                            <input type="checkbox" value="@user.UserId" class="Group-elements Group-checkbox checkbox-align" />
+                        </div>
+                    </div>
+                </li>
+                }
+            }
+            @foreach (var group in Model)
+            {
+                foreach(var user in group.Groups)
+                {
+
+                <li class="list-group-item user-item">
+                    <div class="userlist">
+                        <div class="user-info">
+                            <img id="userimage" class="img-circle img-thumbnail rounded-circle" src="https://bootdey.com/img/Content/avatar/avatar7.png">
+                            <a class="username" asp-controller="Chat" asp-action="GroupChat" asp-route-channelName="@user.ChannelName">
+                                @user.ChannelName
+                            </a>
+                        </div>
+                        <div>
+                            @if (user.uReadCount > 0)
+                            {
+                                <span class="unread-badge">@user.uReadCount</span>
+                            }
+                            <input type="checkbox" value="@user.ChannelName" class="Group-elements Group-checkbox checkbox-align" />
+                        </div>
+                    </div>
+                </li>
+
+                }
+            }
+        </ul>
+    </div>
+</div>   
+@section Scripts{
+    <script>
+        document.getElementById("showCheckBox").addEventListener("click", function () {
+            var elements = document.querySelectorAll(".Group-elements");
+            elements.forEach(function (element) {
+                element.style.display = element.style.display === "none" ? "inline-block" : "none";
+            });
+        });
+        document.getElementById("CreateGroup").addEventListener("click" , function (){
+            var elements = document.querySelectorAll(".Group-checkbox");
+            var GroupIds = [];
+            elements.forEach(function (element) {
+               if(element.checked){
+                   GroupIds.push(element.value);
+               }
+            });
+            // AJAX CALL
+            console.log(GroupIds);
+            var ChannelName = document.getElementById("ChannelName").value;
+            debugger
+            $.ajax({
+                url: '/Chat/CreateGroup',
+                type: 'POST',
+                contentType: 'application/json', // If sending JSON
+                data: JSON.stringify({
+                    GroupIds : GroupIds ,
+                    ChannelName : ChannelName
+                }),
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert("Error"+response.message);
+                    }
+                },
+                error: function (xhr) {
+                    let errorMessage = 'Error Creating Group. Please try again.';
+
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    } else if (xhr.responseText) {
+                        try {
+                            const errorResponse = JSON.parse(xhr.responseText);
+                            errorMessage = errorResponse.message || errorMessage;
+                        } catch (e) {
+                            // Use default error message
+                        }
+                    }
+                    alert(errorMessage);
+                },
+            });
+        });
+    </script>
+}

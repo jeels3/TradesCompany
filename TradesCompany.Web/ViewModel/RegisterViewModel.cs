@@ -21,7 +21,7 @@ namespace TradesCompany.Web.ViewModel
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "Password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
-        public string? Role { get; set; }
+        public string Role { get; set; } = "User";
         public IList<AuthenticationScheme>? ExternalLogins { get; set; }
     }
 }

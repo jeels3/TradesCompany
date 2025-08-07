@@ -1,0 +1,156 @@
+﻿@using Microsoft.IdentityModel.Claims
+@{
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    string? userName = User.FindFirst(ClaimTypes.Name)?.Value;
+    string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - Librarian Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f8f9fa;
+            overflow: scroll;
+        }
+
+        .sidebar {
+            height: 100vh;
+            background: linear-gradient(to bottom right, #0d6efd, #6610f2);
+            color: white;
+            padding-top: 20px;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+            position: fixed;
+        }
+
+            .sidebar .nav-link {
+                color: #e0e0e0;
+                padding: 12px 20px;
+                font-size: 16px;
+                border-radius: 8px;
+                transition: all 0.3s;
+            }
+
+                .sidebar .nav-link:hover,
+                .sidebar .nav-link.active {
+                    background-color: rgba(255, 255, 255, 0.15);
+                    color: #fff;
+                }
+
+        .brand-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logout-link:hover {
+            background-color: rgba(220, 53, 69, 0.1);
+            transform: translateX(4px);
+            border-color: #dc3545;
+        }
+
+        main {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <input value="@userId" type="hidden" id="userId" />
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block sidebar">
+                <div class="py-4 text-center border-bottom">
+                    <h4 class="fw-bold mb-0">
+                        <i class="fas fa-tools"></i>Trades Employee
+                    </h4>
+                </div>
+
+                <nav class="nav flex-column px-3 mt-3">
+
+                    <a class="nav-link @(currentAction == "Dashboard" ? "bg-white text-primary fw-semibold" : "hover-nav")"
+                       asp-controller="Employee" asp-action="Dashboard">
+                        <i class="bi bi-plus-circle"></i> Dashboard
+                    </a>
+
+                    <a class="nav-link @(currentAction == "AllQuotation" ? "bg-white text-primary fw-semibold" : "hover-nav")"
+                       asp-controller="Employee" asp-action="AllQuotation">
+                        <i class="bi bi-collection"></i> My Quotation
+                    </a>
+
+                    <a class="nav-link @(currentAction == "Notification" ? "bg-white text-primary fw-semibold" : "hover-nav")"
+                       asp-controller="Employee" asp-action="Notification">
+                        <i class="bi bi-bell-fill"><spam id="notificationcnt"></spam></i> Notification
+                    </a>
+
+                    <a class="nav-link @(currentAction == "MyScheduleServices" ? "bg-white text-primary fw-semibold" : "hover-nav")"
+                       asp-controller="Employee" asp-action="MyScheduleServices">
+                        <i class="bi bi-journal-check"></i> My Schedule
+                    </a>
+
+                    <a class="nav-link d-flex align-items-center justify-content-between gap-2 py-2 px-3 rounded transition @(currentAction == "UserListing" ? "bg-white text-primary fw-semibold shadow-sm" : "hover-nav")"
+                       asp-controller="Chat" asp-action="UserListing">
+
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-chat-dots-fill fs-5"></i>
+                            <span>Chat</span>
+                        </div>
+
+                        <span id="chatnotificationcnt"></span>
+                    </a>
+                            
+                    <a asp-controller="Account" asp-action="Logout"
+                       class="nav-link d-flex align-items-center gap-2 py-2 px-3 rounded text-danger bg-white fw-semibold mt-4 logout-link">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10">
+                <div class="admin-header d-flex justify-content-between align-items-center p-3 bg-white shadow-sm mb-3">
+                    <h4 class="mb-0">@ViewData["Title"] - @userName</h4>
+                    <span class="text-muted small"> Employee pannel</span>
+                </div>
+                @RenderBody()
+                @RenderBody()
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-custom alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-custom alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>
+                        @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="~/js/signalr.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script> 
+    @* <script src="~/js/Notifications.js" asp-append-version="true"></script> *@
+    @RenderSection("Scripts", required: false)
+    @* <script src="~/js/ShowNotificationCount.js" asp-append-version="true"></script> *@
+</body>
+</html>

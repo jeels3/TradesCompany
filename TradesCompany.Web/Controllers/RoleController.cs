@@ -2,17 +2,18 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TradesCompany.Domain.Entities;
 using TradesCompany.Web.ViewModel;
 
 namespace TradesCompany.Web.Controllers
 {
-    [Authorize(Policy = "CreateRolePolicy")]
+    //[Authorize(Policy = "CreateRolePolicy")]
     public class RoleController : Controller
     {
-        private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public RoleController(RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
+        public RoleController(RoleManager<ApplicationRole> roleManager, UserManager<ApplicationUser> userManager)
         {
             _roleManager = roleManager;
             _userManager = userManager;
@@ -21,7 +22,7 @@ namespace TradesCompany.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> ListRoles()
         {
-            List<IdentityRole> roles = await _roleManager.Roles.ToListAsync();
+            List<ApplicationRole> roles = await _roleManager.Roles.ToListAsync();
             return View(roles);
         }
 
@@ -43,7 +44,7 @@ namespace TradesCompany.Web.Controllers
                 }
                 else
                 {
-                    IdentityRole identityRole = new IdentityRole
+                    ApplicationRole identityRole = new ApplicationRole
                     {
                         Name = roleModel?.RoleName
                     };
@@ -61,5 +62,6 @@ namespace TradesCompany.Web.Controllers
             }
             return View(roleModel);
         }
+         
     }
 }

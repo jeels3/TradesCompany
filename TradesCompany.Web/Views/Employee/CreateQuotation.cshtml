@@ -1,0 +1,93 @@
+﻿@model TradesCompany.Web.ViewModel.QuotationViewModel;
+@{
+    Layout = "~/Views/Shared/Layouts/_ELayout.cshtml";
+    ViewData["Title"] = "Create Quotation";
+}
+
+<div class="register-container">
+    <div class="form-section">
+        <div class="form-wrapper">
+            <h2>Get Started Now</h2>
+
+            <form method="post" asp-action="CreateQuotation" asp-controller="Employee" id="bookingForm">
+
+                <span asp-validation-summary="RegistrationError" class="text-danger mb-3"></span>
+
+                <div class="form-group">
+                    <label asp-for="Title">Title</label>
+                    <input asp-for="Title" class="form-control" placeholder="Enter your Title" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Description">Description</label>
+                    <input asp-for="Description" class="form-control" placeholder="Enter your Description" id="WorkDetails" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <input asp-for="BookingId" type="hidden" />
+
+                <div class="form-group">
+                    <label asp-for="Price">Price</label>
+                    <input asp-for="Price" class="form-control" placeholder="Enter your Price" id="price"/>
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn-submit">Send Quotation</button>
+            </form>
+        </div>
+    </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        $(document).ready(function() {
+            // Form validation
+            debugger
+
+            $('#bookingForm').on('submit', function(e) {
+                let isValid = true;
+
+                // Clear previous error states
+                $('.is-invalid').removeClass('is-invalid');
+
+                // Validate price
+                const price = $('#price').val();
+                if (!price || price <= 1) {
+                    $('#price').addClass('is-invalid');
+                    $('#price').siblings('.text-danger').text('Please provide valid price');
+                    isValid = false;
+                }
+
+                // Validate work details
+                const workDetails = $('#WorkDetails').val().trim();
+                if (!workDetails || workDetails.length < 10) {
+                    $('#WorkDetails').addClass('is-invalid');
+                    if (workDetails.length < 10 && workDetails.length > 0) {
+                        // Show custom error for minimum length
+                        $('#WorkDetails').siblings('.text-danger').text('Please provide at least 10 characters describing your work requirements.');
+                    }
+                    isValid = false;
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+                    $('html, body').animate({
+                        scrollTop: $('.is-invalid').first().offset().top - 100
+                    }, 500);
+                }
+            });
+
+            // Real-time character count for work details
+            $('#WorkDetails').on('input', function() {
+                const length = $(this).val().length;
+                const minLength = 10;
+
+                if (length < minLength) {
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+            });
+    </script>
+}

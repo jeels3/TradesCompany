@@ -1,5 +1,56 @@
-﻿@{
+﻿@using Microsoft.IdentityModel.Claims
+@model IEnumerable<TradesCompany.Domain.Entities.ServiceType>
+
+@{
     Layout = "~/Views/Shared/Layouts/_UserLayout.cshtml";
+    string? userName = User.FindFirst(ClaimTypes.Name)?.Value.ToUpper();
 }
 
-<h1>hello</h1>
+<div class="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden" style='font-family: Inter, "Noto Sans", sans-serif;'>
+    <div class="layout-container flex h-full grow flex-col">
+        <!-- Main Content -->
+        <div class="px-40 flex flex-1 justify-center py-5">
+            <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+                <!-- Welcome Message -->
+                <div class="flex flex-wrap justify-between items-center gap-3 p-6 bg-white rounded-2xl shadow-md">
+                    <p class="text-[#111418] text-3xl font-semibold leading-snug tracking-wide min-w-[18rem]">
+                        @{
+                            var currentTime = TimeOnly.FromDateTime(DateTime.Now);
+                            var greeting = currentTime < new TimeOnly(12, 0) ? "Good morning"
+                            : currentTime < new TimeOnly(17, 0) ? "Good afternoon"
+                            : "Good evening";
+                        }
+                        Welcome @userName, @greeting
+                    </p>
+                </div>
+
+
+                <!-- Explore Services -->
+                <h2 class="text-[#111418] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Explore Services</h2>
+
+                <!-- Service Grid -->
+                <div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4" id="SereDiv">
+
+                    @if (!Model.Any())
+                    {
+                        <h1>No Service Type Found</h1>
+                    }
+                    else
+                    {   
+                    foreach (var service in Model)
+                        {
+                            <a asp-action="GetUserByServiceType" asp-controller="User" asp-route-serviceTypeId="@service.Id">
+                            <div class="flex flex-col gap-3 pb-3">
+                                <div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg" style='background-image: url("@service.ImgLink");'></div>
+                                <p class="text-[#111418] text-base font-medium leading-normal">@service.ServiceName</p>
+                            </div>
+                            </a>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

@@ -1,0 +1,197 @@
+﻿@model IEnumerable<TradesCompany.Application.DTOs.QuotationByUser>
+
+@{
+    Layout = "~/Views/Shared/Layouts/_UserLayout.cshtml";
+}
+
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+<style>
+    /* body {
+        margin-top: 20px;
+        background: #eee;
+    } */
+
+    .card {
+        box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
+    }
+
+    .avatar.sm {
+        width: 2.25rem;
+        height: 2.25rem;
+        font-size: .818125rem;
+    }
+
+    .table-nowrap .table td,
+    .table-nowrap .table th {
+        white-space: nowrap;
+    }
+
+    .table > :not(caption) > * > * {
+        padding: 0.75rem 1.25rem;
+        border-bottom-width: 1px;
+    }
+
+    table th {
+        font-weight: 600;
+        background-color: #eeecfd !important;
+    }   
+</style>    
+
+<div class="container">
+    <nav aria-label="breadcrumb" class="breadcrumb-custom">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a asp-action="Dashboard" asp-controller="User" class="text-decoration-none">Home</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">All Quotation</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-12 mb-3 mb-lg-5">
+            <div class="overflow-hidden card table-nowrap table-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">All Quotation</h5>
+                </div>
+                <div class="table-responsive">
+                    @if (!Model.Any())
+                    {
+                        <h1 class="ms-3">No Quotation Found</h1>
+                    }
+                    else
+                    {
+                        <table class="table mb-0">
+                            <thead class="small text-uppercase bg-body text-muted">
+                                <tr>
+                                    <th>Service Man</th>
+                                    <th>Email</th>
+                                    <th>Work Details</th>
+                                    <th>Work Description</th>
+                                    <th>Service Type</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var quotation in Model)
+                                {
+                                    <tr class="align-middle">
+                                        <td>@quotation.ServicemanName</td>
+                                        <td>@quotation.ServiceManEmail</td>
+                                        <td>@quotation.WorkDetails</td>
+                                        <td>@quotation.Description</td>
+                                        <td>@quotation.ServiceName</td>
+                                        <td>@quotation.Price</td>
+                                        <td>@quotation.status</td>
+                                        <td class="text-end">
+                                            <div class="dropdown" id="dropdownitems">
+                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="fa fa-bars"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end" id="dropdowndiv">
+                                                    <li><button class="dropdown-item details-btn" data-id="@quotation.quotationId">View Details</button></li>
+                                                    @if (quotation.status == "Pending")
+                                                    {
+                                                        <li><button class="dropdown-item accept-btn" data-id="@quotation.quotationId">Accept Service</button></li>
+                                                    }
+                                                    @if (quotation.status != "Canceled" && quotation.status != "Completed")
+                                                    {
+                                                        <li><button class="dropdown-item reject-btn" data-id="@quotation.quotationId">Reject Service</button></li>
+                                                    }
+                                                </ul>
+                                            </div>
+                                        </td>
+
+
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quotation Details Modal -->
+<div class="modal fade" id="viewQuotationModal" tabindex="-1" aria-labelledby="viewQuotationLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewQuotationLabel">Quotation Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>ServiceMan Charge: <span id="servicemancharge"></span></p>
+                <p>GST: <span id="gst"></span></p>
+                <p>Platform Fees: <span id="platformfees"></span></p>
+                <p>Total Price: <span id="totalprice"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary cancel-edit" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).on('click', '.accept-btn', function () {
+            const quotationId = $(this).data('id');
+
+            if (confirm('Are you sure you want to Accept this Request?')) {
+                $.ajax({
+                    url: `/User/RequestAccept?quotationId=${quotationId}`,
+                    success: function (res) {
+                        alert(res.message);
+                        location.reload();
+                    },
+                    error: function (xhr) {
+                        const err = xhr.responseJSON?.message || 'Error Accepting Request';
+                        alert(err);
+                    }
+                });
+            }
+        });
+
+        $(document).on('click', '.reject-btn', function () {
+            const quotationId = $(this).data('id');
+
+            if (confirm('Are you sure you want to reject this Request?')) {
+                $.ajax({
+                    url: `/User/RequestReject?quotationId=${quotationId}`,
+                    success: function (res) {
+                        alert(res.message);
+                        location.reload();
+                    },
+                    error: function (xhr) {
+                        const err = xhr.responseJSON?.message || 'Error Rejecting Request';
+                        alert(err);
+                    }
+                });
+            }
+        });
+
+        $(document).on('click', '.details-btn', function () {
+            const quotationId = $(this).data('id');
+
+            $.ajax({
+                url: `/User/QuotationDetails?quotationId=${quotationId}`,
+                success: function (res) {
+                    console.log(res);
+                    $('#servicemancharge').text(res.servicemancharge);
+                    $('#gst').text(res.gst);
+                    $('#platformfees').text(res.platformfees);
+                    $('#totalprice').text(res.totalprice);
+                    $('#viewQuotationModal').modal('show');
+                },
+                error: function (xhr) {
+                    const err = xhr.responseJSON?.message || 'Error loading quotation details';
+                    alert(err);
+                }
+            });
+        });
+    </script>
+}

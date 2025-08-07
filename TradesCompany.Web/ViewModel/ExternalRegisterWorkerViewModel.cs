@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using System.ComponentModel.DataAnnotations;
+using TradesCompany.Domain.Entities;
 
 namespace TradesCompany.Web.ViewModel
 {
@@ -9,7 +11,8 @@ namespace TradesCompany.Web.ViewModel
         [Required]
         public string UserName { get; set; }
         [Required]
-        public string ServiceType { get; set; }
+        public List<ServiceType>? ServiceType { get; set; } = new List<ServiceType>();
+        public int ServiceTypeId { get; set; }
         public string Role { get; set; }
     }
 }

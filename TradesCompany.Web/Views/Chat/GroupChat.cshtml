@@ -1,0 +1,95 @@
+﻿@using Microsoft.IdentityModel.Claims
+@model IEnumerable<TradesCompany.Domain.Entities.ChannelMessage>
+@{
+
+    if (User.FindFirst(ClaimTypes.Role)?.Value == "USER")
+    {
+        Layout = "~/Views/Shared/Layouts/_UserLayout.cshtml";
+    }
+    else if (User.FindFirst(ClaimTypes.Role)?.Value == "EMPLOYEE")
+    {
+        Layout = "~/Views/Shared/Layouts/_ELayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/Layouts/_AdminLayout.cshtml";
+    }
+    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+}
+<link href="~/css/OneToOneChat.css" rel="stylesheet" />
+<input value="@userId" type="hidden" id="userId" />
+<input value="@TempData["ChannelName"]" type="hidden" id="ChannelName" />
+
+<div class="container content mt-4">
+    <div class="row justify-content-center">
+        <div class="col-xl-6 col-lg-8 col-md-10 col-sm-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white fw-bold">
+                    Chat: @TempData["GroupName"]
+                </div>
+                <div class="card-body chat-body height3 overflow-auto">
+                    <ul class="chat-list list-unstyled mb-0" id="chatlist">
+                        @{
+                            var date = "";
+                            bool seenbyreceiver = false;
+                            foreach (var message in Model)
+                            {
+                                var msgDate = message.CreateAt.Date;
+                                if (msgDate != DateTime.Now.Date && msgDate.ToString() != date)
+                                {
+                                    date = msgDate.ToString();
+                                    <li class="text-center text-muted small my-3">@message.CreateAt.ToString("dd/MM/yyyy")</li>
+                                    ;
+                                }
+                                else if (msgDate == DateTime.Now.Date && "Today" != date)
+                                {
+                                    date = "Today";
+                                    <li class="text-center text-muted small my-3">Today</li>
+                                    ;
+                                }
+                                if (message.SenderId != userId)
+                                {
+                                    @* Receiver Message *@
+                                    <li class="in d-flex mb-3">
+                                        <img alt="Avatar" src="https://bootdey.com/img/Content/avatar/avatar1.png" class="rounded-circle me-3" width="40" height="40" />
+                                        <div class="message-content bg-secondary rounded p-2 shadow-sm">
+                                            <p class="mb-1 text-white">@message.Message</p>
+                                            <small class="text-white">@message.CreateAt.ToString("HH:mm")</small>
+                                        </div>
+                                    </li>
+                                }
+                                else
+                                {
+                                    @* Sender Message *@
+                                    <li class=" out d-flex justify-content-end mb-3">
+                                        <div class="message-content bg-primary text-white rounded p-2 shadow-sm me-3 text-end">
+                                            <p class="mb-1">@message.Message</p>
+                                            <small class="text-light">@message.CreateAt.ToString("HH:mm")</small>
+                                        </div>
+                                        <img alt="Avatar" src="https://bootdey.com/img/Content/avatar/avatar6.png" class="rounded-circle" width="40" height="40" />
+                                    </li>
+                                }
+
+                            }
+                            var lastSentMessage = Model.LastOrDefault(m => m.SenderId == userId);
+                            if (lastSentMessage != null && lastSentMessage.IsSeen.Any(s => s.Seen && s.ReceiverId != userId) && seenbyreceiver == false)
+                            {
+                                seenbyreceiver = true;
+                                <li class="text-end in text-muted small" id="seenCount">Seen : @lastSentMessage.IsSeen.Count()</li>
+                            }
+                        }
+                    </ul>
+                </div>
+                <div class="card-footer d-flex gap-2">
+                    <input type="text" id="message" class="form-control" placeholder="Type your message..." />
+                    <button onclick="sendMessage()" class="btn btn-primary px-4">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
+    <script src="~/js/signalr.js"></script>
+    <script src="~/js/Chat.js"></script>
+}

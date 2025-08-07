@@ -1,12 +1,22 @@
 ﻿@model TradesCompany.Web.ViewModel.LoginViewModel;
 
+<link rel="stylesheet" href="~/css/registerpage.css" />
 <div class="row">
     <div class="col-md-6">
-        <h1>Local Account Login</h1>
+        <h1>Account Login</h1>
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                @TempData["ErrorMessage"]
+            </div>
+        }
         <hr />
         <form method="post" asp-action="Login" asp-controller="Account">
             <input type="hidden" name="ReturnUrl" value="@Model.ReturnUrl" />
-            <div asp-validation-summary="All" class="text-danger"></div>
+            <div asp-validation-summary="All" class="alert-danger text-danger h-25"></div>
             <div class="form-group">
                 <label asp-for="Email"></label>
                 <input asp-for="Email" class="form-control" />
@@ -24,11 +34,11 @@
                         @Html.DisplayNameFor(m => m.RememberMe)
                     </label>
                 </div>
-            </div>
+            </div>                                      
             <button type="submit" class="btn btn-primary">Login</button>
         </form>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-6"> 
         <h1>External Login</h1>
         <hr />
         @if (Model.ExternalLogins == null || Model.ExternalLogins.Count == 0)
@@ -37,19 +47,21 @@
         }
         else
         {
-            <div>
+            <div class="mt-5">
                 @foreach (var provider in Model.ExternalLogins)
                 {
-                    <button type="button" class="btn btn-primary external-login-btn"
+                    <button type="button" class="btn btn-primary external-login-btn google-btn"
                             data-provider="@provider.Name"
                             data-url="@Url.Action("ExternalLogin", "Account", new { provider = provider.Name, returnUrl = Model.ReturnUrl })"
                             title="Log in using your @provider.DisplayName account">
-                        @provider.DisplayName
+                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
+                            Sign in with Google
+                            @provider.DisplayName
                     </button>
                 }
             </div>
         }
-    </div>
+     </div> 
 </div>
 
 @section Scripts {

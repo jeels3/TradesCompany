@@ -1,27 +1,40 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using TradesCompany.Application.Interfaces;
+using TradesCompany.Domain.Entities;
 using TradesCompany.Web.ViewModel;
 
 namespace TradesCompany.Web.Controllers
 {
     public class AccountController : Controller
     {
-       private readonly  UserManager<IdentityUser> _userManager;
-       private readonly SignInManager<IdentityUser> _signInManager;
-       private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly IRepository<ServiceType> _serviceTypeGRepository;
+        private readonly IRepository<ServiceMan> _serviceManGRepository;
+        private readonly ILogger<AccountController> _logger;
 
-        public AccountController(UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
-            RoleManager<IdentityRole> roleManager
+        public AccountController(UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            RoleManager<ApplicationRole> roleManager,
+            IRepository<ServiceType> serviceTypeGRepository,
+            IRepository<ServiceMan> serviceManGRepository,
+              ILogger<AccountController> logger
             )
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
+            _serviceTypeGRepository = serviceTypeGRepository;
+            _serviceManGRepository = serviceManGRepository;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         [HttpGet]
@@ -39,8 +52,16 @@ namespace TradesCompany.Web.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> EmployeeRegister()
         {
-            RegisterViewModel model = new RegisterViewModel
+            var serviceTypes = await _serviceTypeGRepository.GetAllAsync();
+            if(serviceTypes == null)
             {
+                _logger.LogWarning("No service types found for employee registration.");
+                ModelState.AddModelError(string.Empty, "No service types available for registration.");
+                return View(new EmployeeRegisterViewModel());
+            }
+            EmployeeRegisterViewModel model = new EmployeeRegisterViewModel
+            {
+                ServiceTypes = (List<ServiceType>)serviceTypes,
                 ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
             };
             return View(model);
@@ -48,11 +69,98 @@ namespace TradesCompany.Web.Controllers
 
         [HttpPost]
         [AllowAnonymous]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CustomerRegister(RegisterViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    // Reload external logins for the view
+                    model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync())?.ToList()
+                        ?? new List<AuthenticationScheme>();
+                    return View(model);
+                }
+
+                // Check if user already exists
+                var existingUser = await _userManager.FindByEmailAsync(model.Email);
+                if (existingUser != null)
+                {
+                    ModelState.AddModelError("Email", "A user with this email already exists.");
+                    model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync())?.ToList()
+                        ?? new List<Microsoft.AspNetCore.Authentication.AuthenticationScheme>();
+                    return View(model);
+                }
+
+                // Validate role exists
+                if (!await _roleManager.RoleExistsAsync(model.Role))
+                {
+                    _logger.LogWarning("Attempt to register user with non-existent role: {Role}", model.Role);
+                    ModelState.AddModelError("Role", "Invalid role specified.");
+                    model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync())?.ToList()
+                        ?? new List<Microsoft.AspNetCore.Authentication.AuthenticationScheme>();
+                    return View(model);
+                }
+
+                var user = new ApplicationUser
+                {
+                    UserName = model.UserName?.Trim(),
+                    Email = model.Email?.Trim().ToLowerInvariant(),
+                };
+
+                var result = await _userManager.CreateAsync(user, model.Password);
+
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation("User {Email} created successfully", user.Email);
+
+                    var roleResult = await _userManager.AddToRoleAsync(user, model.Role);
+                    if (!roleResult.Succeeded)
+                    {
+                        _logger.LogError("Failed to add role {Role} to user {Email}: {Errors}",
+                            model.Role, user.Email, string.Join(", ", roleResult.Errors.Select(e => e.Description)));
+                    }
+
+                    // await _signInManager.SignInAsync(user, isPersistent: false);
+
+                    TempData["SuccessMessage"] = "Registration successful!";
+                    return RedirectToAction("Login");
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                    _logger.LogWarning("User registration failed for {Email}: {Error}", model.Email, error.Description);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred during customer registration for email: {Email}", model?.Email);
+                ModelState.AddModelError(string.Empty, "An error occurred during registration. Please try again.");
+            }
+
+            // Reload external logins for the view
+            try
+            {
+                model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync())?.ToList()
+                    ?? new List<AuthenticationScheme>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading external logins for registration view");
+                model.ExternalLogins = new List<AuthenticationScheme>();
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> EmployeeRegister(EmployeeRegisterViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var user = new IdentityUser
+                var user = new ApplicationUser
                 {
                     UserName = model.UserName,
                     Email = model.Email
@@ -62,8 +170,16 @@ namespace TradesCompany.Web.Controllers
 
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, "USER");
-                    return RedirectToAction("Dashboard","User");
+                    await _userManager.AddToRoleAsync(user, model.Role);
+
+                    var serviceman = new ServiceMan
+                    {
+                        UserId = user.Id,
+                        ServiceTypeId = model.ServiceTypeId,
+                    };
+                    await _serviceManGRepository.InsertAsync(serviceman);
+                    await _serviceManGRepository.SaveAsync();
+                    return RedirectToAction("Dashboard", "Employee");
                 }
 
                 foreach (var error in result.Errors)
@@ -71,6 +187,7 @@ namespace TradesCompany.Web.Controllers
                     ModelState.AddModelError("RegistrationError", error.Description);
                 }
             }
+            model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             return View(model);
         }
 
@@ -87,65 +204,62 @@ namespace TradesCompany.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model, string? ReturnUrl)
+        [AllowAnonymous]
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+                    ModelState.AddModelError("", "Invalid login attempt.");
+                    return View(model);
+                }
+
+                var result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
 
                 if (result.Succeeded)
                 {
-                    if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+                    // Fatch Claim from user
+                    // Create a Token
+                    var roles = await _userManager.GetRolesAsync(user);
+                    if (roles.Contains("EMPLOYEE"))
                     {
-                        return Redirect(ReturnUrl);
+                        if (model.ReturnUrl != null) return Redirect(model.ReturnUrl);
+                        Console.WriteLine("User Role Is Here :=> " + User.FindFirst(ClaimTypes.Role)?.Value);
+                        return RedirectToAction("Dashboard", "Employee");
                     }
-
-                    return RedirectToAction(nameof(HomeController.Index), "Home");
-                }
-                if (result.RequiresTwoFactor)
-                {
-                    // Handle two-factor authentication case
-                }
-                if (result.IsLockedOut)
-                {
-                    // Handle lockout scenario
+                    else if (roles.Contains("USER"))
+                    {
+                        if (model.ReturnUrl != null) return Redirect(model.ReturnUrl);
+                        return RedirectToAction("Dashboard", "User");
+                    }
+                    else if (roles.Contains("ADMIN"))
+                    {
+                        return RedirectToAction("Dashboard", "Admin");
+                    }
                 }
                 else
                 {
                     model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-                    ModelState.AddModelError("LoginError", "Invalid login attempt.");
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                     return View(model);
                 }
             }
+            // If we got this far, something failed, redisplay form
             model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             return View(model);
         }
 
         [AllowAnonymous]
-        [HttpPost]
-        public async Task<IActionResult> IsEmailAvailable(string Email)
-        {
-            //Check If the Email Id is Already in the Database
-            var user = await _userManager.FindByEmailAsync(Email);
-
-            if (user == null)
-            {
-                return Json(true);
-            }
-            else
-            {
-                return Json($"Email {Email} is already in use.");
-            }
-        }
-
-        [AllowAnonymous]
         [HttpGet]
-        public IActionResult ExternalLogin(string provider, string returnUrl , string role)
+        public IActionResult ExternalLogin(string provider, string returnUrl, string role)
         {
             var redirectUrl = Url.Action(
                 action: "ExternalLoginCallback",
-                controller: "Account",           
-                values: new { ReturnUrl = returnUrl , role} 
+                controller: "Account",
+                values: new { ReturnUrl = returnUrl, role }
             );
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             return new ChallengeResult(provider, properties);
@@ -167,8 +281,16 @@ namespace TradesCompany.Web.Controllers
 
             if (signInResult.Succeeded)
             {
+                var cuser = await _userManager.FindByEmailAsync(info.Principal.FindFirstValue(ClaimTypes.Email));
+                var cuserrole = await _userManager.GetRolesAsync(cuser);
+                if (cuserrole.Contains("USER"))
+                {
                 return RedirectToAction("Dashboard", "User");
-                return Content($"<script>window.opener.location.href = '{returnUrl}'; window.close();</script>", "text/html");
+                }
+                else if(cuserrole.Contains("EMPLOYEE"))
+                {
+                    return RedirectToAction("Dashboard", "Employee");
+                }
             }
 
             if (signInResult.IsLockedOut)
@@ -186,17 +308,19 @@ namespace TradesCompany.Web.Controllers
             {
                 if (role == "Employee")
                 {
+                    var serviceTypes = await _serviceTypeGRepository.GetAllAsync();
                     var model = new ExternalRegisterWorkerViewModel
                     {
                         Email = email,
                         UserName = name,
-                        Role = "Employee"
+                        Role = "Employee",
+                        ServiceType = (List<ServiceType>)serviceTypes
                     };
                     return View("ExternalRegisterWorker", model);
                 }
                 else
                 {
-                    user = new IdentityUser
+                    user = new ApplicationUser
                     {
                         Email = email,
                         UserName = name
@@ -207,10 +331,9 @@ namespace TradesCompany.Web.Controllers
                         return Content($"<script>alert('Error: {string.Join(", ", createResult.Errors.Select(e => e.Description))}'); window.close();</script>", "text/html");
 
                     await _userManager.AddLoginAsync(user, info);
-                    await _userManager.AddToRoleAsync(user,role);
+                    await _userManager.AddToRoleAsync(user, role.ToUpper());
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return RedirectToAction("Dashboard", "User");
-                    return Content($"<script>window.opener.location.href = '{returnUrl}'; window.close();</script>", "text/html");
                 }
             }
             else
@@ -222,9 +345,14 @@ namespace TradesCompany.Web.Controllers
             }
         }
 
-        public IActionResult ExternalRegisterWorker()
+        public async Task<IActionResult> ExternalRegisterWorker()
         {
-            return View();
+            var serviceTypes = await _serviceTypeGRepository.GetAllAsync();
+            ExternalRegisterWorkerViewModel model = new ExternalRegisterWorkerViewModel
+            {
+                ServiceType = (List<ServiceType>)serviceTypes
+            };
+            return View(model);
         }
 
         [HttpPost]
@@ -242,9 +370,9 @@ namespace TradesCompany.Web.Controllers
                 return Content("<script>alert('External login info not found.'); window.close();</script>", "text/html");
             }
 
-            var user = new IdentityUser
+            var user = new ApplicationUser
             {
-                UserName = model.UserName,
+                UserName = model.UserName,  
                 Email = model.Email,
             };
 
@@ -259,10 +387,24 @@ namespace TradesCompany.Web.Controllers
             }
 
             await _userManager.AddLoginAsync(user, info);
-            await _userManager.AddToRoleAsync(user, model.Role);
-            await _signInManager.SignInAsync(user, isPersistent: false);
 
-            return Content("<script>window.opener.location.href = '/'; window.close();</script>", "text/html");
+            await _userManager.AddToRoleAsync(user, model.Role.ToUpper());
+            var serviceman = new ServiceMan
+            {
+                UserId = user.Id,
+                ServiceTypeId = model.ServiceTypeId,
+            };
+            await _serviceManGRepository.InsertAsync(serviceman);
+            await _serviceManGRepository.SaveAsync();
+
+            await _signInManager.SignInAsync(user, isPersistent: false);
+            // add into service type
+            return RedirectToAction("Dashboard", "Employee");
+        }
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("index", "home");
         }
     }
 }

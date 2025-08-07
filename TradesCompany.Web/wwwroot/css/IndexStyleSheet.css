@@ -1,0 +1,201 @@
+﻿.welcome-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 60px 0;
+    margin: -20px -15px 40px -15px;
+    border-radius: 0 0 20px 20px;
+}
+
+.welcome-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.welcome-subtitle {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    opacity: 0.9;
+}
+
+.action-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+.action-card {
+    background: white;
+    border-radius: 15px;
+    padding: 30px 25px;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    text-align: center;
+}
+
+    .action-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        text-decoration: none;
+        color: inherit;
+    }
+
+.card-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 1.8rem;
+    color: white;
+}
+
+.admin-card .card-icon {
+    background: linear-gradient(135deg, #2c5aa0, #1e3d72);
+}
+
+.admin-card:hover {
+    border-color: #2c5aa0;
+}
+
+.login-card .card-icon {
+    background: linear-gradient(135deg, #6f42c1, #5a2d91);
+}
+
+.login-card:hover {
+    border-color: #6f42c1;
+}
+
+.customer-card .card-icon {
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+}
+
+.customer-card:hover {
+    border-color: #28a745;
+}
+
+.employee-card .card-icon {
+    background: linear-gradient(135deg, #fd7e14, #e8590c);
+}
+
+.employee-card:hover {
+    border-color: #fd7e14;
+}
+
+.card-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.card-description {
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.card-link {
+    display: inline-flex;
+    align-items: center;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.admin-card .card-link {
+    color: #2c5aa0;
+}
+
+.login-card .card-link {
+    color: #6f42c1;
+}
+
+.customer-card .card-link {
+    color: #28a745;
+}
+
+.employee-card .card-link {
+    color: #fd7e14;
+}
+
+.card-link i {
+    margin-left: 8px;
+    transition: transform 0.3s ease;
+}
+
+.action-card:hover .card-link i {
+    transform: translateX(3px);
+}
+
+.features-section {
+    background: white;
+    border-radius: 15px;
+    padding: 40px 30px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    margin-top: 40px;
+}
+
+.features-title {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.feature-item {
+    text-align: center;
+    padding: 20px 15px;
+}
+
+.feature-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.feature-title {
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.feature-description {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+    .welcome-section {
+        padding: 40px 20px;
+        margin: -20px -15px 30px -15px;
+    }
+
+    .welcome-title {
+        font-size: 2rem;
+    }
+
+    .action-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .action-card {
+        padding: 25px 20px;
+    }
+}

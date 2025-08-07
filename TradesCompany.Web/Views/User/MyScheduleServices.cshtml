@@ -1,0 +1,133 @@
+﻿@model IEnumerable<TradesCompany.Application.DTOs.ScheduleServiceByUser>
+
+@{
+    Layout = "~/Views/Shared/Layouts/_UserLayout.cshtml";
+}
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+<style>
+    /* body {
+        margin-top: 20px;
+        background: #eee;
+    } */
+
+    .card {
+        box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
+    }
+
+    .avatar.sm {
+        width: 2.25rem;
+        height: 2.25rem;
+        font-size: .818125rem;
+    }
+
+    .table-nowrap .table td, .table-nowrap .table th {
+        white-space: nowrap;
+    }
+
+    .table > :not(caption) > * > * {
+        padding: 0.75rem 1.25rem;
+        border-bottom-width: 1px;
+    }
+
+    table th {
+        font-weight: 600;
+        background-color: #eeecfd !important;
+    }
+</style>
+<div class="container">
+    <nav aria-label="breadcrumb" class="breadcrumb-custom">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Dashboard" asp-controller="User" class="text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Your Schedule Services</li>
+        </ol>
+    </nav>
+    <div class="row">
+        <div class="col-12 mb-3 mb-lg-5">
+            <div class="overflow-hidden card table-nowrap table-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Customer Schedule Services</h5>
+                </div>
+                <div class="table-responsive">
+                    @if (!Model.Any())
+                    {
+                        <h1 class="ms-3">No Schedule Any Services</h1>
+                    }
+                    else
+                    {
+                        <table class="table mb-0">
+                            <thead class="small text-uppercase bg-body text-muted">
+                                <tr>
+                                    <th>Service Man</th>
+                                    <th>Work Details</th>
+                                    <th>Service Type</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                    <th>Schedule At</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var service in Model)
+                                {
+
+
+                                    <tr class="align-middle">
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div>
+                                                    <div class="h6 mb-0 lh-1">@service.ServiceMan</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>@service.WorkDetails</td>
+                                        <td>@service.ServiceName</td>
+                                        <td> <span class="d-inline-block align-middle">@service.TotalPrice</span></td>
+                                        <td><span>@service.status</span></td>
+                                        <td>@service.ScheduledAt</td>
+                                        <td class="text-end">
+                                            <div class="drodown">
+                                                <a data-bs-toggle="dropdown" href="#" class="btn p-1" aria-expanded="false">
+                                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-end" style="">
+                                                    @* <a href="#!" class="dropdown-item">View Details</a> *@
+                                                    @if (service.status == "Scheduled")
+                                                    {
+                                                    <button data-id="@service.ScheduleServiceId"
+                                                    class="dropdown-item cancel-btn">Schedule Cancel</button>    
+                                                    }
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).on('click', '.cancel-btn', function () {
+        const ScheduleServiceId = $(this).data('id');
+
+        if (confirm('Are you sure you want to cancel Schedule?')) {
+            $.ajax({
+                url: `/User/ScheduleReject?ScheduleServiceId=${ScheduleServiceId}`,
+                success: function (res) {
+                    alert(res.message);
+                    location.reload();
+                },
+                error: function (xhr) {
+                    const err = xhr.responseJSON?.message || 'Error Scheduling Request';
+                    alert(err);
+                }
+            });
+        }
+        });
+    </script>
+}
