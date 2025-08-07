@@ -4,6 +4,9 @@ var ChannelName = document.getElementById("ChannelName").value;
 const connection2 = new signalR.HubConnectionBuilder()
     .withUrl("/chatHub")
     .build();
+const connection3 = new signalR.HubConnectionBuilder()
+    .withUrl("/notificationHub")
+    .build();
 function fullfill() {
     console.log("Fullfill called");
     connection2.invoke("JoinGroup", ChannelName);
@@ -17,6 +20,7 @@ function reject() {
 }
 
 connection2.start().then(fullfill, reject);
+connection3.start().then(fullfill, reject);
 
 debugger
 document.addEventListener("DOMContentLoaded", function () {
@@ -85,6 +89,7 @@ connection2.on("ReceiveChatNotificationCount", (count) => {
 });
 
 connection2.on("ReceiveChatNotificationCountByChannelId", (count, appendid) => {
+    alert("chat.js" + appendid +"user "+userId)
     const notificationCountElement = document.getElementById(appendid);
     if (notificationCountElement) {
         notificationCountElement.textContent = count > 0 ? count : '';

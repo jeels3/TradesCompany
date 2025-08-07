@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
 using Grpc.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
@@ -13,6 +14,7 @@ using Channel = TradesCompany.Domain.Entities.Channel;
 
 namespace TradesCompany.Web.Controllers
 {
+    [Authorize(Roles = "USER , ADMIN , EMPLOYEE")]
     public class ChatController : Controller
     {
         private readonly IChatRepository _chatRepository;
@@ -39,6 +41,8 @@ namespace TradesCompany.Web.Controllers
         {
             try
             {
+                var data = await _chatRepository.GetUserAndGroupListingWithCount(userId);
+
                 var users = await _chatRepository.GetAllUserListing(userId);
                 var groups = await _chatRepository.GetGroupByUserId(userId);
                 if (users == null && groups == null)
@@ -55,7 +59,7 @@ namespace TradesCompany.Web.Controllers
                     Users = users,
                     channels = groups
                 };
-                return View(model);
+                return View(data);
             }
             catch (Exception ex)
             {

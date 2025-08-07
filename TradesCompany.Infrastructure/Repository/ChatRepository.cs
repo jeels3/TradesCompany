@@ -83,6 +83,35 @@ namespace TradesCompany.Infrastructure.Repository
                             .Where(cm => !cm.IsSeen.Any(s => s.ReceiverId == userId)) // No IsSeen row for this user = not seen
                             .Count();
         }
+
+        public async Task<UnreadMessageInfoDto> GetAllUnreadMessageByChannelIdWithSenderDetails(int channelId, string userId)
+        {
+            // Step 1: Get the other participant (sender)
+            var senderId = await _context.ChannelUser
+                .Where(cu => cu.ChannelId == channelId && cu.UserId != userId)
+                .Select(cu => cu.UserId)
+                .FirstOrDefaultAsync();
+
+            if (senderId == null)
+                return null; // No other user found in this channel
+
+            // Step 2: Get count of unread messages from that sender to this user
+            var unreadCount = await _context.ChannelMessage
+                .Where(cm => cm.ChannelId == channelId)
+                .Where(cm => cm.SenderId == senderId)
+                .Where(cm => !cm.IsSeen.Any(s => s.ReceiverId == userId))
+                .CountAsync();
+
+            // Step 3: Always return senderId and count (even if 0)
+            return new UnreadMessageInfoDto
+            {
+                SenderId = senderId,
+                UnreadCount = unreadCount
+            };
+        }
+
+
+
         public async Task<List<Channel>> GetGroupByUserId(string userId)
         {
             return await _context.Channel
@@ -101,6 +130,49 @@ namespace TradesCompany.Infrastructure.Repository
         public async Task<List<UserAndGroupListingWithCount>> GetAllChannelsByUserId(string userId)
         {
             return null;
+        }
+
+        public async Task<List<UserAndGroupListingWithCount>> GetUserAndGroupListingWithCount(string userId)
+        {
+            var userChannels = await _context.ChannelUser
+                .Where(cu => cu.UserId == userId)
+                .Select(cu => cu.Channel)
+                .ToListAsync();
+            var result = new List<UserAndGroupListingWithCount>();
+            foreach (var channel in userChannels)
+            {
+                var unreadCount = await GetAllUnreadMessageByChannelId(channel.Id, userId);
+                var channelName = await _context.Channel.Where(c => c.Id == channel.Id).FirstOrDefaultAsync();
+                var unreadcountforpersonal = await GetAllUnreadMessageByChannelIdWithSenderDetails(channel.Id, userId);
+
+                if (channelName.ChannelName.Contains("Group"))
+                {
+                    GroupDTO group = new GroupDTO
+                    {
+                        ChannelName = channelName.ChannelName,
+                        uReadCount = unreadCount
+                    };
+                    result.Add(new UserAndGroupListingWithCount
+                    {
+                        Groups = new List<GroupDTO> { group }
+                    });
+                }
+                else
+                {
+                    UserDto userDto = new UserDto
+                    {
+                        UserId = unreadcountforpersonal.SenderId,
+                        UserName = await _context.Users.Where(u => u.Id == unreadcountforpersonal.SenderId).Select(u => u.UserName).FirstOrDefaultAsync(),
+                        uReadCount = unreadcountforpersonal.UnreadCount
+                    };
+                    result.Add(new UserAndGroupListingWithCount
+                    {
+                        Users = new List<UserDto> { userDto }
+                    });
+                }
+
+            }
+            return result;
         }
     }
 }

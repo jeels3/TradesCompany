@@ -1,16 +1,14 @@
-﻿body {
-    background: #eee;
-}
+﻿
 
-.chat-list {
-    padding: 0;
-    font-size: .8rem;
-}
+    .chat-list {
+        padding: 0;
+        font-size: .8rem;
+    }
 
     .chat-list li {
         margin-bottom: 10px;
         overflow: auto;
-        color: #ffffff;
+        color: #fff;
     }
 
     .chat-list .chat-img {

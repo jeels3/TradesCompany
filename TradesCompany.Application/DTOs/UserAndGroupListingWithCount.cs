@@ -9,13 +9,18 @@ namespace TradesCompany.Application.DTOs
 {
     public class UserAndGroupListingWithCount
     {
-        public List<UserAndGroupListingViewModel> userAndGroupListingViewModels { get; set; } = new List<UserAndGroupListingViewModel>();
+       public List<GroupDTO>? Groups { get; set; } = new List<GroupDTO>();
+        public List<UserDto>? Users { get; set; } = new List<UserDto>();
     }
-    public class UserAndGroupListingViewModel
+    public class GroupDTO
     {
-        public ApplicationUser User { get; set; }
-        public Channel Channels { get; set; }
-        public int uReadCount { get; set; }
+        public string? ChannelName { get; set; }
+        public int? uReadCount { get; set; } = 0;
     }
-    
+    public class UserDto
+    {
+        public string? UserId { get; set; }
+        public string? UserName { get; set; }
+        public int? uReadCount { get; set; } = 0;
+    }
 }

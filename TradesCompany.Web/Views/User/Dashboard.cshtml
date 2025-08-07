@@ -3,7 +3,7 @@
 
 @{
     Layout = "~/Views/Shared/Layouts/_UserLayout.cshtml";
-    string? userName = User.FindFirst(ClaimTypes.Name)?.Value;
+    string? userName = User.FindFirst(ClaimTypes.Name)?.Value.ToUpper();
 }
 
 <div class="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden" style='font-family: Inter, "Noto Sans", sans-serif;'>
@@ -12,11 +12,18 @@
         <div class="px-40 flex flex-1 justify-center py-5">
             <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
                 <!-- Welcome Message -->
-                <div class="flex flex-wrap justify-between gap-3 p-4">
-                    <p class="text-[#111418] tracking-light text-[32px] font-bold leading-tight min-w-72">
-                        Welcome back , @userName !
+                <div class="flex flex-wrap justify-between items-center gap-3 p-6 bg-white rounded-2xl shadow-md">
+                    <p class="text-[#111418] text-3xl font-semibold leading-snug tracking-wide min-w-[18rem]">
+                        @{
+                            var currentTime = TimeOnly.FromDateTime(DateTime.Now);
+                            var greeting = currentTime < new TimeOnly(12, 0) ? "Good morning"
+                            : currentTime < new TimeOnly(17, 0) ? "Good afternoon"
+                            : "Good evening";
+                        }
+                        Welcome @userName, @greeting
                     </p>
                 </div>
+
 
                 <!-- Explore Services -->
                 <h2 class="text-[#111418] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Explore Services</h2>

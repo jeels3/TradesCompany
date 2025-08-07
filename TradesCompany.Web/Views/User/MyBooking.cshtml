@@ -5,10 +5,10 @@
 }
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 <style>
-    body {
+    /* body {
         margin-top: 20px;
         background: #eee;
-    }
+    } */
 
     .card {
         box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
@@ -89,7 +89,7 @@
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-end" style="">
                                                     @* <a href="#!" class="dropdown-item">View Details</a> *@
-                                                    @if (service.Status == "Pending")
+                                                    @if (service.Status != "Completed" && service.Status != "Canceled")
                                                     {
                                                         <button data-id="@service.Id"
                                                                 class="dropdown-item cancel-btn">
@@ -126,7 +126,7 @@
                     const err = xhr.responseJSON?.message || 'Error Canceling Request';
                     alert(err);
                 }
-            });
+            }); 
         }
         });
     </script>

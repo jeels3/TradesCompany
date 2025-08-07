@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using System.Data;
 using System.Security.Claims;
 using TradesCompany.Application.DTOs;
@@ -29,6 +30,26 @@ namespace TradesCompany.Web.Controllers
                 string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 var count = await _userRepository.GetAllNotificationCount(userId);
                 return Json(userId);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        public IActionResult Profile()
+        {
+            return View();
+        }
+        
+        // Profile Controller 
+        public async Task<IActionResult> GetUserClaims()
+        {
+            try
+            {
+                string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var claims = await _userRepository.GetAllUserClaims(userId);
+                return Json(claims);
             }
             catch (Exception ex)
             {

@@ -121,7 +121,7 @@ namespace TradesCompany.Web.Controllers
                 // Update Status : Quoation
                 var quotation = await _quotationGRepository.GetByIdAsync(quotationId);
                 var booking = await _bookingGRepository.GetByIdAsync(quotation.BookingId);
-                quotation.Status = "Reject";
+                quotation.Status = "Rejected";
                 await _quotationGRepository.SaveAsync();
                 // send notification
                 await _notificationService.SendNotificationOfNewQuotation(booking.UserId, "Quotation Rejected", "Your Booking on Quotation Is Rejected");
@@ -146,12 +146,14 @@ namespace TradesCompany.Web.Controllers
                 try
                 {
                     // save DB
-                    var amout = (int)model.Price * 0.05;
+                    var withgst = model.Price + (model.Price * 18) / 100; // Assuming 18% GST
+                    var amout = withgst + 100; // Assuming 100 is the platform fee
+
                     Quotation quotation = new Quotation
                     {
                         BookingId = model.BookingId,
                         ServiceManId = servicemen.Id,
-                        Price = model.Price + ((decimal)amout),
+                        Price = amout,
                         Status = "Pending",
                         QuotationPdf = "soon",
                         QuotationDescription = model.Description,
@@ -184,6 +186,77 @@ namespace TradesCompany.Web.Controllers
                 return View(new List<QuotationByServicerMan>());
             }
             return View(data);
+        }
+
+        public async Task <IActionResult> GetQuotationDetails(int quotationId)
+        {
+            try
+            {
+                var quotation = await _quotationGRepository.GetByIdAsync(quotationId);
+                if (quotation == null)
+                {
+                    TempData["ErrorMessage"] = "Quotation not found.";
+                    return RedirectToAction("AllQuotation");
+                }
+
+                decimal totalprice = quotation.Price;
+                decimal platformfeesExcluded = totalprice - 100;
+                decimal actualprice = platformfeesExcluded / (1 + 18m / 100m);
+                var data = new
+                {
+                    quotationId = quotation.Id,
+                    servicemancharge = actualprice,
+                    gst = (actualprice * 18) / 100,
+                    platformfees = 100,
+                    totalprice = quotation.Price,
+                    Description = quotation.QuotationDescription,
+                };
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Something went wrong while fetching quotation details. Please try again.";
+                return BadRequest("Something Went Wrong");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditQuotation([FromForm] Dictionary<string,string> data)
+        {
+            var quotationId = int.Parse(data["quotationId"]);
+            var price = decimal.Parse(data["price"]);
+            var QuotationDescription = data["QuotationDescription"];
+            try
+            {
+                var quotation = await _quotationGRepository.GetByIdAsync(quotationId);
+                var booking = await _bookingGRepository.GetByIdAsync(quotation.BookingId);
+                if (booking == null)
+                {
+                    TempData["ErrorMessage"] = "Booking not found for the quotation.";
+                    return BadRequest("Booking Not Found Of This Quotation");
+                }
+                if (quotation == null)
+                {
+                    TempData["ErrorMessage"] = "Quotation not found.";
+                    return RedirectToAction("AllQuotation");
+                }
+                // Update quotation details
+                var withgst = price + (price * 18) / 100; // Assuming 18% GST
+                var amout = withgst + 100;
+                quotation.Price = amout;
+                quotation.QuotationDescription = QuotationDescription;
+
+
+                quotation.Status = "Pending"; // Reset status to Pending after edit
+                await _quotationGRepository.SaveAsync();
+                await _notificationService.SendNotificationOfNewQuotation(booking.UserId, "Quotation", "Quotation Updated By Service Man");
+                return Ok(new {message = "Quotation Update Succesfully"});
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Something went wrong while updating the quotation. Please try again.";
+                return BadRequest("Something Went Wrong");
+            }
         }
 
         [Authorize(Policy = "ScheduleServicePolicy")]
@@ -356,14 +429,14 @@ namespace TradesCompany.Web.Controllers
                 quotation.Status = "Completed";
                 booking.Status = "Completed";
                 await _quotationGRepository.SaveAsync();
-                var totalamount = (double)serviceSchedule.TotalPrice;
+                var totalamount = serviceSchedule.TotalPrice;
                 // Create Bill
                 Bill model = new Bill
                 {
                     Title = "Service Completed",
-                    serviceCharge = totalamount - (totalamount * 0.18) - (totalamount * 0.05),
-                    Gst = totalamount * 0.18, // Assuming 18% GST
-                    PlatFormFees = totalamount * 0.05, // Assuming 5% Platform Fees
+                    serviceCharge = totalamount - (totalamount * 18 / 100) - (totalamount * 5 / 100),
+                    Gst = totalamount * 18 / 100, // Assuming 18% GST
+                    PlatFormFees = totalamount * 5 / 100, // Assuming 5% Platform Fees
                     TotalPrice = totalamount,
                     serviceScheduleId = serviceSchedule.Id,
 

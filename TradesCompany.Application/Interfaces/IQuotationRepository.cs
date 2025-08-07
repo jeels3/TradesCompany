@@ -11,5 +11,6 @@ namespace TradesCompany.Application.Interfaces
     public interface IQuotationRepository
     {
         Task<List<QuotationByUser>> GetQuotationForUser(string userId);
+        Task<List<Quotation>> GetQuotationByBookingId(int bookingId);
     }
 }

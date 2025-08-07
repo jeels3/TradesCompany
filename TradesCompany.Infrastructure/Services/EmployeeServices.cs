@@ -48,10 +48,10 @@ namespace TradesCompany.Infrastructure.Services
             Bill model = new Bill
             {
                 Title = scheduleservice.ServiceMan.ServiceTypes.ServiceName,
-                serviceCharge = (double)scheduleservice.TotalPrice - (((double)scheduleservice.TotalPrice*18)/100) - 50,
+                serviceCharge = scheduleservice.TotalPrice - ((scheduleservice.TotalPrice*18)/100) - 50,
                 PlatFormFees = 50,
-                Gst = (((double)scheduleservice.TotalPrice * 18) / 100),
-                TotalPrice = (double)scheduleservice.TotalPrice,
+                Gst = ((scheduleservice.TotalPrice * 18) / 100),
+                TotalPrice = scheduleservice.TotalPrice,
                 CreatedAt = DateTime.Now,
             };
             return model;

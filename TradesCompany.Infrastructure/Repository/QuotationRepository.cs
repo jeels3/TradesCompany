@@ -25,6 +25,13 @@ namespace TradesCompany.Infrastructure.Repository
                 .FromSqlInterpolated($"EXEC GetAllQuotationForUser {userId}")
                 .ToListAsync();
         }
+
+        public async Task<List<Quotation>> GetQuotationByBookingId(int bookingId)
+        {
+            return await _context.Quotations
+                .Where(q => q.BookingId == bookingId)
+                .ToListAsync();
+        }
     }
 }
  

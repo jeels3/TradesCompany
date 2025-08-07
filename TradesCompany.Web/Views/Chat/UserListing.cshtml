@@ -1,5 +1,5 @@
 ﻿@using Microsoft.IdentityModel.Claims
-@model TradesCompany.Web.ViewModel.UserAndGroupListing;
+@model List<TradesCompany.Application.DTOs.UserAndGroupListingWithCount>;
 @{
     if (User.FindFirst(ClaimTypes.Role)?.Value == "USER")
     {
@@ -19,60 +19,55 @@
 <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
 <style>
     #userimage {
-        width: 70px;
-        height: 70px;
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
     }
 
     .userlist {
         display: flex;
-        align-content: center;
         align-items: center;
-        column-gap: 10px;
+        justify-content: space-between;
     }
 
-    .username{
-        text-decoration:none;
-        color:black;
-        text-transform:capitalize;
-        font-size:25px;
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
     }
 
-    .jumbotron .btn {
-        color: #FFFFFF;
-        padding: 5px !important;
-        font-size: 12px !important;
-        margin-left: 20px;
+    .username {
+        text-decoration: none;
+        color: #333;
+        font-weight: 600;
+        text-transform: capitalize;
+        font-size: 18px;
     }
 
-    .jumbotron label {
+    .unread-badge {
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+        padding: 5px 10px;
         font-size: 12px;
-    }
-
-    .img-user {
-        height: 120px;
-        width: 120px;
-        margin-right: 20px;
-    }
-
-    .prj-name {
         font-weight: bold;
-        color: #5bc0de;
-    }
-
-    .user-item img, .user-item h3 {
         display: inline-block;
+        min-width: 25px;
+        text-align: center;
     }
 
-    .jumbotron .btn .user-item h3 a {
-        color: #5bc0de;
-        padding: 5px !important;
-        font-size: 12px !important;
+    .list-group-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
-    .list-group{
-        width: 420px;
+
+    .Group-elements {
+        display: none;
     }
-    .Group-elements{
-        display:none;
+
+    .checkbox-align {
+        margin-left: 10px;
     }
 </style>
 <div class="container bootstrap snippets bootdey">
@@ -89,37 +84,53 @@
 
     <div class="jumbotron" style="min-height:400px;height:auto;">
         <ul class="list-group">
-            @foreach (var user in Model.Users)
+            @foreach (var users in Model)
             {
-                <li class="list-group-item user-item text-left">
+                @foreach(var user in users.Users)
+                {
+                   <li class="list-group-item user-item">
                     <div class="userlist">
-                        <div>
-                            <img id="userimage" class="img-circle img-user img-thumbnail rounded-circle" src="https://bootdey.com/img/Content/avatar/avatar7.png">
+                        <div class="user-info">
+                            <img id="userimage" class="img-circle img-thumbnail rounded-circle" src="https://bootdey.com/img/Content/avatar/avatar7.png">
+                            <a class="username" asp-controller="Chat" asp-action="OneToOneChat" asp-route-receiverId="@user.UserId">
+                                @user.UserName
+                            </a>
                         </div>
                         <div>
-                            <h3>
-                                <a class="username" asp-controller="Chat" asp-action="OneToOneChat" asp-route-receiverId="@user.Id">@user.UserName <span id="@user.Id" class="text-secondary text-sm-center bg-danger rounded-circle text-black"></span></a><br>
-                            </h3>
+                            @if (user.uReadCount > 0)
+                            {
+                                <span class="unread-badge">@user.uReadCount</span>
+                            }
+                            <input type="checkbox" value="@user.UserId" class="Group-elements Group-checkbox checkbox-align" />
                         </div>
-                        <input type="checkbox" value="@user.Id" class="Group-elements Group-checkbox" />
                     </div>
                 </li>
+                }
             }
-            @foreach (var user in Model.channels)
+            @foreach (var group in Model)
             {
-                <li class="list-group-item user-item text-left">
+                foreach(var user in group.Groups)
+                {
+
+                <li class="list-group-item user-item">
                     <div class="userlist">
-                        <div>
-                            <img id="userimage" class="img-circle img-user img-thumbnail rounded-circle" src="https://bootdey.com/img/Content/avatar/avatar7.png">
+                        <div class="user-info">
+                            <img id="userimage" class="img-circle img-thumbnail rounded-circle" src="https://bootdey.com/img/Content/avatar/avatar7.png">
+                            <a class="username" asp-controller="Chat" asp-action="GroupChat" asp-route-channelName="@user.ChannelName">
+                                @user.ChannelName
+                            </a>
                         </div>
                         <div>
-                            <h3>
-                                <a class="username" asp-controller="Chat" asp-action="GroupChat" asp-route-channelName="@user.ChannelName">@user.ChannelName</a><br>
-                            </h3>
+                            @if (user.uReadCount > 0)
+                            {
+                                <span class="unread-badge">@user.uReadCount</span>
+                            }
+                            <input type="checkbox" value="@user.ChannelName" class="Group-elements Group-checkbox checkbox-align" />
                         </div>
-                        <input type="checkbox" value="@user.Id" class="Group-elements Group-checkbox" />
                     </div>
                 </li>
+
+                }
             }
         </ul>
     </div>

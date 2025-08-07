@@ -20,5 +20,7 @@ namespace TradesCompany.Application.Interfaces
         Task <int> GetAllUnreadMessageByChannelId(int channelId, string userId);
         Task<List<string>> GetUserByChannelId(int channelId);
         Task<List<UserAndGroupListingWithCount>> GetAllChannelsByUserId(string userId);
+        Task<List<UserAndGroupListingWithCount>> GetUserAndGroupListingWithCount(string userId);
+        Task <UnreadMessageInfoDto> GetAllUnreadMessageByChannelIdWithSenderDetails(int channelId, string userId);
     }
 }

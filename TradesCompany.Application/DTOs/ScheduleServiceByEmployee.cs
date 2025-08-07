@@ -19,5 +19,6 @@ namespace TradesCompany.Application.DTOs
         public DateTime? ScheduledAt { get; set; }
         public decimal? TotalPrice { get; set; }
         public string Status { get; set; }
+
     }
 }

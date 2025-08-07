@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TradesCompany.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using TradesCompany.Infrastructure.Data;
 namespace TradesCompany.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250805054840_update_scheduleserviceviewmodel")]
+    partial class update_scheduleserviceviewmodel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -493,21 +496,21 @@ namespace TradesCompany.Infrastructure.Migrations
                     b.Property<string>("FilePath")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Gst")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Gst")
+                        .HasColumnType("float");
 
-                    b.Property<decimal>("PlatFormFees")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("PlatFormFees")
+                        .HasColumnType("float");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("TotalPrice")
+                        .HasColumnType("float");
 
-                    b.Property<decimal>("serviceCharge")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("serviceCharge")
+                        .HasColumnType("float");
 
                     b.Property<int>("serviceScheduleId")
                         .HasColumnType("int");

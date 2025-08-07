@@ -1,10 +1,17 @@
-﻿@model IEnumerable<TradesCompany.Application.DTOs.BookingByServiceType>
+﻿@using Microsoft.IdentityModel.Claims
+@model IEnumerable<TradesCompany.Application.DTOs.BookingByServiceType>
 @{
     Layout = "~/Views/Shared/Layouts/_ELayout.cshtml";
-    ViewData["Title"] = "Employee Dashboard";
+    string? userName = User.FindFirst(ClaimTypes.Name)?.Value.ToUpper();
+    var currentTime = TimeOnly.FromDateTime(DateTime.Now);
+    var greeting = currentTime < new TimeOnly(12, 0) ? "Good morning"
+    : currentTime < new TimeOnly(17, 0) ? "Good afternoon"
+    : "Good evening";
+    ViewData["Title"] = $"{greeting}";
 }
 
 <div>
     <p>Total Booking :@Model.Count()</p>
 </div>
+
 @Html.Partial("~/Views/PartialView/_BookingListing.cshtml",Model)

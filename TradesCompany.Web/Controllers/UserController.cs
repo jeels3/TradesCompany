@@ -178,6 +178,18 @@ namespace TradesCompany.Web.Controllers
                 // Update Status : Booking , Quoation
                 var booking = await _bookingGRepository.GetByIdAsync(bookingId);
                 booking.Status = "Canceled";
+                // If Any Quotation Available than update status to canceled
+                var quotations = await _quotationRepository.GetQuotationByBookingId(bookingId);
+                if(quotations != null && quotations.Any())
+                {
+                    foreach (var quotation in quotations)
+                    {
+                        quotation.Status = "Canceled";
+                        var serviceMan = await _serviceManGRepository.GetByIdAsync(quotation.ServiceManId);
+                        await _notificationService.SendNotificationOfNewQuotation(serviceMan.UserId, "Booking Cancel", "Booking Cancel On Which You Send Quotation");
+                    }
+                    await _quotationGRepository.SaveAsync();
+                }
                 await _bookingGRepository.SaveAsync();
             }
             catch (Exception ex)
@@ -200,7 +212,38 @@ namespace TradesCompany.Web.Controllers
             }
             return View(quotations);
         }
+        [HttpGet]
+        public async Task<IActionResult> QuotationDetails(int quotationId)
+        {
+            try
+            {
+                var quotation = await _quotationGRepository.GetByIdAsync(quotationId);
+                if (quotation == null)
+                {
+                    TempData["ErrorMessage"] = "Quotation not found.";
+                    return BadRequest("Quotation Not Found");
+                }
 
+                decimal totalprice = quotation.Price;
+                decimal platformfeesExcluded = totalprice - 100;
+                decimal actualprice = platformfeesExcluded / (1 + 18m / 100m);
+
+                var data = new
+                {
+                    quotationId = quotation.Id,
+                    servicemancharge = actualprice,
+                    gst = ( actualprice * 18 ) / 100,
+                    platformfees = 100,
+                    totalprice = quotation.Price,
+                };
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Something Went Wrong : {ex.Message}";
+                return BadRequest("Something Went Wrong");
+            }
+        }
         //[HttpPost] // Customer Accept 
         [Authorize(Policy = "BookingServicePolicy")]
         public async Task<IActionResult> RequestAccept(int quotationId)
@@ -229,7 +272,7 @@ namespace TradesCompany.Web.Controllers
                 // Update Status : Booking , Quoation
                 var quotation = await _quotationGRepository.GetByIdAsync(quotationId);
                 var serviceMan = await _serviceManGRepository.GetByIdAsync(quotation.ServiceManId);
-                quotation.Status = "Rejected";
+                quotation.Status = "Canceled";
                 await _quotationGRepository.SaveAsync();
                 // send notification
                 await _notificationService.SendNotificationOfNewQuotation(serviceMan.UserId, "Quotation Rejected", "Your Quotation Is Rejected");

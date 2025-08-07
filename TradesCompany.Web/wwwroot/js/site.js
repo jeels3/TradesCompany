@@ -89,8 +89,8 @@ connection.on("ReceiveChatNotificationCount", (count) => {
 
 connection.on("ReceiveChatNotificationCountByChannelId", (count, appendid) => {
     const notificationCountElement = document.getElementById(appendid);
-    alert(appendid);
     if (notificationCountElement) {
+        alert("sitejs",appendid , "count",count);
         notificationCountElement.textContent = count > 0 ? count : '';
     }
 });

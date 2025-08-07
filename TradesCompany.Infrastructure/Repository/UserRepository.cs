@@ -99,6 +99,7 @@ namespace TradesCompany.Infrastructure.Repository
 
         public async Task<Dictionary<string, int>> GetAllDataForAdmin()
         {
+            var usersInUserRole = await _userManager.GetUsersInRoleAsync("USER");
             var userCount = await _context.Users.CountAsync();
             var serviceManCount = await _context.ServiceMan.CountAsync();
             var bookingCount = await _context.Bookings.CountAsync();
@@ -107,7 +108,7 @@ namespace TradesCompany.Infrastructure.Repository
             var TotalRevenue = await _context.ServiceSchedules.Where(ss => ss.Status == "Completed").SumAsync(ss => ss.TotalPrice);
             return new Dictionary<string, int>
             {
-                { "UserCount", userCount-serviceManCount },
+                { "UserCount", usersInUserRole.Count() },
                 { "ServiceManCount", serviceManCount },
                 { "BookingCount", bookingCount },
                 { "BookingCompleteCount", BookingComplete },

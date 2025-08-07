@@ -42,6 +42,8 @@
     <script>
         $(document).ready(function() {
             // Form validation
+            debugger
+
             $('#bookingForm').on('submit', function(e) {
                 let isValid = true;
 
@@ -50,8 +52,9 @@
 
                 // Validate price
                 const price = $('#price').val();
-                if (!price || price <= 0) {
+                if (!price || price <= 1) {
                     $('#price').addClass('is-invalid');
+                    $('#price').siblings('.text-danger').text('Please provide valid price');
                     isValid = false;
                 }
 
@@ -84,6 +87,7 @@
                 } else {
                     $(this).removeClass('is-invalid');
                 }
+            });
             });
     </script>
 }

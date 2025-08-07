@@ -41,7 +41,7 @@
                 <div class="table-responsive">
                     @if (!Model.Any())
                     {
-                        <h1>ServiceMan Not Found</h1>
+                        <h1>Booking Not Found</h1>
                     }
                     else
                     {
@@ -77,16 +77,16 @@
                             <td>@booking.Price</td>
                             <td class="text-end">
                                 <div class="drodown">
+                                    @if(booking.Status != "Completed" && booking.Status != "Canceled")
+                                    {
                                     <a data-bs-toggle="dropdown" href="#" class="btn p-1" aria-expanded="false">
                                         <i class="fa fa-bars" aria-hidden="true"></i>
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-end" style="">
                                         @* <a href="#!" class="dropdown-item">View Details</a> *@
-                                        @if(booking.Status != "Completed" && booking.Status != "Canceled")
-                                        {
                                         <a asp-action="Createquotation" asp-controller="Employee" asp-route-bookingId="@booking.bookingId" class="dropdown-item">Send Quotation</a>
-                                        }
                                     </div>
+                                    }
                                 </div>
                             </td>
                         </tr>
