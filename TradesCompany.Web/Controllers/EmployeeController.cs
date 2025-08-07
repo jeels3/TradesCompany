@@ -28,7 +28,7 @@ namespace TradesCompany.Web.Controllers
         private readonly IRepository<Bill> _billGRepository;
         private readonly IRepository<ApplicationUser> _userGRepository;
         private readonly IRepository<ServiceSchedule> _serviceScheduleGRepository;
-        private readonly IRepository<ServiceMan> _serviceManGRepository; 
+        private readonly IRepository<ServiceMan> _serviceManGRepository;
 
         private readonly IBookingRepository _bookingRepository;
         private readonly IEmployeeServices _employeeServices;
@@ -79,7 +79,7 @@ namespace TradesCompany.Web.Controllers
             string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var servicemen = await _serviceManRepository.GetServiceManByUserId(userId);
             var booking = await _bookingRepository.GetAllBookingAsync(servicemen.ServiceTypeId);
-            if(booking == null)
+            if (booking == null)
             {
                 return View(new List<BookingByServiceType>());
             }
@@ -88,16 +88,16 @@ namespace TradesCompany.Web.Controllers
 
         [HttpGet]
         [Authorize(Policy = "SendQuotationPolicy")]
-        public async  Task<IActionResult> CreateQuotation(int bookingId)
+        public async Task<IActionResult> CreateQuotation(int bookingId)
         {
             // Check if bookingId is valid
-            if(bookingId <= 0)
+            if (bookingId <= 0)
             {
                 TempData["ErrorMessage"] = "Invalid booking ID.";
                 return RedirectToAction("Dashboard");
             }
             var booking = await _bookingGRepository.GetByIdAsync(bookingId);
-            if(booking == null)
+            if (booking == null)
             {
                 TempData["ErrorMessage"] = "Invalid booking ID. Please try again.";
                 return RedirectToAction("Dashboard");
@@ -167,7 +167,8 @@ namespace TradesCompany.Web.Controllers
 
                     await _notificationService.SendNotificationOfNewQuotation(booking.UserId, "Quotation", "New Quotation Send By Service Man");
                     return RedirectToAction("AllQuotation");
-                }catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     TempData["ErrorMessage"] = "Something went wrong while creating the quotation. Please try again.";
                     return View(model);
@@ -181,14 +182,14 @@ namespace TradesCompany.Web.Controllers
         {
             string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var data = await _employeeServices.QuotationByServicerMan(userId);
-            if(data == null)
+            if (data == null)
             {
                 return View(new List<QuotationByServicerMan>());
             }
             return View(data);
         }
 
-        public async Task <IActionResult> GetQuotationDetails(int quotationId)
+        public async Task<IActionResult> GetQuotationDetails(int quotationId)
         {
             try
             {
@@ -221,7 +222,7 @@ namespace TradesCompany.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditQuotation([FromForm] Dictionary<string,string> data)
+        public async Task<IActionResult> EditQuotation([FromForm] Dictionary<string, string> data)
         {
             var quotationId = int.Parse(data["quotationId"]);
             var price = decimal.Parse(data["price"]);
@@ -250,7 +251,7 @@ namespace TradesCompany.Web.Controllers
                 quotation.Status = "Pending"; // Reset status to Pending after edit
                 await _quotationGRepository.SaveAsync();
                 await _notificationService.SendNotificationOfNewQuotation(booking.UserId, "Quotation", "Quotation Updated By Service Man");
-                return Ok(new {message = "Quotation Update Succesfully"});
+                return Ok(new { message = "Quotation Update Succesfully" });
             }
             catch (Exception ex)
             {
@@ -262,7 +263,7 @@ namespace TradesCompany.Web.Controllers
         [Authorize(Policy = "ScheduleServicePolicy")]
         [HttpPost]
         public async Task<IActionResult> ScheduleServices([FromForm] ScheduleDtos model)
-             
+
         {
             try
             {
@@ -358,7 +359,7 @@ namespace TradesCompany.Web.Controllers
             {
                 string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 var data = await _employeeServices.GetAllScheduleServiceByEmployee(userId);
-                if(data == null)
+                if (data == null)
                 {
                     return View(new List<ScheduleServiceByEmployee>());
                 }
@@ -402,13 +403,13 @@ namespace TradesCompany.Web.Controllers
             {
                 string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 var notifications = await _notificationRepository.GetAllNotificationByUserId(userId);
-                if(notifications == null)
+                if (notifications == null)
                 {
                     return View(new List<Notification>());
                 }
                 return View(notifications);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 TempData["ErrorMessage"] = "Something went wrong while fetching notifications. Please try again.";
                 return View();
@@ -460,7 +461,7 @@ namespace TradesCompany.Web.Controllers
                     $"<p>Playfor Charge : {model.PlatFormFees}</p>" +
                     $"<p>Gst : {model.Gst}</p>" +
                     $"<p>Total Amount : {model.TotalPrice}</p>" +
-                    $"<p>ServiceMan : {invoice.ServiceManName}</p>"+
+                    $"<p>ServiceMan : {invoice.ServiceManName}</p>" +
                     $"<p>ServiceMan : {servicemanuser.Email}</p>" +
                     $"<p>Contact Us : TradesCompany@gmail.com </p>"
                 ;
@@ -474,7 +475,7 @@ namespace TradesCompany.Web.Controllers
                 // send pdf throgh email
                 var emailbody = "Please find the attached PDF document.";
                 Attachment attachment = new Attachment(new MemoryStream(pdfbytes), $"invoice-{invoice.BillId}.pdf", MediaTypeNames.Application.Pdf);
-                await _emailService.SendEmailAsync(attachment , customer.Email, "Service Completede", emailbody, false );
+                await _emailService.SendEmailAsync(attachment, customer.Email, "Service Completede", emailbody, false);
             }
             catch (Exception ex)
             {

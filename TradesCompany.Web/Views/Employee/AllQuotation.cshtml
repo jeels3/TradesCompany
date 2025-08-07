@@ -1,15 +1,11 @@
 ﻿@model IEnumerable<TradesCompany.Application.DTOs.QuotationByServicerMan>
 @{
-    Layout = "~/Views/Shared/Layouts/_ELayout.cshtml";
+    Layout = "~/Views/Shared/Layouts/_EmployeeLayout.cshtml";
     ViewData["Title"] = "My Quotation";
 }
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 <style>
-    body {
-        margin-top: 20px;
-        background: #eee;
-    }
-
+    
     .card {
         box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
     }
@@ -36,7 +32,7 @@
 </style>
 <div class="container">
     <div class="row">
-        <div class="col-12 mb-3 mb-lg-5">
+        <div class="col-12 mb-3 mb-lg-3">
             <div class="overflow-hidden card table-nowrap table-card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Your Quotation</h5>
@@ -109,23 +105,34 @@
 </div>
 
 <!-- Schedule Service Modal -->
-<div id="scheduleModal" class="modal-overlay w-25">
-    <div class="modal-content">
-        <h4 style="margin-bottom: 20px;">Schedule Service</h4>
-        <div class="form-group card-body">
-            <label for="scheduleDate" class="form-label">Select Date:</label>
-            <input type="date" id="scheduleDate" class="form-control" name="scheduleDate" required />
-        </div>
-        <div class="form-group">
-            <label for="scheduleTime" class="form-label">Select Time:</label>
-            <input type="time" id="scheduleTime" class="form-control" name="scheduleTime" required />
-        </div>
-        <div class="btn-group form-group">
-            <button type="button" id="cancelSchedule">Cancel</button>
-            <button type="button" class="btn-primary" id="confirmSchedule">Schedule Service</button>
+<div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="editQuotationLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border border-secondary shadow">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editQuotationLabel">Schedule Service</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="scheduleDate" class="form-label">Select Date:</label>
+                    <input type="date" id="scheduleDate" class="form-control" name="scheduleDate" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="scheduleTime" class="form-label">Select Time:</label>
+                    <input type="time" id="scheduleTime" class="form-control" name="scheduleTime" required>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" id="cancelSchedule" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="confirmSchedule">Schedule Service</button>
+            </div>
         </div>
     </div>
 </div>
+
 
 <!-- Edit Quotation -->
 <div class="modal fade" id="editQuotationModal" tabindex="-1" aria-labelledby="editQuotationLabel" aria-hidden="true">
@@ -182,7 +189,9 @@
         // Show modal when schedule button is clicked
         $(document).on('click', '.schedule-btn', function () {
             currentQuotationId = $(this).data('id');
-            $('#scheduleModal').show();
+            // $('#scheduleModal').show();
+            const modal = new bootstrap.Modal(document.getElementById('scheduleModal'));
+            modal.show();
         });
 
         // Hide modal when cancel is clicked

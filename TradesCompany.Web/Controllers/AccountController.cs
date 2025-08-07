@@ -53,7 +53,7 @@ namespace TradesCompany.Web.Controllers
         public async Task<IActionResult> EmployeeRegister()
         {
             var serviceTypes = await _serviceTypeGRepository.GetAllAsync();
-            if(serviceTypes == null)
+            if (serviceTypes == null)
             {
                 _logger.LogWarning("No service types found for employee registration.");
                 ModelState.AddModelError(string.Empty, "No service types available for registration.");
@@ -285,9 +285,9 @@ namespace TradesCompany.Web.Controllers
                 var cuserrole = await _userManager.GetRolesAsync(cuser);
                 if (cuserrole.Contains("USER"))
                 {
-                return RedirectToAction("Dashboard", "User");
+                    return RedirectToAction("Dashboard", "User");
                 }
-                else if(cuserrole.Contains("EMPLOYEE"))
+                else if (cuserrole.Contains("EMPLOYEE"))
                 {
                     return RedirectToAction("Dashboard", "Employee");
                 }
@@ -372,7 +372,7 @@ namespace TradesCompany.Web.Controllers
 
             var user = new ApplicationUser
             {
-                UserName = model.UserName,  
+                UserName = model.UserName,
                 Email = model.Email,
             };
 

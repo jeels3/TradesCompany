@@ -38,7 +38,6 @@ namespace TradesCompany.Infrastructure.Repository
             }
             return false;
         }
-
         public async Task<List<ChannelMessage>> GetChatMessageByChannelName(string ChannelName)
         {
             return await _context.ChannelMessage
@@ -48,7 +47,6 @@ namespace TradesCompany.Infrastructure.Repository
                 .OrderBy(ch => ch.CreateAt) // Order by CreateAt in descending order
                 .ToListAsync();
         }
-
         public async Task<int> GetChannelIdByChannelName(string ChannelName)
         {
             var channel = await _context.Channel.FirstOrDefaultAsync(c => c.ChannelName == ChannelName);
@@ -109,8 +107,6 @@ namespace TradesCompany.Infrastructure.Repository
                 UnreadCount = unreadCount
             };
         }
-
-
 
         public async Task<List<Channel>> GetGroupByUserId(string userId)
         {

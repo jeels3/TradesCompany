@@ -239,7 +239,7 @@ namespace TradesCompany.Web.Controllers
                 }
                 // Check User is Exist in Channel
                 var UserInChennel = await _chatRepository.CheckUserInChannel(channelId, userId);
-                if(!UserInChennel)
+                if (!UserInChennel)
                 {
                     TempData["errorMessage"] = "You are not a member of this channel.";
                     return RedirectToAction("UserListing", "Chat");

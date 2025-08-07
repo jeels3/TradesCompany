@@ -8,11 +8,11 @@
     }
     else if (User.FindFirst(ClaimTypes.Role)?.Value == "EMPLOYEE")
     {
-        Layout = "~/Views/Shared/Layouts/_ELayout.cshtml";
+        Layout = "~/Views/Shared/Layouts/_EmployeeLayout.cshtml";
     }
     else
     {
-        Layout = "~/Views/Shared/Layouts/_AdminLayout.cshtml";
+        Layout = "~/Views/Shared/Layouts/_ALayout.cshtml";
     }
     var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 }

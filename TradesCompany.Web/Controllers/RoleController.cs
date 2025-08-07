@@ -62,6 +62,6 @@ namespace TradesCompany.Web.Controllers
             }
             return View(roleModel);
         }
-         
+
     }
 }

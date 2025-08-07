@@ -61,15 +61,11 @@
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Service Type</th>
-                                <th>Rating</th>
-                                <th class="text-end">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                         @foreach(var service in Model)
                         {
-                            
-
                             <tr class="align-middle">
                                 <td>
                                     <div class="d-flex align-items-center">
@@ -80,18 +76,6 @@
                                 </td>
                                 <td>@service.Email</td>
                                 <td> <span class="d-inline-block align-middle">@service.ServiceName</span></td>
-                                <td><span>****6231</span></td>
-                                <td class="text-end">
-                                    <div class="drodown">
-                                        <a data-bs-toggle="dropdown" href="#" class="btn p-1" aria-expanded="false">
-                                            <i class="fa fa-bars" aria-hidden="true"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end" style="">
-                                            @* <a href="#!" class="dropdown-item">View Details</a> *@
-                                            <a asp-action="BookService" asp-controller="User" class="dropdown-item">Book Service</a>
-                                        </div>
-                                    </div>
-                                </td>
                             </tr>
                         }
                         </tbody>
