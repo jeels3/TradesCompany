@@ -2,10 +2,7 @@
 
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 <style>
-    body {
-        margin-top: 20px;
-        background: #eee;
-    }
+   
 
     .card {
         box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
@@ -31,7 +28,7 @@
         background-color: #eeecfd !important;
     }
 </style>
-<div class="container">
+<div class="container mt-3">
     <div class="row">
         <div class="col-12 mb-3 mb-lg-5">
             <div class="overflow-hidden card table-nowrap table-card">
@@ -41,7 +38,7 @@
                 <div class="table-responsive">
                     @if (!Model.Any())
                     {
-                        <h1>Booking Not Found</h1>
+                        <h1 class="text-capitalize align-items-center text-center m-3 text-danger fw-bold">Booking Not Found</h1>
                     }
                     else
                     {

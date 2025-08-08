@@ -1,67 +1,148 @@
 ﻿@model TradesCompany.Web.ViewModel.LoginViewModel;
 
 <link rel="stylesheet" href="~/css/registerpage.css" />
-<div class="row">
-    <div class="col-md-6">
-        <h1>Account Login</h1>
-        @if (TempData["ErrorMessage"] != null)
-        {
-            <div class="alert" role="alert">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                @TempData["ErrorMessage"]
-            </div>
-        }
-        <hr />
-        <form method="post" asp-action="Login" asp-controller="Account">
-            <input type="hidden" name="ReturnUrl" value="@Model.ReturnUrl" />
-            <div asp-validation-summary="All" class="alert-danger text-danger h-25"></div>
-            <div class="form-group">
-                <label asp-for="Email"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Password"></label>
-                <input asp-for="Password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <div class="checkbox">
-                    <label asp-for="RememberMe">
-                        <input asp-for="RememberMe" />
-                        @Html.DisplayNameFor(m => m.RememberMe)
-                    </label>
-                </div>
-            </div>                                      
-            <button type="submit" class="btn btn-primary">Login</button>
-        </form>
-    </div>
-    <div class="col-md-6"> 
-        <h1>External Login</h1>
-        <hr />
-        @if (Model.ExternalLogins == null || Model.ExternalLogins.Count == 0)
-        {
-            <div>No external logins configured</div>
-        }
-        else
-        {
-            <div class="mt-5">
-                @foreach (var provider in Model.ExternalLogins)
-                {
-                    <button type="button" class="btn btn-primary external-login-btn google-btn"
-                            data-provider="@provider.Name"
-                            data-url="@Url.Action("ExternalLogin", "Account", new { provider = provider.Name, returnUrl = Model.ReturnUrl })"
-                            title="Log in using your @provider.DisplayName account">
-                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
-                            Sign in with Google
-                            @provider.DisplayName
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+
+<style>
+    h1 {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        font-weight: 600;
+    }
+
+    .alert {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        color: #721c24;
+        padding: 15px;
+        border-radius: 4px;
+        position: relative;
+    }
+
+    .alert .close {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        color: inherit;
+        border: none;
+        background: transparent;
+        font-size: 20px;
+    }
+
+    .btn-primary {
+        padding: 10px 25px;
+        font-weight: 600;
+    }
+
+    .external-login-btn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+        padding: 10px 20px;
+        font-weight: 500;
+        background-color: #4285F4;
+        color: white;
+        border: none;
+        border-radius: 4px;
+    }
+
+    .external-login-btn img {
+        height: 20px;
+        width: 20px;
+    }
+
+    .checkbox label {
+        font-weight: 500;
+    }
+
+    .form-control {
+        padding: 10px;
+        font-size: 1rem;
+        border-radius: 4px;
+        border: 1px solid #ced4da;
+    }
+</style>
+
+<div class="container mt-5">
+    <!-- Account Login Section -->
+    <div class="row mb-5">
+        <div class="col-6">
+            <h1>Account Login</h1>
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
                     </button>
-                }
-            </div>
-        }
-     </div> 
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+
+            <hr />
+
+            <form method="post" asp-action="Login" asp-controller="Account">
+                <input type="hidden" name="ReturnUrl" value="@Model.ReturnUrl" />
+
+                <div asp-validation-summary="All" class="alert-danger text-danger h-25 mb-3"></div>
+
+                <div class="form-group">
+                    <label asp-for="Email"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Password"></label>
+                    <input asp-for="Password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input asp-for="RememberMe" class="form-check-input" />
+                            @Html.DisplayNameFor(m => m.RememberMe)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary form-control text-center">Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- External Login Section -->
+    <div class="row">
+        <div class="col-6">
+            @if (Model.ExternalLogins == null || Model.ExternalLogins.Count == 0)
+            {
+                <div class="alert alert-warning">No external logins configured</div>
+            }
+            else
+            {
+                <div class="mt-4">
+                    @foreach (var provider in Model.ExternalLogins)
+                    {
+                        <button type="button" class="external-login-btn"
+                                data-provider="@provider.Name"
+                                data-url="@Url.Action("ExternalLogin", "Account", new { provider = provider.Name, returnUrl = Model.ReturnUrl })"
+                                title="Log in using your @provider.DisplayName account">
+                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
+                            Sign in with @provider.DisplayName
+                        </button>
+                    }
+                </div>
+            }
+        </div>
+    </div>
 </div>
 
 @section Scripts {
@@ -71,23 +152,19 @@
                 var provider = this.getAttribute('data-provider');
                 var url = this.getAttribute('data-url');
 
-                // Define popup window size
                 var width = 500;
                 var height = 600;
                 var left = (window.innerWidth / 2) - (width / 2);
                 var top = (window.innerHeight / 2) - (height / 2);
 
-                // Open the popup window
                 var popup = window.open(url, provider, `width=${width},height=${height},top=${top},left=${left},resizable=yes`);
 
-                // Monitor the popup to check if it closes
                 var checkPopup = setInterval(function () {
                     if (popup.closed) {
                         clearInterval(checkPopup);
-                        // Optionally, reload or fetch updated user state
-                        location.reload(); // Refresh the parent window to reflect login state
+                        location.reload();
                     }
-                }, 500); // Check every 500ms if the popup is closed
+                }, 500);
             });
         });
     </script>

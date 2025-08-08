@@ -38,7 +38,6 @@ namespace TradesCompany.Infrastructure.Repository
             }
             return false;
         }
-
         public async Task<List<ChannelMessage>> GetChatMessageByChannelName(string ChannelName)
         {
             return await _context.ChannelMessage
@@ -48,7 +47,6 @@ namespace TradesCompany.Infrastructure.Repository
                 .OrderBy(ch => ch.CreateAt) // Order by CreateAt in descending order
                 .ToListAsync();
         }
-
         public async Task<int> GetChannelIdByChannelName(string ChannelName)
         {
             var channel = await _context.Channel.FirstOrDefaultAsync(c => c.ChannelName == ChannelName);
@@ -110,8 +108,6 @@ namespace TradesCompany.Infrastructure.Repository
             };
         }
 
-
-
         public async Task<List<Channel>> GetGroupByUserId(string userId)
         {
             return await _context.Channel
@@ -170,9 +166,29 @@ namespace TradesCompany.Infrastructure.Repository
                         Users = new List<UserDto> { userDto }
                     });
                 }
+            }
 
+            if(result.Count == 0)
+            {
+                // Add All Users Listing Here 
+                var users = await _context.Users.Where(u => u.Id != userId).ToListAsync();
+                foreach(var user in users)
+                {
+                    UserDto userDto = new UserDto
+                    {
+                        UserId = user.Id,
+                        UserName = user.UserName,
+                        uReadCount =  0
+                    };
+                    result.Add(new UserAndGroupListingWithCount
+                    {
+                        Users = new List<UserDto> { userDto }
+                    });
+                }
             }
             return result;
         }
     }
 }
+//---->  Get Unread Count By ReceiverId and SenderId
+ 

@@ -1,17 +1,12 @@
 ﻿
 @{
-    Layout = "~/Views/Shared/Layouts/_AdminLayout.cshtml";
+    Layout = "~/Views/Shared/Layouts/_ALayout.cshtml";
     ViewData["Title"] = "User Listing";
 }
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" />
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 <style>
-    body {
-        margin-top: 20px;
-        background: #eee;
-    }
-
     .card {
         box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
     }
@@ -36,7 +31,7 @@
         background-color: #eeecfd !important;
     }
 </style>
-<div class="container">
+<div class="container mt-3">
     <div class="row">
         <div class="col-12 mb-3 mb-lg-5">
             <div class="overflow-hidden card table-nowrap table-card">

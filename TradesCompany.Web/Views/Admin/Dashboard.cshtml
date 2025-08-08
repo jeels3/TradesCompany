@@ -1,18 +1,15 @@
 ﻿@using Newtonsoft.Json
 @model TradesCompany.Application.DTOs.ChartModel;
 @{
-    Layout = "~/Views/Shared/Layouts/_AdminLayout.cshtml";
+    Layout = "~/Views/Shared/Layouts/_ALayout.cshtml";
     ViewData["Title"] = "Admin Dashboard";
 }
 <style>
     
-    .chartdiv{
+.chartdiv{
+    margin-left:50px;
     width:500px;
     height:250;
-}
-body{
-    margin-top:20px;
-    background:#FAFAFA;
 }
 .order-card {
     color: #fff;
@@ -66,6 +63,7 @@ body{
     border-radius:5px;
 }
 .controlls {
+    margin-left:15px;
     display: flex;
     flex-direction:row;
     column-gap:20px;
@@ -75,7 +73,7 @@ body{
 
 
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-<div class="container">
+<div class="container mt-3">
     <div class="row">
         <div class="col-md-4 col-xl-3">
             <div class="card bg-c-blue order-card">

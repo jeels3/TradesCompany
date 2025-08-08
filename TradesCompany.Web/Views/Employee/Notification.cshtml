@@ -7,7 +7,7 @@
     }
     else
     {
-    Layout = "~/Views/Shared/Layouts/_ELayout.cshtml";
+    Layout = "~/Views/Shared/Layouts/_EmployeeLayout.cshtml";
     }
     ViewData["Title"] = "Notification";
     string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -15,11 +15,6 @@
 <input  value="@userId" type="hidden" id="userId"/>
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 <style>
-    /* body {
-        margin-top: 20px;
-        background: #eee;
-    } */
-
     .card {
         box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
     }
@@ -54,7 +49,7 @@
                 <div class="table-responsive">
                     @if (!Model.Any())
                     {
-                        <h1>Not Notification</h1>
+                        <h1 class="text-capitalize align-items-center text-center m-3 text-danger fw-bold" >Not Notification</h1>
                     }
                     else
                     {

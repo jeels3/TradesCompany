@@ -16,8 +16,8 @@ namespace TradesCompany.Web.Controllers
         private readonly ExcelService excelService;
         private readonly ConnectionService _connectionService;
 
-        public AdminController(IUserRepository userRepository, 
-            ChartServices chartServices, 
+        public AdminController(IUserRepository userRepository,
+            ChartServices chartServices,
             ExcelService excelService,
             ConnectionService connectionService
             )
@@ -96,7 +96,7 @@ namespace TradesCompany.Web.Controllers
 
         [HttpPost]
         public async Task<IActionResult> LoadUser([FromForm] UserDataTable model)
-       {
+        {
             var (users, totalRecords) = await _userRepository.GetFilteredUsersAsync(model);
 
             //// Optional: only send required fields to DataTables
@@ -117,6 +117,6 @@ namespace TradesCompany.Web.Controllers
                 data = results
             });
         }
-    
+
     }
 }

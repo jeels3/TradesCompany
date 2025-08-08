@@ -42,23 +42,10 @@ namespace TradesCompany.Web.Controllers
             try
             {
                 var data = await _chatRepository.GetUserAndGroupListingWithCount(userId);
-
-                var users = await _chatRepository.GetAllUserListing(userId);
-                var groups = await _chatRepository.GetGroupByUserId(userId);
-                if (users == null && groups == null)
+                if(data == null )
                 {
-                    UserAndGroupListing nullmodel = new UserAndGroupListing
-                    {
-                        Users = new List<ApplicationUser>(),
-                        channels = new List<Channel>()
-                    };
-                    return View(nullmodel);
+                    return View();
                 }
-                UserAndGroupListing model = new UserAndGroupListing
-                {
-                    Users = users,
-                    channels = groups
-                };
                 return View(data);
             }
             catch (Exception ex)
@@ -239,7 +226,7 @@ namespace TradesCompany.Web.Controllers
                 }
                 // Check User is Exist in Channel
                 var UserInChennel = await _chatRepository.CheckUserInChannel(channelId, userId);
-                if(!UserInChennel)
+                if (!UserInChennel)
                 {
                     TempData["errorMessage"] = "You are not a member of this channel.";
                     return RedirectToAction("UserListing", "Chat");
