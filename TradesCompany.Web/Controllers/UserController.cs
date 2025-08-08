@@ -309,8 +309,8 @@ namespace TradesCompany.Web.Controllers
                 var serviceSchedule = await _serviceScheduleGRepository.GetByIdAsync(ScheduleServiceId);
                 var quotation = await _quotationGRepository.GetByIdAsync(serviceSchedule.QuotationId);
                 var serviceMan = await _serviceManGRepository.GetByIdAsync(quotation.ServiceManId);
-                quotation.Status = "Rejected";
-                serviceSchedule.Status = "Rejected";
+                quotation.Status = "Canceled";
+                serviceSchedule.Status = "Canceled";
                 await _serviceScheduleGRepository.SaveAsync();
                 await _quotationGRepository.SaveAsync();
                 // send notification

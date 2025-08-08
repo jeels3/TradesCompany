@@ -166,9 +166,29 @@ namespace TradesCompany.Infrastructure.Repository
                         Users = new List<UserDto> { userDto }
                     });
                 }
+            }
 
+            if(result.Count == 0)
+            {
+                // Add All Users Listing Here 
+                var users = await _context.Users.Where(u => u.Id != userId).ToListAsync();
+                foreach(var user in users)
+                {
+                    UserDto userDto = new UserDto
+                    {
+                        UserId = user.Id,
+                        UserName = user.UserName,
+                        uReadCount =  0
+                    };
+                    result.Add(new UserAndGroupListingWithCount
+                    {
+                        Users = new List<UserDto> { userDto }
+                    });
+                }
             }
             return result;
         }
     }
 }
+//---->  Get Unread Count By ReceiverId and SenderId
+ 

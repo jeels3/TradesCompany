@@ -42,23 +42,10 @@ namespace TradesCompany.Web.Controllers
             try
             {
                 var data = await _chatRepository.GetUserAndGroupListingWithCount(userId);
-
-                var users = await _chatRepository.GetAllUserListing(userId);
-                var groups = await _chatRepository.GetGroupByUserId(userId);
-                if (users == null && groups == null)
+                if(data == null )
                 {
-                    UserAndGroupListing nullmodel = new UserAndGroupListing
-                    {
-                        Users = new List<ApplicationUser>(),
-                        channels = new List<Channel>()
-                    };
-                    return View(nullmodel);
+                    return View();
                 }
-                UserAndGroupListing model = new UserAndGroupListing
-                {
-                    Users = users,
-                    channels = groups
-                };
                 return View(data);
             }
             catch (Exception ex)

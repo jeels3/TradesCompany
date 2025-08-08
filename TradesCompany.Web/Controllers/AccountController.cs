@@ -187,6 +187,8 @@ namespace TradesCompany.Web.Controllers
                     ModelState.AddModelError("RegistrationError", error.Description);
                 }
             }
+            var serviceTypes = await _serviceTypeGRepository.GetAllAsync();
+            model.ServiceTypes = (List<ServiceType>?)serviceTypes;
             model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             return View(model);
         }

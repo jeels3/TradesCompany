@@ -3,13 +3,10 @@
 @{
     Layout = "~/Views/Shared/Layouts/_UserLayout.cshtml";
 }
-<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
-<style>
-    /* body {
-        margin-top: 20px;
-        background: #eee;
-    } */
 
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style>
     .card {
         box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
     }
@@ -33,24 +30,55 @@
         font-weight: 600;
         background-color: #eeecfd !important;
     }
+
+    .filter-btn.active {
+        color: white !important;
+    }
+
+    .filter-btn[data-status="scheduled"].active {
+        background-color: #f0ad4e;
+    }
+
+    .filter-btn[data-status="completed"].active {
+        background-color: #5cb85c;
+    }
+
+    .filter-btn[data-status="canceled"].active {
+        background-color: #d9534f;
+    }
 </style>
+
 <div class="container">
     <nav aria-label="breadcrumb" class="breadcrumb-custom">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a asp-action="Dashboard" asp-controller="User" class="text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item">
+                <a asp-action="Dashboard" asp-controller="User" class="text-decoration-none">Home</a>
+            </li>
             <li class="breadcrumb-item active" aria-current="page">Your Schedule Services</li>
         </ol>
     </nav>
+
     <div class="row">
         <div class="col-12 mb-3 mb-lg-5">
             <div class="overflow-hidden card table-nowrap table-card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Customer Schedule Services</h5>
                 </div>
+
+                <!-- Filter Buttons -->
+                <div class="m-3 px-3">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button class="btn btn-outline-primary filter-btn active" data-status="all">All</button>
+                        <button class="btn btn-outline-warning filter-btn" data-status="scheduled">Scheduled</button>
+                        <button class="btn btn-outline-success filter-btn" data-status="completed">Completed</button>
+                        <button class="btn btn-outline-danger filter-btn" data-status="canceled">Canceled</button>
+                    </div>
+                </div>
+
                 <div class="table-responsive">
                     @if (!Model.Any())
                     {
-                        <h1 class="ms-3">No Schedule Any Services</h1>
+                        <h1 class="text-capitalize align-items-center text-center m-3 text-danger fw-bold">No Schedule Any Services</h1>
                     }
                     else
                     {
@@ -69,9 +97,7 @@
                             <tbody>
                                 @foreach (var service in Model)
                                 {
-
-
-                                    <tr class="align-middle">
+                                    <tr class="align-middle service-row" data-status="@service.status.ToLower()">
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div>
@@ -81,7 +107,7 @@
                                         </td>
                                         <td>@service.WorkDetails</td>
                                         <td>@service.ServiceName</td>
-                                        <td> <span class="d-inline-block align-middle">@service.TotalPrice</span></td>
+                                        <td><span class="d-inline-block align-middle">@service.TotalPrice</span></td>
                                         <td><span>@service.status</span></td>
                                         <td>@service.ScheduledAt</td>
                                         <td class="text-end">
@@ -89,12 +115,13 @@
                                                 <a data-bs-toggle="dropdown" href="#" class="btn p-1" aria-expanded="false">
                                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                                 </a>
-                                                <div class="dropdown-menu dropdown-menu-end" style="">
-                                                    @* <a href="#!" class="dropdown-item">View Details</a> *@
+                                                <div class="dropdown-menu dropdown-menu-end">
                                                     @if (service.status == "Scheduled")
                                                     {
-                                                    <button data-id="@service.ScheduleServiceId"
-                                                    class="dropdown-item cancel-btn">Schedule Cancel</button>    
+                                                        <button data-id="@service.ScheduleServiceId"
+                                                                class="dropdown-item cancel-btn">
+                                                            Schedule Cancel
+                                                        </button>
                                                     }
                                                 </div>
                                             </div>
@@ -112,22 +139,42 @@
 
 @section Scripts {
     <script>
-        $(document).on('click', '.cancel-btn', function () {
-        const ScheduleServiceId = $(this).data('id');
+        $(document).ready(function () {
+            // Filtering logic
+            $('.filter-btn').click(function () {
+                const selectedStatus = $(this).data('status');
+                $('.filter-btn').removeClass('active');
+                $(this).addClass('active');
 
-        if (confirm('Are you sure you want to cancel Schedule?')) {
-            $.ajax({
-                url: `/User/ScheduleReject?ScheduleServiceId=${ScheduleServiceId}`,
-                success: function (res) {
-                    alert(res.message);
-                    location.reload();
-                },
-                error: function (xhr) {
-                    const err = xhr.responseJSON?.message || 'Error Scheduling Request';
-                    alert(err);
+                if (selectedStatus === 'all') {
+                    $('.service-row').show();
+                } else {
+                    $('.service-row').each(function () {
+                        const rowStatus = $(this).data('status');
+                        $(this).toggle(rowStatus === selectedStatus);
+                    });
                 }
             });
-        }
+
+            // Cancel Schedule
+            $(document).on('click', '.cancel-btn', function () {
+                const ScheduleServiceId = $(this).data('id');
+
+                if (confirm('Are you sure you want to cancel Schedule?')) {
+                    $.ajax({
+                        url: `/User/ScheduleReject?ScheduleServiceId=${ScheduleServiceId}`,
+                        method: 'POST',
+                        success: function (res) {
+                            alert(res.message);
+                            location.reload();
+                        },
+                        error: function (xhr) {
+                            const err = xhr.responseJSON?.message || 'Error Cancelling Request';
+                            alert(err);
+                        }
+                    });
+                }
+            });
         });
     </script>
 }
