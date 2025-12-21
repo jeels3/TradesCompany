@@ -14,6 +14,7 @@ using TradesCompany.Application.Services;
 using TradesCompany.Domain.Entities;
 using TradesCompany.Infrastructure.Services;
 using TradesCompany.Web.ViewModel;
+using TradesCompany.Domain.Enums;
 
 namespace TradesCompany.Web.Controllers
 {
@@ -102,7 +103,7 @@ namespace TradesCompany.Web.Controllers
                 TempData["ErrorMessage"] = "Invalid booking ID. Please try again.";
                 return RedirectToAction("Dashboard");
             }
-            if (booking.Status.Equals("Completed") || booking.Status.Equals("Canceled"))
+            if (booking.Status == BookingStatus.Completed || booking.Status == BookingStatus.Cancelled)
             {
                 TempData["ErrorMessage"] = "booking Is Completed or Canceled";
                 return RedirectToAction("Dashboard");
@@ -121,7 +122,7 @@ namespace TradesCompany.Web.Controllers
                 // Update Status : Quoation
                 var quotation = await _quotationGRepository.GetByIdAsync(quotationId);
                 var booking = await _bookingGRepository.GetByIdAsync(quotation.BookingId);
-                quotation.Status = "Rejected";
+                quotation.Status = BookingStatus.Rejected;
                 await _quotationGRepository.SaveAsync();
                 // send notification
                 await _notificationService.SendNotificationOfNewQuotation(booking.UserId, "Quotation Rejected", "Your Booking on Quotation Is Rejected");
@@ -154,12 +155,12 @@ namespace TradesCompany.Web.Controllers
                         BookingId = model.BookingId,
                         ServiceManId = servicemen.Id,
                         Price = amout,
-                        Status = "Pending",
+                        Status = BookingStatus.Pending,
                         QuotationPdf = "soon",
                         QuotationDescription = model.Description,
                     };
 
-                    booking.Status = "Accepted";
+                    booking.Status = BookingStatus.Accepted;
 
                     await _quotationGRepository.InsertAsync(quotation);
                     await _quotationGRepository.SaveAsync();
@@ -248,7 +249,7 @@ namespace TradesCompany.Web.Controllers
                 quotation.QuotationDescription = QuotationDescription;
 
 
-                quotation.Status = "Pending"; // Reset status to Pending after edit
+                quotation.Status = BookingStatus.Pending; // Reset status to Pending after edit
                 await _quotationGRepository.SaveAsync();
                 await _notificationService.SendNotificationOfNewQuotation(booking.UserId, "Quotation", "Quotation Updated By Service Man");
                 return Ok(new { message = "Quotation Update Succesfully" });
@@ -293,8 +294,8 @@ namespace TradesCompany.Web.Controllers
                 var existingSchedules = await _serviceGSchedule.GetAllAsync();
                 var conflictingSchedule = existingSchedules
                     .Where(s => s.ServiceManId == quotation.ServiceManId &&
-                               s.Status != "Cancelled" &&
-                               s.Status != "Completed")
+                               s.Status != BookingStatus.Cancelled &&
+                               s.Status != BookingStatus.Completed)
                     .Any(s => Math.Abs((s.ScheduledAt - requestedDateTime).TotalHours) < 2);
 
                 if (conflictingSchedule)
@@ -314,11 +315,11 @@ namespace TradesCompany.Web.Controllers
                     QuotationId = quotation.Id,
                     ScheduledAt = requestedDateTime,
                     TotalPrice = quotation.Price,
-                    Status = "Scheduled"
+                    Status = BookingStatus.Scheduled
                 };
 
                 // Update quotation status
-                quotation.Status = "Scheduled";
+                quotation.Status = BookingStatus.Scheduled;
                 await _quotationGRepository.SaveAsync();
 
                 // Save service schedule
@@ -381,8 +382,8 @@ namespace TradesCompany.Web.Controllers
                 var quotation = await _quotationGRepository.GetByIdAsync(serviceSchedule.QuotationId);
                 var booking = await _bookingGRepository.GetByIdAsync(quotation.BookingId);
                 var serviceMan = await _serviceManGRepository.GetByIdAsync(quotation.ServiceManId);
-                quotation.Status = "Rejected";
-                serviceSchedule.Status = "Rejected";
+                quotation.Status = BookingStatus.Rejected;
+                serviceSchedule.Status = BookingStatus.Rejected;
                 await _serviceScheduleGRepository.SaveAsync();
                 await _quotationGRepository.SaveAsync();
                 // send notification
@@ -426,9 +427,9 @@ namespace TradesCompany.Web.Controllers
                 var quotation = await _quotationGRepository.GetByIdAsync(serviceSchedule.QuotationId);
                 var booking = await _bookingGRepository.GetByIdAsync(quotation.BookingId);
 
-                serviceSchedule.Status = "Completed";
-                quotation.Status = "Completed";
-                booking.Status = "Completed";
+                serviceSchedule.Status = BookingStatus.Completed;
+                quotation.Status = BookingStatus.Completed;
+                booking.Status = BookingStatus.Completed;
                 await _quotationGRepository.SaveAsync();
                 var totalamount = serviceSchedule.TotalPrice;
                 // Create Bill

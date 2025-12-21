@@ -111,6 +111,40 @@ namespace TradesCompany.Infrastructure.Data
                 .HasOne(r => r.ServiceSchedule)
                 .WithOne(ss => ss.Rating)
                 .HasForeignKey<Rating>(r => r.ServiceScheduleId);
+
+            // Configure Enum conversions for Entities
+            builder.Entity<Booking>()
+                .Property(b => b.Status)
+                .HasConversion<string>();
+
+            builder.Entity<Quotation>()
+                .Property(q => q.Status)
+                .HasConversion<string>();
+
+            builder.Entity<ServiceSchedule>()
+                .Property(ss => ss.Status)
+                .HasConversion<string>();
+
+            // Configure Enum conversions for Keyless Entities (DTOs)
+            builder.Entity<QuotationByUser>()
+                .Property(q => q.status)
+                .HasConversion<string>();
+
+            builder.Entity<QuotationByServicerMan>()
+                .Property(q => q.Status)
+                .HasConversion<string>();
+
+            builder.Entity<BookingByServiceType>()
+                .Property(b => b.Status)
+                .HasConversion<string>();
+
+            builder.Entity<ScheduleServiceByUser>()
+                .Property(s => s.status)
+                .HasConversion<string>();
+
+            builder.Entity<ScheduleServiceByEmployee>()
+                .Property(s => s.Status)
+                .HasConversion<string>();
         }
     }
 }

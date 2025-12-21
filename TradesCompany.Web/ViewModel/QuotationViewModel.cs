@@ -17,7 +17,7 @@ namespace TradesCompany.Web.ViewModel
         [Required(AllowEmptyStrings = false, ErrorMessage = "Required")]
         [DataType(DataType.Currency)]
         public decimal Price { get; set; }
-        public string Status { get; set; } = "Pending"; // ENUM: Pending, Accepted, Rejected
+        public Domain.Enums.BookingStatus Status { get; set; } = Domain.Enums.BookingStatus.Pending;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

@@ -16,7 +16,7 @@ namespace TradesCompany.Domain.Entities
         public string QuotationPdf { get; set; } = null!;
         public string QuotationDescription { get; set; }
         public decimal Price { get; set; }
-        public string Status { get; set; } = "Pending"; // ENUM: Pending, Accepted, Rejected
+        public Enums.BookingStatus Status { get; set; } = Enums.BookingStatus.Pending;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
     }

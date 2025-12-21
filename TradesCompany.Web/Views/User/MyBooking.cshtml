@@ -1,4 +1,5 @@
-﻿@model IEnumerable<TradesCompany.Domain.Entities.Booking>
+﻿@using TradesCompany.Domain.Enums
+@model IEnumerable<TradesCompany.Domain.Entities.Booking>
 
 @{
     Layout = "~/Views/Shared/Layouts/_UserLayout.cshtml";
@@ -89,7 +90,7 @@
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-end" style="">
                                                     @* <a href="#!" class="dropdown-item">View Details</a> *@
-                                                    @if (service.Status != "Completed" && service.Status != "Canceled")
+                                                    @if (service.Status != BookingStatus.Completed && service.Status != BookingStatus.Cancelled)
                                                     {
                                                         <button data-id="@service.Id"
                                                                 class="dropdown-item cancel-btn">

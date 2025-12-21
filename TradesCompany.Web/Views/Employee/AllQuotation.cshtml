@@ -78,15 +78,15 @@
                                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-end" style="">
-                                                    @if (service.Status != "Completed" && service.Status != "Canceled")
+                                                    @if (service.Status != BookingStatus.Completed && service.Status != BookingStatus.Cancelled)
                                                     {
                                                         <button data-id="@service.quotationId" class="dropdown-item cancel-btn">Cancel Service</button>
                                                     }
-                                                    @if (service.Status == "Accepted")
+                                                    @if (service.Status == BookingStatus.Accepted)
                                                     {
                                                         <button data-id="@service.quotationId" class="dropdown-item schedule-btn">Schedule Services</button>
                                                     }
-                                                    @if (service.Status != "Completed")
+                                                    @if (service.Status != BookingStatus.Completed)
                                                     {
                                                         <button data-id="@service.quotationId" class="dropdown-item edit-btn">Edit Quotation</button>
                                                     }

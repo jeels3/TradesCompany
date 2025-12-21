@@ -17,7 +17,7 @@ namespace TradesCompany.Domain.Entities
         public Quotation Quotation { get; set; } = null!;
         public DateTime ScheduledAt { get; set; }
         public decimal TotalPrice { get; set; }
-        public string Status { get; set; } = "Scheduled"; // ENUM: Scheduled, Completed, Cancelled
+        public Enums.BookingStatus Status { get; set; } = Enums.BookingStatus.Scheduled;
         public int? BillId { get; set; }
         public Bill? Bill { get; set; }
         public Rating? Rating { get; set; }

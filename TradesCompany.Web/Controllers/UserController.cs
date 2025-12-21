@@ -15,6 +15,7 @@ using TradesCompany.Application.Services;
 using TradesCompany.Domain.Entities;
 using TradesCompany.Shared.Hubs;
 using TradesCompany.Web.ViewModel;
+using TradesCompany.Domain.Enums;
 
 namespace TradesCompany.Web.Controllers
 {
@@ -177,14 +178,14 @@ namespace TradesCompany.Web.Controllers
             {
                 // Update Status : Booking , Quoation
                 var booking = await _bookingGRepository.GetByIdAsync(bookingId);
-                booking.Status = "Canceled";
+                booking.Status = BookingStatus.Cancelled;
                 // If Any Quotation Available than update status to canceled
                 var quotations = await _quotationRepository.GetQuotationByBookingId(bookingId);
                 if (quotations != null && quotations.Any())
                 {
                     foreach (var quotation in quotations)
                     {
-                        quotation.Status = "Canceled";
+                        quotation.Status = BookingStatus.Cancelled;
                         var serviceMan = await _serviceManGRepository.GetByIdAsync(quotation.ServiceManId);
                         await _notificationService.SendNotificationOfNewQuotation(serviceMan.UserId, "Booking Cancel", "Booking Cancel On Which You Send Quotation");
                     }
@@ -253,7 +254,7 @@ namespace TradesCompany.Web.Controllers
                 // Update Status : Booking , Quoation
                 var quotation = await _quotationGRepository.GetByIdAsync(quotationId);
                 var serviceMan = await _serviceManGRepository.GetByIdAsync(quotation.ServiceManId);
-                quotation.Status = "Accepted";
+                quotation.Status = BookingStatus.Accepted;
                 await _quotationGRepository.SaveAsync();
                 // send notification
                 await _notificationService.SendNotificationOfNewQuotation(serviceMan.UserId, "Quotation Accepted", "Your Quotation Is Accepted");
@@ -272,7 +273,7 @@ namespace TradesCompany.Web.Controllers
                 // Update Status : Booking , Quoation
                 var quotation = await _quotationGRepository.GetByIdAsync(quotationId);
                 var serviceMan = await _serviceManGRepository.GetByIdAsync(quotation.ServiceManId);
-                quotation.Status = "Canceled";
+                quotation.Status = BookingStatus.Cancelled;
                 await _quotationGRepository.SaveAsync();
                 // send notification
                 await _notificationService.SendNotificationOfNewQuotation(serviceMan.UserId, "Quotation Rejected", "Your Quotation Is Rejected");
@@ -309,8 +310,8 @@ namespace TradesCompany.Web.Controllers
                 var serviceSchedule = await _serviceScheduleGRepository.GetByIdAsync(ScheduleServiceId);
                 var quotation = await _quotationGRepository.GetByIdAsync(serviceSchedule.QuotationId);
                 var serviceMan = await _serviceManGRepository.GetByIdAsync(quotation.ServiceManId);
-                quotation.Status = "Canceled";
-                serviceSchedule.Status = "Canceled";
+                quotation.Status = BookingStatus.Cancelled;
+                serviceSchedule.Status = BookingStatus.Cancelled;
                 await _serviceScheduleGRepository.SaveAsync();
                 await _quotationGRepository.SaveAsync();
                 // send notification

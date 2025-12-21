@@ -4,13 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using TradesCompany.Domain.Enums;
+
 namespace TradesCompany.Application.DTOs
 {
     public class BookingByServiceType
     {
         public string? CustomerName { get; set; }
         public string? Email { get; set; }
-        public string? Status { get; set; }
+        public BookingStatus Status { get; set; }
         public string? WorkDetails { get; set; }
         public int? bookingId { get; set; }
         public decimal? Price { get; set; }

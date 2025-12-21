@@ -89,7 +89,6 @@ connection2.on("ReceiveChatNotificationCount", (count) => {
 });
 
 connection2.on("ReceiveChatNotificationCountByChannelId", (count, appendid) => {
-    alert("chat.js" + appendid +"user "+userId)
     const notificationCountElement = document.getElementById(appendid);
     if (notificationCountElement) {
         notificationCountElement.textContent = count > 0 ? count : '';

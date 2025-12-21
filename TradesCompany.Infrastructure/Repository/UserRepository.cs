@@ -104,8 +104,8 @@ namespace TradesCompany.Infrastructure.Repository
             var serviceManCount = await _context.ServiceMan.CountAsync();
             var bookingCount = await _context.Bookings.CountAsync();
             var quotationCount = await _context.Quotations.CountAsync();
-            var BookingComplete = await _context.ServiceSchedules.CountAsync(n => n.Status == "Completed");
-            var TotalRevenue = await _context.ServiceSchedules.Where(ss => ss.Status == "Completed").SumAsync(ss => ss.TotalPrice);
+            var BookingComplete = await _context.ServiceSchedules.CountAsync(n => n.Status == Domain.Enums.BookingStatus.Completed);
+            var TotalRevenue = await _context.ServiceSchedules.Where(ss => ss.Status == Domain.Enums.BookingStatus.Completed).SumAsync(ss => ss.TotalPrice);
             return new Dictionary<string, int>
             {
                 { "UserCount", usersInUserRole.Count() },

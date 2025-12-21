@@ -37,7 +37,7 @@ namespace TradesCompany.Infrastructure.Services
         public async Task<List<string>> GetAllServiceManForSreviceNotification()
         {
             return await _context.ServiceSchedules
-                                 .Where(ss => ss.ScheduledAt <= DateTime.Now.AddMinutes(30) && ss.ScheduledAt.AddMinutes(31) >= DateTime.Now && ss.Status != "Completed")
+                                 .Where(ss => ss.ScheduledAt <= DateTime.Now.AddMinutes(30) && ss.ScheduledAt.AddMinutes(31) >= DateTime.Now && ss.Status != Domain.Enums.BookingStatus.Completed)
                                  .Select(ss => ss.ServiceMan.UserId)
                                  .ToListAsync();
         }

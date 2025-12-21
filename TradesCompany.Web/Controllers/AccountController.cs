@@ -14,27 +14,28 @@ namespace TradesCompany.Web.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly IAuthService _authService;
+        private readonly SignInManager<ApplicationUser> _signInManager; // Kept for External Login
+        private readonly UserManager<ApplicationUser> _userManager; // Kept for External Login
         private readonly IRepository<ServiceType> _serviceTypeGRepository;
-        private readonly IRepository<ServiceMan> _serviceManGRepository;
         private readonly ILogger<AccountController> _logger;
+        private readonly IRepository<ServiceMan> _serviceManGRepository;
 
-        public AccountController(UserManager<ApplicationUser> userManager,
+
+        public AccountController(
+            IAuthService authService,
             SignInManager<ApplicationUser> signInManager,
-            RoleManager<ApplicationRole> roleManager,
+            UserManager<ApplicationUser> userManager,
             IRepository<ServiceType> serviceTypeGRepository,
-            IRepository<ServiceMan> serviceManGRepository,
-              ILogger<AccountController> logger
-            )
+            ILogger<AccountController> logger,
+            IRepository<ServiceMan> serviceManGRepository)
         {
-            _userManager = userManager;
+            _authService = authService;
             _signInManager = signInManager;
-            _roleManager = roleManager;
+            _userManager = userManager;
             _serviceTypeGRepository = serviceTypeGRepository;
-            _serviceManGRepository = serviceManGRepository;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _serviceManGRepository = serviceManGRepository;
         }
 
         [HttpGet]
@@ -76,61 +77,31 @@ namespace TradesCompany.Web.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    // Reload external logins for the view
                     model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync())?.ToList()
                         ?? new List<AuthenticationScheme>();
                     return View(model);
                 }
 
-                // Check if user already exists
-                var existingUser = await _userManager.FindByEmailAsync(model.Email);
-                if (existingUser != null)
+                var registerDto = new TradesCompany.Application.DTOs.RegisterDto
                 {
-                    ModelState.AddModelError("Email", "A user with this email already exists.");
-                    model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync())?.ToList()
-                        ?? new List<Microsoft.AspNetCore.Authentication.AuthenticationScheme>();
-                    return View(model);
-                }
-
-                // Validate role exists
-                if (!await _roleManager.RoleExistsAsync(model.Role))
-                {
-                    _logger.LogWarning("Attempt to register user with non-existent role: {Role}", model.Role);
-                    ModelState.AddModelError("Role", "Invalid role specified.");
-                    model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync())?.ToList()
-                        ?? new List<Microsoft.AspNetCore.Authentication.AuthenticationScheme>();
-                    return View(model);
-                }
-
-                var user = new ApplicationUser
-                {
-                    UserName = model.UserName?.Trim(),
-                    Email = model.Email?.Trim().ToLowerInvariant(),
+                    Email = model.Email,
+                    UserName = model.UserName,
+                    Password = model.Password,
+                    Role = model.Role
                 };
 
-                var result = await _userManager.CreateAsync(user, model.Password);
+                var result = await _authService.RegisterCustomerAsync(registerDto);
 
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User {Email} created successfully", user.Email);
-
-                    var roleResult = await _userManager.AddToRoleAsync(user, model.Role);
-                    if (!roleResult.Succeeded)
-                    {
-                        _logger.LogError("Failed to add role {Role} to user {Email}: {Errors}",
-                            model.Role, user.Email, string.Join(", ", roleResult.Errors.Select(e => e.Description)));
-                    }
-
-                    // await _signInManager.SignInAsync(user, isPersistent: false);
-
+                    _logger.LogInformation("User {Email} created successfully", model.Email);
                     TempData["SuccessMessage"] = "Registration successful!";
                     return RedirectToAction("Login");
                 }
 
                 foreach (var error in result.Errors)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                    _logger.LogWarning("User registration failed for {Email}: {Error}", model.Email, error.Description);
+                    ModelState.AddModelError(string.Empty, error);
                 }
             }
             catch (Exception ex)
@@ -139,18 +110,8 @@ namespace TradesCompany.Web.Controllers
                 ModelState.AddModelError(string.Empty, "An error occurred during registration. Please try again.");
             }
 
-            // Reload external logins for the view
-            try
-            {
-                model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync())?.ToList()
-                    ?? new List<AuthenticationScheme>();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error loading external logins for registration view");
-                model.ExternalLogins = new List<AuthenticationScheme>();
-            }
-
+            model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync())?.ToList()
+                ?? new List<AuthenticationScheme>();
             return View(model);
         }
 
@@ -160,31 +121,25 @@ namespace TradesCompany.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser
+                var registerDto = new TradesCompany.Application.DTOs.EmployeeRegisterDto
                 {
+                    Email = model.Email,
                     UserName = model.UserName,
-                    Email = model.Email
+                    Password = model.Password,
+                    Role = model.Role,
+                    ServiceTypeId = model.ServiceTypeId
                 };
 
-                var result = await _userManager.CreateAsync(user, model.Password);
+                var result = await _authService.RegisterEmployeeAsync(registerDto);
 
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, model.Role);
-
-                    var serviceman = new ServiceMan
-                    {
-                        UserId = user.Id,
-                        ServiceTypeId = model.ServiceTypeId,
-                    };
-                    await _serviceManGRepository.InsertAsync(serviceman);
-                    await _serviceManGRepository.SaveAsync();
                     return RedirectToAction("Dashboard", "Employee");
                 }
 
                 foreach (var error in result.Errors)
                 {
-                    ModelState.AddModelError("RegistrationError", error.Description);
+                    ModelState.AddModelError("RegistrationError", error);
                 }
             }
             var serviceTypes = await _serviceTypeGRepository.GetAllAsync();
@@ -211,25 +166,25 @@ namespace TradesCompany.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByEmailAsync(model.Email);
-                if (user == null)
+                var loginDto = new TradesCompany.Application.DTOs.LoginDto
                 {
-                    model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-                    ModelState.AddModelError("", "Invalid login attempt.");
-                    return View(model);
-                }
+                    Email = model.Email,
+                    Password = model.Password,
+                    RememberMe = model.RememberMe
+                };
 
-                var result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
+                var result = await _authService.LoginAsync(loginDto);
 
                 if (result.Succeeded)
                 {
-                    // Fatch Claim from user
-                    // Create a Token
+                    // Fetch user to get roles for redirection (Logic partially in Controller still, to keep simple redirection)
+                    // Ideally AuthService returns Role or we decode User claim here since cookie is set.
+                    var user = await _userManager.FindByEmailAsync(model.Email);
                     var roles = await _userManager.GetRolesAsync(user);
+
                     if (roles.Contains("EMPLOYEE"))
                     {
                         if (model.ReturnUrl != null) return Redirect(model.ReturnUrl);
-                        Console.WriteLine("User Role Is Here :=> " + User.FindFirst(ClaimTypes.Role)?.Value);
                         return RedirectToAction("Dashboard", "Employee");
                     }
                     else if (roles.Contains("USER"))
@@ -249,7 +204,6 @@ namespace TradesCompany.Web.Controllers
                     return View(model);
                 }
             }
-            // If we got this far, something failed, redisplay form
             model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             return View(model);
         }
@@ -405,7 +359,7 @@ namespace TradesCompany.Web.Controllers
         }
         public async Task<IActionResult> Logout()
         {
-            await _signInManager.SignOutAsync();
+            await _authService.LogoutAsync();
             return RedirectToAction("index", "home");
         }
     }

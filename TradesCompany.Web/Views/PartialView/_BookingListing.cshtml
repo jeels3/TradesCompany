@@ -74,7 +74,7 @@
                             <td>@booking.Price</td>
                             <td class="text-end">
                                 <div class="drodown">
-                                    @if(booking.Status != "Completed" && booking.Status != "Canceled")
+                                    @if(booking.Status != BookingStatus.Completed && booking.Status != BookingStatus.Cancelled)
                                     {
                                     <a data-bs-toggle="dropdown" href="#" class="btn p-1" aria-expanded="false">
                                         <i class="fa fa-bars" aria-hidden="true"></i>

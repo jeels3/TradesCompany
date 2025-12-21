@@ -20,7 +20,7 @@ namespace TradesCompany.Domain.Entities
         public string? imagepath { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? CompletedAt { get; set; }
-        public string Status { get; set; } = "Pending"; // ENUM: Pending, Accepted, Rejected, Completed
+        public Enums.BookingStatus Status { get; set; } = Enums.BookingStatus.Pending;
         public ICollection<Quotation> Quotations { get; set; } = new List<Quotation>();
         public ICollection<ServiceSchedule>? ServiceSchedules { get; set; } = new List<ServiceSchedule>();
     }

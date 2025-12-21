@@ -31,6 +31,7 @@ namespace TradesCompany.Infrastructure
             services.AddScoped<IChatRepository, ChatRepository>();
             services.AddScoped<IChatService, ChatService>();
             services.AddScoped<ConnectionService>();
+            services.AddScoped<IAuthService, AuthService>();
             //services.AddHostedService<DummyWorker>();
             return services;
         }

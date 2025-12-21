@@ -71,7 +71,7 @@
                         <button class="btn btn-outline-primary filter-btn active" data-status="all">All</button>
                         <button class="btn btn-outline-warning filter-btn" data-status="scheduled">Scheduled</button>
                         <button class="btn btn-outline-success filter-btn" data-status="completed">Completed</button>
-                        <button class="btn btn-outline-danger filter-btn" data-status="canceled">Canceled</button>
+                        <button class="btn btn-outline-danger filter-btn" data-status="cancelled">Cancelled</button>
                     </div>
                 </div>
 
@@ -97,7 +97,7 @@
                             <tbody>
                                 @foreach (var service in Model)
                                 {
-                                    <tr class="align-middle service-row" data-status="@service.status.ToLower()">
+                                    <tr class="align-middle service-row" data-status="@service.status">
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div>
@@ -116,7 +116,7 @@
                                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-end">
-                                                    @if (service.status == "Scheduled")
+                                                    @if (service.status == BookingStatus.Scheduled)
                                                     {
                                                         <button data-id="@service.ScheduleServiceId"
                                                                 class="dropdown-item cancel-btn">
@@ -150,7 +150,8 @@
                     $('.service-row').show();
                 } else {
                     $('.service-row').each(function () {
-                        const rowStatus = $(this).data('status');
+                        // Ensure we treat status as string and compare lower case
+                        const rowStatus = String($(this).data('status')).toLowerCase();
                         $(this).toggle(rowStatus === selectedStatus);
                     });
                 }

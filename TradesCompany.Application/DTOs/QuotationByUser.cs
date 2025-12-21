@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using TradesCompany.Domain.Enums;
+
 namespace TradesCompany.Application.DTOs
 {
     public class QuotationByUser
@@ -16,7 +18,7 @@ namespace TradesCompany.Application.DTOs
         public string? ServiceManEmail { get; set; }
         public string? ServiceName { get; set; }
         public string? WorkDetails {  get; set; }
-        public string? status { get; set; }
+        public BookingStatus status { get; set; }
         public string? Description { get; set; }
     }
 }

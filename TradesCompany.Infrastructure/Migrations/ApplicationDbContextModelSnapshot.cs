@@ -143,6 +143,7 @@ namespace TradesCompany.Infrastructure.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Status")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("WorkDetails")
@@ -173,6 +174,7 @@ namespace TradesCompany.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("WorkDetails")
@@ -218,6 +220,7 @@ namespace TradesCompany.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("status")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("userId")

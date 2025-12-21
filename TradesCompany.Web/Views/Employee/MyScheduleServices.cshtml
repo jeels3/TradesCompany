@@ -63,7 +63,7 @@
                         <button class="btn btn-outline-primary filter-btn active" data-status="all">All</button>
                         <button class="btn btn-outline-warning filter-btn" data-status="scheduled">Scheduled</button>
                         <button class="btn btn-outline-success filter-btn" data-status="completed">Completed</button>
-                        <button class="btn btn-outline-danger filter-btn" data-status="canceled">Canceled</button>
+                        <button class="btn btn-outline-danger filter-btn" data-status="cancelled">Cancelled</button>
                     </div>
                 </div>
 
@@ -91,7 +91,7 @@
                             <tbody>
                                 @foreach (var service in Model)
                                 {
-                                    <tr class="align-middle service-row" data-status="@service.Status.ToLower()">
+                                    <tr class="align-middle service-row" data-status="@service.Status">
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="h6 mb-0 lh-1">@service.ServiceMan</div>
@@ -145,7 +145,8 @@
                     $('.service-row').show();
                 } else {
                     $('.service-row').each(function () {
-                        const rowStatus = $(this).data('status');
+                        // Ensure we treat status as string and compare lower case
+                        const rowStatus = String($(this).data('status')).toLowerCase();
                         $(this).toggle(rowStatus === selectedStatus);
                     });
                 }

@@ -91,11 +91,11 @@
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end" id="dropdowndiv">
                                                     <li><button class="dropdown-item details-btn" data-id="@quotation.quotationId">View Details</button></li>
-                                                    @if (quotation.status == "Pending")
+                                                    @if (quotation.status == BookingStatus.Pending)
                                                     {
                                                         <li><button class="dropdown-item accept-btn" data-id="@quotation.quotationId">Accept Service</button></li>
                                                     }
-                                                    @if (quotation.status != "Canceled" && quotation.status != "Completed")
+                                                    @if (quotation.status != BookingStatus.Cancelled && quotation.status != BookingStatus.Completed)
                                                     {
                                                         <li><button class="dropdown-item reject-btn" data-id="@quotation.quotationId">Reject Service</button></li>
                                                     }

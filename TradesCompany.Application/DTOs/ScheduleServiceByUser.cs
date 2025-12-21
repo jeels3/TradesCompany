@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using TradesCompany.Domain.Enums;
+
 namespace TradesCompany.Application.DTOs
 {
     public class ScheduleServiceByUser
@@ -15,6 +17,6 @@ namespace TradesCompany.Application.DTOs
         public string? ServiceName { get; set; }
         public DateTime? ScheduledAt { get; set; }
         public decimal? TotalPrice { get; set; }
-        public string status { get; set; }
+        public BookingStatus status { get; set; }
     }
 }
